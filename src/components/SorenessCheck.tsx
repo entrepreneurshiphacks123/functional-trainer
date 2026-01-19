@@ -1,18 +1,18 @@
 import { useMemo, useState } from "react";
 import { MovementPattern } from "../../types/MovementPattern";
-import { Button, Card, Pill, Screen, Segmented } from "../ui/Primitives";
+import { Button, Card, Screen, Segmented } from "../ui/Primitives";
 
 type Soreness = "green" | "yellow" | "red";
 
 const pretty: Record<MovementPattern, string> = {
-  acceleration: "Acceleration",
-  deceleration: "Deceleration",
+  acceleration: "Accel",
+  deceleration: "Decel",
   rotation: "Rotation",
-  anti_rotation: "Anti-Rotation",
-  single_leg: "Single-Leg",
-  elastic_power: "Elastic Power",
-  foot_ankle: "Foot/Ankle",
-  shoulder_stability: "Shoulder Stability",
+  anti_rotation: "Anti-rot",
+  single_leg: "Single-leg",
+  elastic_power: "Elastic",
+  foot_ankle: "Foot/ankle",
+  shoulder_stability: "Shoulders",
 };
 
 export default function SorenessCheck({
@@ -38,51 +38,26 @@ export default function SorenessCheck({
     []
   );
 
-  const [state, setState] = useState<Partial<Record<MovementPattern, Soreness>>>(
-    initial ?? {}
-  );
-
-  const pillTone = (v?: Soreness) =>
-    v === "green" ? "good" : v === "yellow" ? "warn" : v === "red" ? "bad" : "neutral";
+  const [state, setState] = useState<Partial<Record<MovementPattern, Soreness>>>(initial ?? {});
 
   return (
-    <Screen
-      title="Quick soreness check"
-      subtitle="This is how the app adapts. Red blocks a pattern for 48–72h. Green recovers faster."
-    >
+    <Screen title="Soreness">
       <Card>
         <div style={{ display: "grid", gap: 12 }}>
           {patterns.map((p) => {
-            const v = state[p];
+            const v = state[p] ?? "green";
             return (
-              <div
-                key={p}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <div style={{ display: "grid", gap: 6 }}>
-                  <div style={{ fontWeight: 700 }}>{pretty[p]}</div>
-                  <div style={{ opacity: 0.65, fontSize: 13 }}>
-                    {p === "shoulder_stability" ? "Protect the weak link." : "How did this feel today?"}
-                  </div>
-                </div>
-
-                <div style={{ display: "grid", gap: 8, justifyItems: "end" }}>
-                  <Pill label={v ?? "unset"} tone={pillTone(v)} />
-                  <Segmented
-                    value={v ?? "green"}
-                    options={[
-                      { key: "green", label: "Green" },
-                      { key: "yellow", label: "Yellow" },
-                      { key: "red", label: "Red" },
-                    ]}
-                    onChange={(nv) => setState((s) => ({ ...s, [p]: nv as Soreness }))}
-                  />
-                </div>
+              <div key={p} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+                <div style={{ fontWeight: 700 }}>{pretty[p]}</div>
+                <Segmented
+                  value={v}
+                  options={[
+                    { key: "green", label: "G" },
+                    { key: "yellow", label: "Y" },
+                    { key: "red", label: "R" },
+                  ]}
+                  onChange={(nv) => setState((s) => ({ ...s, [p]: nv as Soreness }))}
+                />
               </div>
             );
           })}
@@ -97,7 +72,7 @@ export default function SorenessCheck({
             onDone();
           }}
         >
-          Save & Exit
+          Save
         </Button>
       </Card>
     </Screen>
