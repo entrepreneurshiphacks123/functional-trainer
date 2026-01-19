@@ -33,11 +33,10 @@ function formatMMSS(totalSec: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-// crude but effective: time-based if dose mentions min/sec
+// time-based if dose mentions min/sec AND does not include ×
 function parseTimedSeconds(dose: string): number | null {
   const d = dose.toLowerCase();
 
-  // "2 min", "3–5 min", "20s", "20 sec", "6×20s" (we treat sets as rep-based)
   if (d.includes("×")) return null;
 
   const minMatch = d.match(/(\d+)\s*(?:–|-)?\s*(\d+)?\s*min/);
@@ -48,7 +47,9 @@ function parseTimedSeconds(dose: string): number | null {
     return avg * 60;
   }
 
-  const secMatch = d.match(/(\d+)\s*(?:–|-)?\s*(\d+)?\s*(?:s|sec|secs|second|seconds)\b/);
+  const secMatch = d.match(
+    /(\d+)\s*(?:–|-)?\s*(\d+)?\s*(?:s|sec|secs|second|seconds)\b/
+  );
   if (secMatch) {
     const a = Number(secMatch[1]);
     const b = secMatch[2] ? Number(secMatch[2]) : a;
@@ -75,6 +76,34 @@ function defaultRestForSlot(slot: WorkoutItem["slot"]) {
   return 0;
 }
 
+// ------- Persist current position + timer -------
+const WP_KEY = "wp_state_v2";
+function itemsSig(items: { id: string }[]) {
+  return items.map((x) => x.id).join("|");
+}
+function loadWP() {
+  try {
+    const raw = localStorage.getItem(WP_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+function saveWP(data: any) {
+  try {
+    localStorage.setItem(WP_KEY, JSON.stringify(data));
+  } catch {}
+}
+
+// iOS haptic (when supported)
+function haptic() {
+  try {
+    // not supported everywhere; harmless if absent
+    if (navigator.vibrate) navigator.vibrate(10);
+  } catch {}
+}
+
+// ------- Modal (fixed: scrollable, safe-area, sticky header) -------
 function Modal({
   title,
   onClose,
@@ -105,21 +134,38 @@ function Modal({
           background: "var(--card)",
           border: "1px solid var(--border)",
           borderRadius: 18,
-          padding: 14,
-          maxWidth: 560,
           width: "100%",
+          maxWidth: 560,
           margin: "0 auto",
+          // Safe height + internal scrolling (fixes cutoff)
+          maxHeight: "min(78vh, 720px)",
+          overflow: "hidden",
+          boxSizing: "border-box",
         }}
       >
         <div
           style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 2,
+            background: "var(--card)",
+            borderBottom: "1px solid var(--border)",
+            padding:
+              "12px 14px calc(10px + env(safe-area-inset-bottom, 0px))",
             display: "flex",
             justifyContent: "space-between",
             gap: 12,
             alignItems: "center",
           }}
         >
-          <div style={{ fontSize: 16, fontWeight: 850, letterSpacing: "-0.01em" }}>
+          <div
+            style={{
+              fontSize: 16,
+              fontWeight: 900,
+              letterSpacing: "-0.01em",
+              lineHeight: 1.2,
+            }}
+          >
             {title}
           </div>
           <button
@@ -131,6 +177,7 @@ function Modal({
               color: "var(--text)",
               padding: "8px 10px",
               fontSize: 14,
+              fontWeight: 850,
               cursor: "pointer",
               WebkitTapHighlightColor: "transparent",
             }}
@@ -139,8 +186,16 @@ function Modal({
           </button>
         </div>
 
-        <div style={{ height: 10 }} />
-        {children}
+        <div
+          style={{
+            padding: 14,
+            paddingBottom: "max(14px, env(safe-area-inset-bottom))",
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -162,17 +217,45 @@ export default function WorkoutPlayer({
 
   const activeItem = items[i];
 
-  // Timer state (per active exercise)
+  // Timer state
   const [running, setRunning] = React.useState(false);
   const [remaining, setRemaining] = React.useState(60);
 
-  // Auto-scroll active into view (iPhone usability win)
+  // Auto-scroll active into view
   const activeRef = React.useRef<HTMLButtonElement | null>(null);
   React.useEffect(() => {
     activeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [i]);
 
-  // Recompute timer defaults whenever the active exercise changes
+  // Restore state on mount / when items change
+  React.useEffect(() => {
+    const saved = loadWP();
+    if (!saved) return;
+
+    if (saved.sig !== itemsSig(items)) return;
+
+    if (typeof saved.i === "number") {
+      const safe = Math.max(0, Math.min(items.length - 1, saved.i));
+      setI(safe);
+    }
+    if (typeof saved.remaining === "number") setRemaining(saved.remaining);
+
+    // Restore paused (native feel: no surprise running timer)
+    setRunning(false);
+  }, [items]);
+
+  // Persist state
+  React.useEffect(() => {
+    saveWP({
+      sig: itemsSig(items),
+      i,
+      remaining,
+      running, // stored but not auto-resumed
+      ts: Date.now(),
+    });
+  }, [items, i, remaining, running]);
+
+  // Set timer defaults when active changes
   React.useEffect(() => {
     if (!activeItem) return;
 
@@ -189,7 +272,7 @@ export default function WorkoutPlayer({
     setRunning(false);
   }, [activeItem?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // tick
+  // Tick
   React.useEffect(() => {
     if (!running) return;
 
@@ -197,12 +280,13 @@ export default function WorkoutPlayer({
       setRemaining((r) => {
         if (r <= 1) {
           const timed = activeItem ? parseTimedSeconds(activeItem.dose) : null;
-          if (timed) return 0; // timed ends at 0
+          if (timed) return 0; // timed ends
 
           const rep = activeItem ? isRepBased(activeItem.dose) : true;
           const rest =
-            activeItem?.restSec ?? (rep ? 60 : defaultRestForSlot(activeItem?.slot ?? "strength"));
-          return rest;
+            activeItem?.restSec ??
+            (rep ? 60 : defaultRestForSlot(activeItem?.slot ?? "strength"));
+          return rest; // loop for rest timers
         }
         return r - 1;
       });
@@ -214,8 +298,21 @@ export default function WorkoutPlayer({
   const showRestTimer = activeItem
     ? isRepBased(activeItem.dose) && (activeItem.restSec ?? 60) > 0
     : false;
+
   const timedSeconds = activeItem ? parseTimedSeconds(activeItem.dose) : null;
   const showTimedTimer = timedSeconds !== null && timedSeconds > 0;
+
+  const goNext = () => {
+    haptic();
+    setRunning(false);
+    setI((x) => Math.min(items.length - 1, x + 1));
+  };
+
+  const goBack = () => {
+    haptic();
+    setRunning(false);
+    setI((x) => Math.max(0, x - 1));
+  };
 
   return (
     <Screen title={`${dayLabel} ${modeLabel}`}>
@@ -234,13 +331,13 @@ export default function WorkoutPlayer({
                   width: "100%",
                   maxWidth: "100%",
                   border: active
-                    ? "1px solid rgba(124,92,255,0.70)"
+                    ? "1px solid rgba(124,92,255,0.72)"
                     : "1px solid var(--border)",
                   background: active ? "var(--card2)" : "transparent",
                   borderRadius: 16,
                   padding: active ? "16px 14px" : "12px 12px",
                   cursor: "pointer",
-                  transform: active ? "scale(1.012)" : "scale(1)",
+                  transform: active ? "scale(1.01)" : "scale(1)",
                   transformOrigin: "center",
                   boxShadow: active ? "0 0 0 3px rgba(124,92,255,0.14)" : "none",
                   boxSizing: "border-box",
@@ -249,12 +346,19 @@ export default function WorkoutPlayer({
                   WebkitTapHighlightColor: "transparent",
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "baseline" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: 14,
+                    alignItems: "baseline",
+                  }}
+                >
                   <div
                     style={{
                       fontSize: active ? 18 : 16,
-                      fontWeight: 850,
-                      opacity: active ? 1 : 0.75,
+                      fontWeight: 900,
+                      opacity: active ? 1 : 0.74,
                       letterSpacing: "-0.01em",
                       minWidth: 0,
                     }}
@@ -265,8 +369,8 @@ export default function WorkoutPlayer({
                   <div
                     style={{
                       fontSize: active ? 18 : 16,
-                      fontWeight: 850,
-                      opacity: active ? 1 : 0.75,
+                      fontWeight: 900,
+                      opacity: active ? 1 : 0.74,
                       letterSpacing: "-0.01em",
                       whiteSpace: "nowrap",
                       flexShrink: 0,
@@ -277,15 +381,15 @@ export default function WorkoutPlayer({
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                  <div style={{ fontSize: 13, opacity: active ? 0.6 : 0.45 }}>
+                  <div style={{ fontSize: 13, opacity: active ? 0.62 : 0.45 }}>
                     {slotLabel[it.slot]}
                   </div>
-                  <div style={{ fontSize: 13, opacity: active ? 0.6 : 0.45 }}>
+                  <div style={{ fontSize: 13, opacity: active ? 0.62 : 0.45 }}>
                     {it.hint ? it.hint : "Tap for details"}
                   </div>
                 </div>
 
-                {/* Timer panel shown only on active row */}
+                {/* Timer panel only on active */}
                 {active && (showRestTimer || showTimedTimer) ? (
                   <div
                     style={{
@@ -304,7 +408,7 @@ export default function WorkoutPlayer({
                       <div style={{ fontSize: 12, opacity: 0.65 }}>
                         {showTimedTimer ? "Timer" : "Rest"}
                       </div>
-                      <div style={{ fontSize: 18, fontWeight: 900, letterSpacing: "-0.01em" }}>
+                      <div style={{ fontSize: 18, fontWeight: 950, letterSpacing: "-0.01em" }}>
                         {formatMMSS(remaining)}
                       </div>
                     </div>
@@ -314,6 +418,7 @@ export default function WorkoutPlayer({
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
+                          haptic();
                           setRunning((r) => !r);
                         }}
                         style={{
@@ -323,7 +428,7 @@ export default function WorkoutPlayer({
                           color: "var(--text)",
                           padding: "10px 12px",
                           fontSize: 14,
-                          fontWeight: 850,
+                          fontWeight: 900,
                           cursor: "pointer",
                           WebkitTapHighlightColor: "transparent",
                         }}
@@ -335,13 +440,15 @@ export default function WorkoutPlayer({
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
+                          haptic();
                           setRunning(false);
 
                           const timed = parseTimedSeconds(it.dose);
                           if (timed) setRemaining(timed);
                           else {
                             const rep = isRepBased(it.dose);
-                            const rest = it.restSec ?? (rep ? 60 : defaultRestForSlot(it.slot));
+                            const rest =
+                              it.restSec ?? (rep ? 60 : defaultRestForSlot(it.slot));
                             setRemaining(rest);
                           }
                         }}
@@ -352,7 +459,7 @@ export default function WorkoutPlayer({
                           color: "var(--text)",
                           padding: "10px 12px",
                           fontSize: 14,
-                          fontWeight: 850,
+                          fontWeight: 900,
                           cursor: "pointer",
                           WebkitTapHighlightColor: "transparent",
                         }}
@@ -367,37 +474,34 @@ export default function WorkoutPlayer({
           })}
         </div>
 
-        <div style={{ height: 14 }} />
+        {/* Sticky controls */}
+        <div
+          style={{
+            position: "sticky",
+            bottom: 10,
+            marginTop: 14,
+            paddingTop: 10,
+            paddingBottom: 2,
+            background: "var(--card)",
+          }}
+        >
+          <div style={{ display: "grid", gap: 10, padding: "0 4px" }}>
+            {i < items.length - 1 ? (
+              <Button icon="➡️" onClick={goNext}>
+                Next
+              </Button>
+            ) : (
+              <Button icon="✅" onClick={onDone}>
+                Done
+              </Button>
+            )}
 
-        <div style={{ display: "grid", gap: 10, padding: "0 4px" }}>
-          {i < items.length - 1 ? (
-            <Button
-              icon="➡️"
-              onClick={() => {
-                setRunning(false);
-                setI((x) => Math.min(items.length - 1, x + 1));
-              }}
-            >
-              Next
-            </Button>
-          ) : (
-            <Button icon="✅" onClick={onDone}>
-              Done
-            </Button>
-          )}
-
-          {i > 0 ? (
-            <Button
-              icon="←"
-              variant="ghost"
-              onClick={() => {
-                setRunning(false);
-                setI((x) => Math.max(0, x - 1));
-              }}
-            >
-              Back
-            </Button>
-          ) : null}
+            {i > 0 ? (
+              <Button icon="←" variant="ghost" onClick={goBack}>
+                Back
+              </Button>
+            ) : null}
+          </div>
         </div>
       </Card>
 
@@ -439,8 +543,15 @@ function ExerciseDetails({
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ fontSize: 13, opacity: 0.65 }}>Load</div>
 
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
-            <div style={{ fontSize: 14, fontWeight: 800 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 12,
+              alignItems: "baseline",
+            }}
+          >
+            <div style={{ fontSize: 14, fontWeight: 900 }}>
               {last.lastLoad ? `Last: ${last.lastLoad}` : "Last: —"}
             </div>
             <div style={{ fontSize: 12, opacity: 0.6 }}>
@@ -461,7 +572,7 @@ function ExerciseDetails({
               background: "var(--card2)",
               color: "var(--text)",
               fontSize: 15,
-              fontWeight: 700,
+              fontWeight: 800,
               outline: "none",
               boxSizing: "border-box",
             }}
@@ -478,7 +589,7 @@ function ExerciseDetails({
                 background: "var(--accent)",
                 color: "#FFFFFF",
                 fontSize: 15,
-                fontWeight: 900,
+                fontWeight: 950,
                 cursor: "pointer",
                 WebkitTapHighlightColor: "transparent",
                 boxSizing: "border-box",
@@ -497,7 +608,7 @@ function ExerciseDetails({
                 background: "var(--card2)",
                 color: "var(--text)",
                 fontSize: 15,
-                fontWeight: 850,
+                fontWeight: 900,
                 cursor: "pointer",
                 WebkitTapHighlightColor: "transparent",
                 boxSizing: "border-box",
@@ -511,15 +622,31 @@ function ExerciseDetails({
         <div style={{ borderTop: "1px solid var(--border)", opacity: 0.7 }} />
 
         {/* Equipment */}
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            alignItems: "baseline",
+          }}
+        >
           <div style={{ fontSize: 13, opacity: 0.65 }}>Equipment</div>
-          <div style={{ fontSize: 14, fontWeight: 800 }}>{item.equipment ?? "—"}</div>
+          <div style={{ fontSize: 14, fontWeight: 900, textAlign: "right" }}>
+            {item.equipment ?? "—"}
+          </div>
         </div>
 
         {/* Description */}
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ fontSize: 13, opacity: 0.65 }}>How</div>
-          <div style={{ fontSize: 14, lineHeight: 1.45, fontWeight: 650 }}>
+          <div
+            style={{
+              fontSize: 14,
+              lineHeight: 1.55,
+              fontWeight: 700,
+              whiteSpace: "pre-wrap",
+            }}
+          >
             {item.description ?? "—"}
           </div>
         </div>
