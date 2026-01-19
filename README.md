@@ -1,16 +1,12 @@
-# Functional Training App
+# Functional Trainer (Patched)
 
-Mobile-first adaptive functional training app.
-Built for Cloudflare Pages + Workers.
+Mobile-first adaptive functional training app (PWA-ready scaffold).
+Designed for Cloudflare Pages (frontend) + Cloudflare Workers (API).
 
-## Features
-- Adaptive A–D training engine
-- Pattern-based fatigue & soreness tracking
-- Zero-choice UX with 🔥 / 🌱 mode
-- Offline-capable PWA
+## Cloudflare Pages setup
+- Build command: `npm run build`
+- Output directory: `dist`
+- Root directory: repo root
 
-## Stack
-- Cloudflare Pages (frontend)
-- Cloudflare Workers (API)
-- KV or D1 (storage)
-- TypeScript
+## Notes
+- `workers/wrangler.toml` is for Worker deployment (kept out of Pages config).
