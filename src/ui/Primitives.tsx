@@ -1,185 +1,9 @@
 import React from "react";
-import { colors, radius, font, page } from "./styles";
+import { colors, font } from "./styles";
 
-export function Screen({
-  title,
-  right,
-  children,
-}: {
-  title: string;
-  right?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div style={wrap}>
-      <div style={container}>
-        <header style={header}>
-          <h1 style={h1}>{title}</h1>
-          {right ? <div>{right}</div> : null}
-        </header>
-        <div style={content}>{children}</div>
-      </div>
-    </div>
-  );
-}
+type CSS = React.CSSProperties;
 
-export function Card({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        background: colors.card,
-        border: `1px solid ${colors.border}`,
-        borderRadius: radius.xl,
-        padding: 16,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-export function Button({
-  children,
-  onClick,
-  variant = "primary",
-  icon,
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-  variant?: "primary" | "ghost";
-  icon?: string;
-}) {
-  const base: React.CSSProperties = {
-    width: "100%",
-    borderRadius: radius.lg,
-    padding: "14px 14px",
-    border: "1px solid transparent",
-    background: "var(--accent)",
-color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: 700,
-    cursor: "pointer",
-    display: "flex",
-    gap: 10,
-    alignItems: "center",
-    justifyContent: "space-between",
-    transition: "transform 120ms ease, opacity 120ms ease",
-    userSelect: "none",
-    WebkitTapHighlightColor: "transparent",
-  };
-
-  const styles =
-    variant === "ghost"
-      ? {
-          background: colors.card2,
-          color: colors.text,
-          border: `1px solid ${colors.border}`,
-        }
-      : {
-          background: colors.accent,
-          color: "#0B0D12",
-        };
-
-  return (
-    <button
-      onClick={onClick}
-      style={{ ...base, ...styles }}
-      onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.99)")}
-      onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-    >
-      <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
-        {icon ? <span style={{ fontSize: 18 }}>{icon}</span> : null}
-        <span>{children}</span>
-      </span>
-      <span style={{ opacity: 0.6 }}>›</span>
-    </button>
-  );
-}
-
-export function TinyIconButton({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        borderRadius: 999,
-        border: `1px solid ${colors.border}`,
-        background: colors.card2,
-        color: colors.text,
-        padding: "8px 10px",
-        fontSize: 13,
-        cursor: "pointer",
-        WebkitTapHighlightColor: "transparent",
-      }}
-    >
-      {label}
-    </button>
-  );
-}
-
-export function Segmented({
-  value,
-  options,
-  onChange,
-  tone,
-}: {
-  value: string;
-  options: Array<{ key: string; label: string }>;
-  onChange: (v: string) => void;
-  tone?: "good" | "warn" | "bad";
-}) {
-  const toneBg =
-    tone === "good"
-      ? "rgba(22,163,74,0.16)"
-      : tone === "warn"
-      ? "rgba(202,138,4,0.16)"
-      : tone === "bad"
-      ? "rgba(220,38,38,0.16)"
-      : "transparent";
-
-  return (
-    <div
-      style={{
-        display: "inline-flex",
-        padding: 4,
-        borderRadius: 999,
-        border: `1px solid ${colors.border}`,
-        background: toneBg || colors.card2,
-        gap: 2,
-      }}
-    >
-      {options.map((o) => {
-        const active = o.key === value;
-        return (
-          <button
-            key={o.key}
-            onClick={() => onChange(o.key)}
-            style={{
-              padding: "8px 10px",
-              borderRadius: 999,
-              border: `1px solid ${active ? colors.border : "transparent"}`,
-              background: active ? colors.card : "transparent",
-              color: colors.text,
-              fontSize: 13,
-              cursor: "pointer",
-              WebkitTapHighlightColor: "transparent",
-            }}
-          >
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-const wrap: React.CSSProperties = {
+const wrap: CSS = {
   minHeight: "100vh",
   background: colors.bg,
   color: colors.text,
@@ -188,26 +12,208 @@ const wrap: React.CSSProperties = {
     "max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))",
 };
 
-const container: React.CSSProperties = {
-  maxWidth: page.max,
+const shell: CSS = {
+  maxWidth: 560,
   margin: "0 auto",
-};
-
-const header: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 12,
-  marginBottom: 12,
-};
-
-const h1: React.CSSProperties = {
-  margin: 0,
-  fontSize: 22,
-  letterSpacing: "-0.02em",
-};
-
-const content: React.CSSProperties = {
   display: "grid",
   gap: 12,
 };
+
+function pressHandlers() {
+  return {
+    onPointerDown: (e: React.PointerEvent<HTMLElement>) => {
+      const el = e.currentTarget as HTMLElement;
+      el.style.transform = "scale(0.985)";
+      el.style.filter = "brightness(0.98)";
+    },
+    onPointerUp: (e: React.PointerEvent<HTMLElement>) => {
+      const el = e.currentTarget as HTMLElement;
+      el.style.transform = "scale(1)";
+      el.style.filter = "brightness(1)";
+    },
+    onPointerCancel: (e: React.PointerEvent<HTMLElement>) => {
+      const el = e.currentTarget as HTMLElement;
+      el.style.transform = "scale(1)";
+      el.style.filter = "brightness(1)";
+    },
+    onPointerLeave: (e: React.PointerEvent<HTMLElement>) => {
+      const el = e.currentTarget as HTMLElement;
+      el.style.transform = "scale(1)";
+      el.style.filter = "brightness(1)";
+    },
+  };
+}
+
+export function Screen({
+  title,
+  right,
+  children,
+}: {
+  title?: string;
+  right?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={wrap}>
+      <div style={shell}>
+        {(title || right) && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+              gap: 12,
+              marginBottom: 2,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 18,
+                fontWeight: 850,
+                letterSpacing: "-0.01em",
+                lineHeight: 1.2,
+              }}
+            >
+              {title ?? ""}
+            </div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              {right ?? null}
+            </div>
+          </div>
+        )}
+
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export function Card({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <div
+      style={{
+        background: "var(--card)",
+        border: "1px solid var(--border)",
+        borderRadius: 18,
+        padding: 14,
+        boxShadow: "none",
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+type ButtonVariant = "primary" | "ghost";
+
+export function Button({
+  children,
+  icon,
+  variant = "primary",
+  onClick,
+  disabled,
+  style,
+  type = "button",
+}: {
+  children: React.ReactNode;
+  icon?: string;
+  variant?: ButtonVariant;
+  onClick?: () => void;
+  disabled?: boolean;
+  style?: React.CSSProperties;
+  type?: "button" | "submit" | "reset";
+}) {
+  const base: CSS = {
+    width: "100%",
+    borderRadius: 14,
+    padding: "12px 12px",
+    border: "1px solid var(--border)",
+    background: "var(--card2)",
+    color: "var(--text)",
+    fontSize: 15,
+    fontWeight: 850,
+    letterSpacing: "-0.01em",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    cursor: disabled ? "not-allowed" : "pointer",
+    opacity: disabled ? 0.55 : 1,
+    userSelect: "none",
+    WebkitTapHighlightColor: "transparent",
+    transition:
+      "transform 120ms ease, filter 120ms ease, background 120ms ease, border-color 120ms ease, opacity 120ms ease",
+    transform: "translateZ(0)",
+  };
+
+  const v: CSS =
+    variant === "primary"
+      ? {
+          background: "var(--accent)",
+          color: "#FFFFFF", // <- key: white text
+          border: "1px solid rgba(255,255,255,0.10)",
+        }
+      : {
+          background: "transparent",
+          color: "var(--text)",
+          border: "1px solid var(--border)",
+        };
+
+  const handlers = disabled ? {} : pressHandlers();
+
+  return (
+    <button
+      type={type}
+      onClick={disabled ? undefined : onClick}
+      style={{ ...base, ...v, ...style }}
+      {...handlers}
+    >
+      {icon ? <span aria-hidden="true">{icon}</span> : null}
+      <span>{children}</span>
+    </button>
+  );
+}
+
+export function TinyIconButton({
+  label,
+  onClick,
+  title,
+}: {
+  label: string;
+  onClick: () => void;
+  title?: string;
+}) {
+  const handlers = pressHandlers();
+
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      style={{
+        borderRadius: 12,
+        border: "1px solid var(--border)",
+        background: "var(--card2)",
+        color: "var(--text)",
+        padding: "10px 10px",
+        fontSize: 14,
+        fontWeight: 850,
+        cursor: "pointer",
+        lineHeight: 1,
+        WebkitTapHighlightColor: "transparent",
+        transition:
+          "transform 120ms ease, filter 120ms ease, background 120ms ease, border-color 120ms ease",
+        transform: "translateZ(0)",
+      }}
+      {...handlers}
+    >
+      {label}
+    </button>
+  );
+}
