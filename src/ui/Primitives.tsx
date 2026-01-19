@@ -217,3 +217,81 @@ export function TinyIconButton({
     </button>
   );
 }
+
+export function Segmented<T extends string>({
+  value,
+  options,
+  onChange,
+}: {
+  value: T;
+  options: Array<{
+    value: T;
+    label: string;
+    tone?: "neutral" | "good" | "warn" | "bad";
+  }>;
+  onChange: (v: T) => void;
+}) {
+  const toneColor = (tone?: "neutral" | "good" | "warn" | "bad") => {
+    if (tone === "good") return "var(--good)";
+    if (tone === "warn") return "var(--warn)";
+    if (tone === "bad") return "var(--bad)";
+    return "var(--text)";
+  };
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${options.length}, 1fr)`,
+        gap: 8,
+      }}
+    >
+      {options.map((opt) => {
+        const active = opt.value === value;
+
+        return (
+          <button
+            key={opt.value}
+            onClick={() => onChange(opt.value)}
+            style={{
+              borderRadius: 14,
+              padding: "10px 10px",
+              border: active ? "1px solid rgba(124,92,255,0.70)" : "1px solid var(--border)",
+              background: active ? "var(--card2)" : "transparent",
+              color: active ? "#FFFFFF" : toneColor(opt.tone),
+              fontWeight: 900,
+              fontSize: 14,
+              cursor: "pointer",
+              WebkitTapHighlightColor: "transparent",
+              transition: "transform 120ms ease, filter 120ms ease, background 120ms ease, border-color 120ms ease",
+              transform: "translateZ(0)",
+            }}
+            onPointerDown={(e) => {
+              const el = e.currentTarget as HTMLButtonElement;
+              el.style.transform = "scale(0.985)";
+              el.style.filter = "brightness(0.98)";
+            }}
+            onPointerUp={(e) => {
+              const el = e.currentTarget as HTMLButtonElement;
+              el.style.transform = "scale(1)";
+              el.style.filter = "brightness(1)";
+            }}
+            onPointerCancel={(e) => {
+              const el = e.currentTarget as HTMLButtonElement;
+              el.style.transform = "scale(1)";
+              el.style.filter = "brightness(1)";
+            }}
+            onPointerLeave={(e) => {
+              const el = e.currentTarget as HTMLButtonElement;
+              el.style.transform = "scale(1)";
+              el.style.filter = "brightness(1)";
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
