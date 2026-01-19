@@ -1,15 +1,16 @@
 export const colors = {
-  bg: "#0B0D12",
-  card: "rgba(255,255,255,0.06)",
-  card2: "rgba(255,255,255,0.08)",
-  border: "rgba(255,255,255,0.10)",
-  text: "rgba(255,255,255,0.92)",
-  muted: "rgba(255,255,255,0.62)",
+  bg: "#0E1116",        // slightly softer than pure black
+  card: "#151922",      // flat card
+  card2: "#1A1F2B",     // subtle elevation
+  border: "rgba(255,255,255,0.08)",
+  text: "rgba(255,255,255,0.94)",
+  muted: "rgba(255,255,255,0.60)",
   accent: "#7C5CFF",
   good: "#2EE59D",
   warn: "#FFD36E",
   bad: "#FF5C7C",
 };
+
 
 export const shadow = {
   soft: "0 12px 40px rgba(0,0,0,0.35)",
