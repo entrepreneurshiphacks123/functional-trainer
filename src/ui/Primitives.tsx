@@ -182,13 +182,13 @@ export function Pill({
 
 const wrap: React.CSSProperties = {
   minHeight: "100vh",
-  background: `radial-gradient(900px 520px at 20% 0%, rgba(124,92,255,0.20), transparent 60%),
-              radial-gradient(900px 520px at 90% 10%, rgba(46,229,157,0.14), transparent 55%),
-              ${colors.bg}`,
+  background: colors.bg,
   color: colors.text,
   fontFamily: font.system,
-  padding: "max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))",
+  padding:
+    "max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))",
 };
+
 
 const container: React.CSSProperties = {
   maxWidth: page.max,
