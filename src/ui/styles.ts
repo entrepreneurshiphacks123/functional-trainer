@@ -1,19 +1,14 @@
 export const colors = {
-  bg: "#0E1116",        // slightly softer than pure black
-  card: "#151922",      // flat card
-  card2: "#1A1F2B",     // subtle elevation
-  border: "rgba(255,255,255,0.08)",
-  text: "rgba(255,255,255,0.94)",
-  muted: "rgba(255,255,255,0.60)",
-  accent: "#7C5CFF",
-  good: "#2EE59D",
-  warn: "#FFD36E",
-  bad: "#FF5C7C",
-};
-
-
-export const shadow = {
-  soft: "0 12px 40px rgba(0,0,0,0.35)",
+  bg: "var(--bg)",
+  card: "var(--card)",
+  card2: "var(--card2)",
+  border: "var(--border)",
+  text: "var(--text)",
+  muted: "var(--muted)",
+  accent: "var(--accent)",
+  good: "var(--good)",
+  warn: "var(--warn)",
+  bad: "var(--bad)",
 };
 
 export const radius = {
@@ -30,7 +25,3 @@ export const font = {
 export const page = {
   max: 560,
 };
-
-export function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
-}
