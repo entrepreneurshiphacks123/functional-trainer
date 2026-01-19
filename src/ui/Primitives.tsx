@@ -54,6 +54,8 @@ export function Button({
     borderRadius: radius.lg,
     padding: "14px 14px",
     border: "1px solid transparent",
+    background: "var(--accent)",
+color: "#FFFFFF",
     fontSize: 16,
     fontWeight: 700,
     cursor: "pointer",
