@@ -1,4 +1,6 @@
 import { MovementPattern } from "../../types/MovementPattern";
+import { DayType } from "./library";
+import type { WorkoutItem } from "../components/WorkoutPlayer";
 
 export type Soreness = "green" | "yellow" | "red";
 export type Mode = "high_performance" | "walk_out_better";
@@ -8,10 +10,19 @@ export type SorenessLogEntry = {
   soreness: Partial<Record<MovementPattern, Soreness>>;
 };
 
+export type WorkoutLogEntry = {
+  dateISO: string; // YYYY-MM-DD
+  day: DayType;
+  mode: Mode;
+  title: string; // e.g. "Day A — Accel + Rotation"
+  items: WorkoutItem[];
+};
+
 export type AppState = {
-  lastDay?: "A" | "B" | "C" | "D";
+  lastDay?: DayType;
   soreness?: Partial<Record<MovementPattern, Soreness>>;
   sorenessLog?: SorenessLogEntry[];
+  workoutLog?: WorkoutLogEntry[];
 };
 
 const KEY = "training:state:v1";
