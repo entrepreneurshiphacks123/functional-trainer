@@ -1,0 +1,6 @@
+name = "functional-trainer-worker"
+compatibility_date = "2024-12-01"
+
+[[kv_namespaces]]
+binding = "STATE"
+id = "REPLACE_WITH_KV_ID"
