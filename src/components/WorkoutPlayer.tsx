@@ -1,9 +1,11 @@
-import { Button, Card, Pill, Screen } from "../ui/Primitives";
+import React from "react";
+import { Card, Screen, Button } from "../ui/Primitives";
 
 export type WorkoutItem = {
   id: string;
   slot: "prep" | "strength" | "athletic" | "finish";
   name: string;
+  dose: string; // <- reps/sets/time, same visual weight as name
   hint?: string;
 };
 
@@ -25,40 +27,47 @@ export default function WorkoutPlayer({
   items: WorkoutItem[];
   onDone: () => void;
 }) {
-  const total = items.length;
   const [i, setI] = React.useState(0);
-  const item = items[i];
-
-  const progress = `${i + 1}/${total}`;
 
   return (
-    <Screen
-      title={dayLabel}
-      right={<Pill label={modeLabel} />}
-    >
+    <Screen title={`${dayLabel} ${modeLabel}`}>
       <Card>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <Pill label={slotLabel[item.slot]} />
-          <span style={{ opacity: 0.65, fontSize: 13 }}>{progress}</span>
+        <div style={{ display: "grid", gap: 10 }}>
+          {items.map((it, idx) => {
+            const active = idx === i;
+            return (
+              <div
+                key={it.id}
+                style={{
+                  padding: "12px 12px",
+                  borderRadius: 14,
+                  border: `1px solid var(--border)`,
+                  background: active ? "var(--card2)" : "transparent",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
+                  <div style={{ fontSize: 16, fontWeight: 750, opacity: active ? 1 : 0.78 }}>
+                    {it.name}
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 750, opacity: active ? 1 : 0.78 }}>
+                    {it.dose}
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                  <div style={{ fontSize: 13, opacity: 0.55 }}>{slotLabel[it.slot]}</div>
+                  {it.hint ? <div style={{ fontSize: 13, opacity: 0.55 }}>{it.hint}</div> : null}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        <div style={{ height: 14 }} />
-
-        <div style={{ fontSize: 22, fontWeight: 750, letterSpacing: "-0.02em", lineHeight: 1.15 }}>
-          {item.name}
-        </div>
-
-        {item.hint ? (
-          <div style={{ marginTop: 10, opacity: 0.7, fontSize: 14, lineHeight: 1.4 }}>
-            {item.hint}
-          </div>
-        ) : null}
-
-        <div style={{ height: 16 }} />
+        <div style={{ height: 12 }} />
 
         <div style={{ display: "grid", gap: 10 }}>
-          {i < total - 1 ? (
-            <Button icon="➡️" onClick={() => setI((x) => Math.min(total - 1, x + 1))}>
+          {i < items.length - 1 ? (
+            <Button icon="➡️" onClick={() => setI((x) => Math.min(items.length - 1, x + 1))}>
               Next
             </Button>
           ) : (
@@ -77,6 +86,3 @@ export default function WorkoutPlayer({
     </Screen>
   );
 }
-
-// required import
-import React from "react";
