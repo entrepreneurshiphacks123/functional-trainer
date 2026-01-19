@@ -60,7 +60,13 @@ function parseTimedSeconds(dose: string): number | null {
 
 function isRepBased(dose: string) {
   const d = dose.toLowerCase();
-  return d.includes("×") || d.includes("sets") || d.includes("/side") || d.includes("carries") || d.includes("runs");
+  return (
+    d.includes("×") ||
+    d.includes("sets") ||
+    d.includes("/side") ||
+    d.includes("carries") ||
+    d.includes("runs")
+  );
 }
 
 function defaultRestForSlot(slot: WorkoutItem["slot"]) {
@@ -105,8 +111,17 @@ function Modal({
           margin: "0 auto",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
-          <div style={{ fontSize: 16, fontWeight: 850, letterSpacing: "-0.01em" }}>{title}</div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            alignItems: "center",
+          }}
+        >
+          <div style={{ fontSize: 16, fontWeight: 850, letterSpacing: "-0.01em" }}>
+            {title}
+          </div>
           <button
             onClick={onClose}
             style={{
@@ -151,6 +166,12 @@ export default function WorkoutPlayer({
   const [running, setRunning] = React.useState(false);
   const [remaining, setRemaining] = React.useState(60);
 
+  // Auto-scroll active into view (iPhone usability win)
+  const activeRef = React.useRef<HTMLButtonElement | null>(null);
+  React.useEffect(() => {
+    activeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [i]);
+
   // Recompute timer defaults whenever the active exercise changes
   React.useEffect(() => {
     if (!activeItem) return;
@@ -164,9 +185,7 @@ export default function WorkoutPlayer({
 
     const rep = isRepBased(activeItem.dose);
     const rest = activeItem.restSec ?? (rep ? 60 : defaultRestForSlot(activeItem.slot));
-    if (rest > 0) {
-      setRemaining(rest);
-    }
+    if (rest > 0) setRemaining(rest);
     setRunning(false);
   }, [activeItem?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -177,11 +196,12 @@ export default function WorkoutPlayer({
     const t = window.setInterval(() => {
       setRemaining((r) => {
         if (r <= 1) {
-          // loop for rep-based / rest timers
           const timed = activeItem ? parseTimedSeconds(activeItem.dose) : null;
-          if (timed) return 0; // timed just ends at 0
+          if (timed) return 0; // timed ends at 0
+
           const rep = activeItem ? isRepBased(activeItem.dose) : true;
-          const rest = activeItem ? (activeItem.restSec ?? (rep ? 60 : defaultRestForSlot(activeItem.slot))) : 60;
+          const rest =
+            activeItem?.restSec ?? (rep ? 60 : defaultRestForSlot(activeItem?.slot ?? "strength"));
           return rest;
         }
         return r - 1;
@@ -191,33 +211,41 @@ export default function WorkoutPlayer({
     return () => window.clearInterval(t);
   }, [running, activeItem]);
 
-  const showRestTimer = activeItem ? isRepBased(activeItem.dose) && (activeItem.restSec ?? 60) > 0 : false;
+  const showRestTimer = activeItem
+    ? isRepBased(activeItem.dose) && (activeItem.restSec ?? 60) > 0
+    : false;
   const timedSeconds = activeItem ? parseTimedSeconds(activeItem.dose) : null;
   const showTimedTimer = timedSeconds !== null && timedSeconds > 0;
 
   return (
     <Screen title={`${dayLabel} ${modeLabel}`}>
       <Card>
-        <div style={{ display: "grid", gap: 10 }}>
+        <div style={{ display: "grid", gap: 10, padding: "0 4px" }}>
           {items.map((it, idx) => {
             const active = idx === i;
 
             return (
               <button
+                ref={active ? activeRef : null}
                 key={it.id}
                 onClick={() => setSelected(it)}
                 style={{
                   textAlign: "left",
                   width: "100%",
-                  border: active ? "1px solid rgba(124,92,255,0.65)" : `1px solid var(--border)`,
+                  maxWidth: "100%",
+                  border: active
+                    ? "1px solid rgba(124,92,255,0.70)"
+                    : "1px solid var(--border)",
                   background: active ? "var(--card2)" : "transparent",
                   borderRadius: 16,
                   padding: active ? "16px 14px" : "12px 12px",
                   cursor: "pointer",
-                  transform: active ? "scale(1.03)" : "scale(1)",
-                  boxShadow: active ? "0 0 0 2px rgba(124,92,255,0.14)" : "none",
+                  transform: active ? "scale(1.012)" : "scale(1)",
+                  transformOrigin: "center",
+                  boxShadow: active ? "0 0 0 3px rgba(124,92,255,0.14)" : "none",
+                  boxSizing: "border-box",
                   transition:
-                    "transform 140ms ease, background 140ms ease, padding 140ms ease, box-shadow 140ms ease, border-color 140ms ease",
+                    "transform 160ms ease, background 160ms ease, padding 160ms ease, box-shadow 160ms ease, border-color 160ms ease",
                   WebkitTapHighlightColor: "transparent",
                 }}
               >
@@ -228,6 +256,7 @@ export default function WorkoutPlayer({
                       fontWeight: 850,
                       opacity: active ? 1 : 0.75,
                       letterSpacing: "-0.01em",
+                      minWidth: 0,
                     }}
                   >
                     {it.name}
@@ -240,6 +269,7 @@ export default function WorkoutPlayer({
                       opacity: active ? 1 : 0.75,
                       letterSpacing: "-0.01em",
                       whiteSpace: "nowrap",
+                      flexShrink: 0,
                     }}
                   >
                     {it.dose}
@@ -339,7 +369,7 @@ export default function WorkoutPlayer({
 
         <div style={{ height: 14 }} />
 
-        <div style={{ display: "grid", gap: 10 }}>
+        <div style={{ display: "grid", gap: 10, padding: "0 4px" }}>
           {i < items.length - 1 ? (
             <Button
               icon="➡️"
@@ -372,7 +402,11 @@ export default function WorkoutPlayer({
       </Card>
 
       {selected ? (
-        <ExerciseDetails item={selected} todayISO={isoDate()} onClose={() => setSelected(null)} />
+        <ExerciseDetails
+          item={selected}
+          todayISO={isoDate()}
+          onClose={() => setSelected(null)}
+        />
       ) : null}
     </Screen>
   );
@@ -429,6 +463,7 @@ function ExerciseDetails({
               fontSize: 15,
               fontWeight: 700,
               outline: "none",
+              boxSizing: "border-box",
             }}
           />
 
@@ -446,6 +481,7 @@ function ExerciseDetails({
                 fontWeight: 900,
                 cursor: "pointer",
                 WebkitTapHighlightColor: "transparent",
+                boxSizing: "border-box",
               }}
             >
               Save
@@ -464,6 +500,7 @@ function ExerciseDetails({
                 fontWeight: 850,
                 cursor: "pointer",
                 WebkitTapHighlightColor: "transparent",
+                boxSizing: "border-box",
               }}
             >
               Cancel
