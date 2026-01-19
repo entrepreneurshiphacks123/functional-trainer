@@ -11,6 +11,9 @@ export type WorkoutItem = {
   equipment?: string;
   description?: string;
   hint?: string;
+
+  // Optional override (if you ever want it per exercise)
+  restSec?: number;
 };
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
@@ -19,6 +22,52 @@ const slotLabel: Record<WorkoutItem["slot"], string> = {
   athletic: "Athletic",
   finish: "Finish",
 };
+
+function isoDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function formatMMSS(totalSec: number) {
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+// crude but effective: time-based if dose mentions min/sec
+function parseTimedSeconds(dose: string): number | null {
+  const d = dose.toLowerCase();
+
+  // "2 min", "3–5 min", "20s", "20 sec", "6×20s" (we treat sets as rep-based)
+  if (d.includes("×")) return null;
+
+  const minMatch = d.match(/(\d+)\s*(?:–|-)?\s*(\d+)?\s*min/);
+  if (minMatch) {
+    const a = Number(minMatch[1]);
+    const b = minMatch[2] ? Number(minMatch[2]) : a;
+    const avg = Math.round((a + b) / 2);
+    return avg * 60;
+  }
+
+  const secMatch = d.match(/(\d+)\s*(?:–|-)?\s*(\d+)?\s*(?:s|sec|secs|second|seconds)\b/);
+  if (secMatch) {
+    const a = Number(secMatch[1]);
+    const b = secMatch[2] ? Number(secMatch[2]) : a;
+    return Math.round((a + b) / 2);
+  }
+
+  return null;
+}
+
+function isRepBased(dose: string) {
+  const d = dose.toLowerCase();
+  return d.includes("×") || d.includes("sets") || d.includes("/side") || d.includes("carries") || d.includes("runs");
+}
+
+function defaultRestForSlot(slot: WorkoutItem["slot"]) {
+  if (slot === "strength") return 60;
+  if (slot === "athletic") return 45;
+  return 0;
+}
 
 function Modal({
   title,
@@ -96,8 +145,55 @@ export default function WorkoutPlayer({
   const [i, setI] = React.useState(0);
   const [selected, setSelected] = React.useState<WorkoutItem | null>(null);
 
-  // used for "today"
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const activeItem = items[i];
+
+  // Timer state (per active exercise)
+  const [running, setRunning] = React.useState(false);
+  const [remaining, setRemaining] = React.useState(60);
+
+  // Recompute timer defaults whenever the active exercise changes
+  React.useEffect(() => {
+    if (!activeItem) return;
+
+    const timed = parseTimedSeconds(activeItem.dose);
+    if (timed) {
+      setRemaining(timed);
+      setRunning(false);
+      return;
+    }
+
+    const rep = isRepBased(activeItem.dose);
+    const rest = activeItem.restSec ?? (rep ? 60 : defaultRestForSlot(activeItem.slot));
+    if (rest > 0) {
+      setRemaining(rest);
+    }
+    setRunning(false);
+  }, [activeItem?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // tick
+  React.useEffect(() => {
+    if (!running) return;
+
+    const t = window.setInterval(() => {
+      setRemaining((r) => {
+        if (r <= 1) {
+          // loop for rep-based / rest timers
+          const timed = activeItem ? parseTimedSeconds(activeItem.dose) : null;
+          if (timed) return 0; // timed just ends at 0
+          const rep = activeItem ? isRepBased(activeItem.dose) : true;
+          const rest = activeItem ? (activeItem.restSec ?? (rep ? 60 : defaultRestForSlot(activeItem.slot))) : 60;
+          return rest;
+        }
+        return r - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(t);
+  }, [running, activeItem]);
+
+  const showRestTimer = activeItem ? isRepBased(activeItem.dose) && (activeItem.restSec ?? 60) > 0 : false;
+  const timedSeconds = activeItem ? parseTimedSeconds(activeItem.dose) : null;
+  const showTimedTimer = timedSeconds !== null && timedSeconds > 0;
 
   return (
     <Screen title={`${dayLabel} ${modeLabel}`}>
@@ -113,13 +209,15 @@ export default function WorkoutPlayer({
                 style={{
                   textAlign: "left",
                   width: "100%",
-                  border: `1px solid var(--border)`,
+                  border: active ? "1px solid rgba(124,92,255,0.65)" : `1px solid var(--border)`,
                   background: active ? "var(--card2)" : "transparent",
                   borderRadius: 16,
                   padding: active ? "16px 14px" : "12px 12px",
                   cursor: "pointer",
                   transform: active ? "scale(1.03)" : "scale(1)",
-                  transition: "transform 140ms ease, background 140ms ease, padding 140ms ease",
+                  boxShadow: active ? "0 0 0 2px rgba(124,92,255,0.14)" : "none",
+                  transition:
+                    "transform 140ms ease, background 140ms ease, padding 140ms ease, box-shadow 140ms ease, border-color 140ms ease",
                   WebkitTapHighlightColor: "transparent",
                 }}
               >
@@ -156,6 +254,84 @@ export default function WorkoutPlayer({
                     {it.hint ? it.hint : "Tap for details"}
                   </div>
                 </div>
+
+                {/* Timer panel shown only on active row */}
+                {active && (showRestTimer || showTimedTimer) ? (
+                  <div
+                    style={{
+                      marginTop: 10,
+                      padding: "10px 10px",
+                      borderRadius: 14,
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      background: "rgba(255,255,255,0.03)",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <div style={{ display: "grid", gap: 2 }}>
+                      <div style={{ fontSize: 12, opacity: 0.65 }}>
+                        {showTimedTimer ? "Timer" : "Rest"}
+                      </div>
+                      <div style={{ fontSize: 18, fontWeight: 900, letterSpacing: "-0.01em" }}>
+                        {formatMMSS(remaining)}
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setRunning((r) => !r);
+                        }}
+                        style={{
+                          borderRadius: 12,
+                          border: "1px solid var(--border)",
+                          background: "var(--card2)",
+                          color: "var(--text)",
+                          padding: "10px 12px",
+                          fontSize: 14,
+                          fontWeight: 850,
+                          cursor: "pointer",
+                          WebkitTapHighlightColor: "transparent",
+                        }}
+                      >
+                        {running ? "Pause" : "Start"}
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setRunning(false);
+
+                          const timed = parseTimedSeconds(it.dose);
+                          if (timed) setRemaining(timed);
+                          else {
+                            const rep = isRepBased(it.dose);
+                            const rest = it.restSec ?? (rep ? 60 : defaultRestForSlot(it.slot));
+                            setRemaining(rest);
+                          }
+                        }}
+                        style={{
+                          borderRadius: 12,
+                          border: "1px solid var(--border)",
+                          background: "transparent",
+                          color: "var(--text)",
+                          padding: "10px 12px",
+                          fontSize: 14,
+                          fontWeight: 850,
+                          cursor: "pointer",
+                          WebkitTapHighlightColor: "transparent",
+                        }}
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </button>
             );
           })}
@@ -165,7 +341,13 @@ export default function WorkoutPlayer({
 
         <div style={{ display: "grid", gap: 10 }}>
           {i < items.length - 1 ? (
-            <Button icon="➡️" onClick={() => setI((x) => Math.min(items.length - 1, x + 1))}>
+            <Button
+              icon="➡️"
+              onClick={() => {
+                setRunning(false);
+                setI((x) => Math.min(items.length - 1, x + 1));
+              }}
+            >
               Next
             </Button>
           ) : (
@@ -175,7 +357,14 @@ export default function WorkoutPlayer({
           )}
 
           {i > 0 ? (
-            <Button icon="←" variant="ghost" onClick={() => setI((x) => Math.max(0, x - 1))}>
+            <Button
+              icon="←"
+              variant="ghost"
+              onClick={() => {
+                setRunning(false);
+                setI((x) => Math.max(0, x - 1));
+              }}
+            >
               Back
             </Button>
           ) : null}
@@ -183,11 +372,7 @@ export default function WorkoutPlayer({
       </Card>
 
       {selected ? (
-        <ExerciseDetails
-          item={selected}
-          todayISO={todayISO}
-          onClose={() => setSelected(null)}
-        />
+        <ExerciseDetails item={selected} todayISO={isoDate()} onClose={() => setSelected(null)} />
       ) : null}
     </Screen>
   );
@@ -258,7 +443,7 @@ function ExerciseDetails({
                 background: "var(--accent)",
                 color: "#FFFFFF",
                 fontSize: 15,
-                fontWeight: 800,
+                fontWeight: 900,
                 cursor: "pointer",
                 WebkitTapHighlightColor: "transparent",
               }}
@@ -276,7 +461,7 @@ function ExerciseDetails({
                 background: "var(--card2)",
                 color: "var(--text)",
                 fontSize: 15,
-                fontWeight: 800,
+                fontWeight: 850,
                 cursor: "pointer",
                 WebkitTapHighlightColor: "transparent",
               }}
