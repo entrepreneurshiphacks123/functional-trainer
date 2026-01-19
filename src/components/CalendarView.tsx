@@ -1,41 +1,31 @@
-import { MovementPattern } from "../../types/MovementPattern";
-import { DayType } from "./library";
-import type { WorkoutItem } from "../components/WorkoutPlayer";
+return (
+  <Screen title="Calendar" right={<TinyIconButton label="←" onClick={onBack} />}>
+    <Card>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
+        {days.map((d) => {
+          const done = doneSet.has(d.dateISO);
+          const isToday = d.dateISO === todayISO;
 
-export type Soreness = "green" | "yellow" | "red";
-export type Mode = "high_performance" | "walk_out_better";
-
-export type SorenessLogEntry = {
-  dateISO: string; // YYYY-MM-DD
-  soreness: Partial<Record<MovementPattern, Soreness>>;
-};
-
-export type WorkoutLogEntry = {
-  dateISO: string; // YYYY-MM-DD
-  day: DayType;
-  mode: Mode;
-  title: string; // "Day A — Accel + Rotation"
-  items: WorkoutItem[];
-};
-
-export type AppState = {
-  lastDay?: DayType;
-  soreness?: Partial<Record<MovementPattern, Soreness>>;
-  sorenessLog?: SorenessLogEntry[];
-  workoutLog?: WorkoutLogEntry[];
-};
-
-const KEY = "training:state:v1";
-
-export function loadState(): AppState {
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as AppState) : {};
-  } catch {
-    return {};
-  }
-}
-
-export function saveState(next: AppState) {
-  localStorage.setItem(KEY, JSON.stringify(next));
-}
+          return (
+            <div
+              key={d.dateISO}
+              style={{
+                aspectRatio: "1 / 1",
+                borderRadius: 12,
+                border: `1px solid var(--border)`,
+                background: done ? "var(--card2)" : "transparent",
+                opacity: d.inMonth ? 1 : 0.35,
+                display: "grid",
+                placeItems: "center",
+                fontWeight: isToday ? 850 : 650,
+              }}
+              title={done ? "Workout done" : ""}
+            >
+              {Number(d.dateISO.slice(-2))}
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  </Screen>
+);
