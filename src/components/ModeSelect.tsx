@@ -8,10 +8,10 @@ export default function ModeSelect({ onSelect }: { onSelect: (m: Mode) => void }
       <Card>
         <div style={{ display: "grid", gap: 10 }}>
           <Button icon="🔥" onClick={() => onSelect("high_performance")}>
-            Performance
+            Performance (approx 45 min)
           </Button>
           <Button icon="🌱" variant="ghost" onClick={() => onSelect("walk_out_better")}>
-            Feel Better
+            Feel Better (approx 30 min)
           </Button>
         </div>
       </Card>
