@@ -124,7 +124,7 @@ export default function App() {
       label="📅"
       onClick={() => setStep((s) => (s === "calendar" ? "mode" : "calendar"))}
     />
-  
+  );
 
   const settingsBtn = (
     <TinyIconButton
@@ -132,11 +132,11 @@ export default function App() {
       onClick={() => setStep((s) => (s === "settings" ? "mode" : "settings"))}
     />
   );
-);
 
   const topRight = (
     <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginBottom: 10 }}>
       {calendarBtn}
+      {settingsBtn}
       {themeToggle}
     </div>
   );
