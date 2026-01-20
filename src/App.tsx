@@ -118,7 +118,7 @@ export default function App() {
     return (dayIntent[workout.day as any] ?? "").trim();
   }, [workout, plan, plannedDay]);
 
-  // For WorkoutPlayer header (WorkoutPlayer will prepend "Day {plannedDay} — ...")
+  // For WorkoutPlayer header (WorkoutPlayer will render: Day {plannedDay} — {workoutLabel} {modeLabel})
   const workoutLabel = workoutTitle;
 
   // For workout log (store with the day included)
@@ -224,6 +224,11 @@ export default function App() {
       {step === "mode" && (
         <div>
           {topRight}
+
+          {/* START FIRST */}
+          <ModeSelect onSelect={start} />
+
+          {/* PLAN SELECT BELOW */}
           <PlanControls
             activePlanId={plan.id}
             onPlanChange={(id) => {
@@ -232,7 +237,6 @@ export default function App() {
               persist({ activePlanId: id, dayOverride: null });
             }}
           />
-          <ModeSelect onSelect={start} />
         </div>
       )}
 
@@ -249,9 +253,7 @@ export default function App() {
               setDayOverride(d);
               persist({ dayOverride: d });
             }}
-            onFinish={() => {
-              setStep("soreness");
-            }}
+            onFinish={() => setStep("soreness")}
             onBack={() => {
               setMode(null);
               setStep("mode");
