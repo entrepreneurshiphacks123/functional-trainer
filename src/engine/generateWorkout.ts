@@ -11,6 +11,33 @@ function nextDay(last?: DayType): DayType {
   return dayOrder[(idx + 1) % dayOrder.length];
 }
 
+/**
+ * Adds ONE extra hard weighted full-body compound movement for Performance mode.
+ * - Weighted
+ * - Full body
+ * - Functional / compound (some rotation bias, but universally doable)
+ * - Inserted just before the "finish" slot when possible
+ */
+function addHighPerformanceExtraHard(items: WorkoutItem[], day: DayType): WorkoutItem[] {
+  const extra: WorkoutItem = {
+    id: `${day.toLowerCase()}_hp_extra`,
+    slot: "athletic",
+    name: "DB clean → push press (alternating)",
+    dose: "4×6/side",
+    equipment: "Dumbbells",
+    description:
+      "Full-body power + conditioning. Clean to shoulder, then drive overhead. Brace ribs down, move fast but crisp. Stop 1–2 reps before form breaks.",
+    hint: "heavy + clean",
+  };
+
+  // Put it before the finisher if a finish slot exists
+  const idxFinish = items.map((x) => x.slot).lastIndexOf("finish");
+  if (idxFinish >= 0) {
+    return [...items.slice(0, idxFinish), extra, ...items.slice(idxFinish)];
+  }
+  return [...items, extra];
+}
+
 export function generateWorkoutV1(args: {
   lastDay?: DayType;
   mode: Mode;
@@ -20,7 +47,7 @@ export function generateWorkoutV1(args: {
 
   // Minimal soreness lock: if shoulders are red, avoid shoulder day C
   const shouldersRed = args.soreness?.shoulder_stability === "red";
-  const safeDay = shouldersRed && day === "C" ? "D" : day;
+  const safeDay: DayType = shouldersRed && day === "C" ? "D" : day;
 
   const spicy = args.mode === "high_performance";
 
@@ -185,8 +212,7 @@ export function generateWorkoutV1(args: {
         name: "1-arm cable row (pause)",
         dose: spicy ? "4×8/side" : "3×8/side",
         equipment: "Cable or band",
-        description:
-          "Row to ribcage. Pause 1 second. Shoulder blade back/down—not up into your ear.",
+        description: "Row to ribcage. Pause 1 second. Shoulder blade back/down—not up into your ear.",
         hint: "pause each rep",
       },
       {
@@ -272,5 +298,10 @@ export function generateWorkoutV1(args: {
     ],
   };
 
-  return { day: safeDay, items: itemsByDay[safeDay] };
+  const base = itemsByDay[safeDay];
+
+  // Performance mode: add 1 extra hard weighted full-body compound movement
+  const finalItems = spicy ? addHighPerformanceExtraHard(base, safeDay) : base;
+
+  return { day: safeDay, items: finalItems };
 }
