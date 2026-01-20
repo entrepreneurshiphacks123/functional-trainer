@@ -63,6 +63,32 @@ function haptic() {
   } catch {}
 }
 
+// Small hook: treat narrow screens as “mobile”
+function useIsNarrow(breakpointPx = 860) {
+  const [isNarrow, setIsNarrow] = React.useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(`(max-width: ${breakpointPx}px)`).matches;
+  });
+
+  React.useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${breakpointPx}px)`);
+    const handler = () => setIsNarrow(mq.matches);
+
+    // Safari compatibility
+    if ((mq as any).addEventListener) (mq as any).addEventListener("change", handler);
+    else (mq as any).addListener(handler);
+
+    handler();
+
+    return () => {
+      if ((mq as any).removeEventListener) (mq as any).removeEventListener("change", handler);
+      else (mq as any).removeListener(handler);
+    };
+  }, [breakpointPx]);
+
+  return isNarrow;
+}
+
 // ------- Modal (scrollable, safe-area, sticky header) -------
 function Modal({
   title,
@@ -161,6 +187,8 @@ export default function WorkoutPlayer({
   items: WorkoutItem[];
   onDone: () => void;
 }) {
+  const isNarrow = useIsNarrow(860);
+
   const [i, setI] = React.useState(0);
   const [selected, setSelected] = React.useState<WorkoutItem | null>(null);
 
@@ -227,6 +255,8 @@ export default function WorkoutPlayer({
 
   const goNext = () => {
     haptic();
+    // “Starts when I start the first workout” = first real action.
+    // Next always starts the session if it isn’t already running.
     startSessionIfNeeded();
     setI((x) => Math.min(items.length - 1, x + 1));
   };
@@ -241,179 +271,237 @@ export default function WorkoutPlayer({
   return (
     <Screen title={`${dayLabel} ${modeLabel}`}>
       <Card>
-        {/* Top strip = constant timer (about 1/3 visual weight of this screen section) */}
+        {/* Layout: timer is a constant ~1/3 screen panel */}
         <div
           style={{
-            borderRadius: 16,
-            border: "1px solid var(--border)",
-            background: "var(--card2)",
-            padding: "14px 14px",
-            marginBottom: 12,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 10,
+            display: "grid",
+            gridTemplateColumns: isNarrow ? "1fr" : "0.95fr 2fr", // ~1/3 vs 2/3
+            gap: 12,
           }}
         >
-          <div style={{ display: "grid", gap: 2 }}>
-            <div style={{ fontSize: 12, opacity: 0.65 }}>Session</div>
-            <div style={{ fontSize: 26, fontWeight: 950, letterSpacing: "-0.02em" }}>
-              {formatHMMSS(elapsedSec)}
+          {/* TIMER PANEL */}
+          <div
+            style={{
+              borderRadius: 18,
+              border: "1px solid var(--border)",
+              background: "var(--card2)",
+              padding: "14px 14px",
+              position: "sticky",
+              top: 10,
+              alignSelf: "start",
+              boxSizing: "border-box",
+
+              // On mobile: keep it visually ~1/3 of the viewport height
+              height: isNarrow ? "33vh" : "calc(100vh - 140px)",
+              minHeight: isNarrow ? 220 : 420,
+              maxHeight: isNarrow ? 360 : 820,
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              gap: 12,
+            }}
+          >
+            <div style={{ display: "grid", gap: 6 }}>
+              <div style={{ fontSize: 12, opacity: 0.65 }}>Session</div>
+              <div
+                style={{
+                  fontSize: isNarrow ? 44 : 56,
+                  fontWeight: 950,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.02,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {formatHMMSS(elapsedSec)}
+              </div>
+
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+                <button
+                  onClick={() => {
+                    haptic();
+                    startSessionIfNeeded();
+                  }}
+                  style={{
+                    borderRadius: 12,
+                    border: "1px solid var(--border)",
+                    background: "transparent",
+                    color: "var(--text)",
+                    padding: "10px 12px",
+                    fontSize: 14,
+                    fontWeight: 900,
+                    cursor: "pointer",
+                    WebkitTapHighlightColor: "transparent",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  {startedAt ? "Running" : "Start"}
+                </button>
+
+                <button
+                  onClick={resetSession}
+                  style={{
+                    borderRadius: 12,
+                    border: "1px solid var(--border)",
+                    background: "transparent",
+                    color: "var(--text)",
+                    padding: "10px 12px",
+                    fontSize: 14,
+                    fontWeight: 900,
+                    cursor: "pointer",
+                    WebkitTapHighlightColor: "transparent",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            {/* CURRENT EXERCISE PREVIEW (helps this panel feel “worth” 1/3 of screen) */}
+            <div
+              style={{
+                borderTop: "1px solid var(--border)",
+                paddingTop: 12,
+                display: "grid",
+                gap: 8,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
+                <div style={{ fontSize: 12, opacity: 0.65 }}>Now</div>
+                <div style={{ fontSize: 12, opacity: 0.65, textAlign: "right" }}>
+                  {i + 1}/{items.length}
+                </div>
+              </div>
+
+              <div style={{ fontSize: 16, fontWeight: 950, letterSpacing: "-0.01em", lineHeight: 1.15 }}>
+                {activeItem?.name ?? "—"}
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                <div style={{ fontSize: 13, opacity: 0.6 }}>{activeItem ? slotLabel[activeItem.slot] : "—"}</div>
+                <div style={{ fontSize: 13, opacity: 0.6, textAlign: "right" }}>{activeItem?.dose ?? ""}</div>
+              </div>
+
+              <div style={{ fontSize: 12, opacity: 0.55, lineHeight: 1.35 }}>
+                {startedAt ? "Timer is running for the whole session." : "Timer starts when you hit Start or Next."}
+              </div>
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              onClick={() => {
-                haptic();
-                startSessionIfNeeded();
-              }}
-              style={{
-                borderRadius: 12,
-                border: "1px solid var(--border)",
-                background: "transparent",
-                color: "var(--text)",
-                padding: "10px 12px",
-                fontSize: 14,
-                fontWeight: 900,
-                cursor: "pointer",
-                WebkitTapHighlightColor: "transparent",
-                boxSizing: "border-box",
-              }}
-            >
-              {startedAt ? "Running" : "Start"}
-            </button>
+          {/* RIGHT SIDE: workout list + sticky controls */}
+          <div style={{ minWidth: 0 }}>
+            {/* Full workout list, current exercise highlighted */}
+            <div style={{ display: "grid", gap: 10, padding: "0 4px" }}>
+              {items.map((it, idx) => {
+                const active = idx === i;
 
-            <button
-              onClick={resetSession}
-              style={{
-                borderRadius: 12,
-                border: "1px solid var(--border)",
-                background: "transparent",
-                color: "var(--text)",
-                padding: "10px 12px",
-                fontSize: 14,
-                fontWeight: 900,
-                cursor: "pointer",
-                WebkitTapHighlightColor: "transparent",
-                boxSizing: "border-box",
-              }}
-            >
-              Reset
-            </button>
-          </div>
-        </div>
-
-        {/* Full workout list, current exercise highlighted */}
-        <div style={{ display: "grid", gap: 10, padding: "0 4px" }}>
-          {items.map((it, idx) => {
-            const active = idx === i;
-
-            return (
-              <button
-                ref={active ? activeRef : null}
-                key={it.id}
-                onClick={() => setSelected(it)}
-                style={{
-                  textAlign: "left",
-                  width: "100%",
-                  maxWidth: "100%",
-                  border: active
-                    ? "1px solid rgba(124,92,255,0.72)"
-                    : "1px solid var(--border)",
-                  background: active ? "var(--card2)" : "transparent",
-                  borderRadius: 16,
-                  padding: active ? "16px 14px" : "12px 12px",
-                  cursor: "pointer",
-                  transform: active ? "scale(1.01)" : "scale(1)",
-                  transformOrigin: "center",
-                  boxShadow: active ? "0 0 0 3px rgba(124,92,255,0.14)" : "none",
-                  boxSizing: "border-box",
-                  transition:
-                    "transform 160ms ease, background 160ms ease, padding 160ms ease, box-shadow 160ms ease, border-color 160ms ease",
-                  WebkitTapHighlightColor: "transparent",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "baseline" }}>
-                  <div
+                return (
+                  <button
+                    ref={active ? activeRef : null}
+                    key={it.id}
+                    onClick={() => setSelected(it)}
                     style={{
-                      fontSize: active ? 18 : 16,
-                      fontWeight: 950,
-                      opacity: active ? 1 : 0.74,
-                      letterSpacing: "-0.01em",
-                      minWidth: 0,
+                      textAlign: "left",
+                      width: "100%",
+                      maxWidth: "100%",
+                      border: active ? "1px solid rgba(124,92,255,0.72)" : "1px solid var(--border)",
+                      background: active ? "var(--card2)" : "transparent",
+                      borderRadius: 16,
+                      padding: active ? "16px 14px" : "12px 12px",
+                      cursor: "pointer",
+                      transform: active ? "scale(1.01)" : "scale(1)",
+                      transformOrigin: "center",
+                      boxShadow: active ? "0 0 0 3px rgba(124,92,255,0.14)" : "none",
+                      boxSizing: "border-box",
+                      transition:
+                        "transform 160ms ease, background 160ms ease, padding 160ms ease, box-shadow 160ms ease, border-color 160ms ease",
+                      WebkitTapHighlightColor: "transparent",
                     }}
                   >
-                    {it.name}
-                  </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: 14,
+                        alignItems: "baseline",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: active ? 18 : 16,
+                          fontWeight: 950,
+                          opacity: active ? 1 : 0.74,
+                          letterSpacing: "-0.01em",
+                          minWidth: 0,
+                        }}
+                      >
+                        {it.name}
+                      </div>
 
-                  <div
-                    style={{
-                      fontSize: active ? 18 : 16,
-                      fontWeight: 950,
-                      opacity: active ? 1 : 0.74,
-                      letterSpacing: "-0.01em",
-                      whiteSpace: "nowrap",
-                      flexShrink: 0,
+                      <div
+                        style={{
+                          fontSize: active ? 18 : 16,
+                          fontWeight: 950,
+                          opacity: active ? 1 : 0.74,
+                          letterSpacing: "-0.01em",
+                          whiteSpace: "nowrap",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {it.dose}
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                      <div style={{ fontSize: 13, opacity: active ? 0.62 : 0.45 }}>{slotLabel[it.slot]}</div>
+                      <div style={{ fontSize: 13, opacity: active ? 0.62 : 0.45 }}>{it.hint ? it.hint : "Tap for details"}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Sticky controls */}
+            <div
+              style={{
+                position: "sticky",
+                bottom: 10,
+                marginTop: 14,
+                paddingTop: 10,
+                paddingBottom: 2,
+                background: "var(--card)",
+              }}
+            >
+              <div style={{ display: "grid", gap: 10, padding: "0 4px" }}>
+                {i < items.length - 1 ? (
+                  <Button icon="➡️" onClick={goNext}>
+                    Next
+                  </Button>
+                ) : (
+                  <Button
+                    icon="✅"
+                    onClick={() => {
+                      haptic();
+                      onDone();
                     }}
                   >
-                    {it.dose}
-                  </div>
-                </div>
+                    Done
+                  </Button>
+                )}
 
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                  <div style={{ fontSize: 13, opacity: active ? 0.62 : 0.45 }}>
-                    {slotLabel[it.slot]}
-                  </div>
-                  <div style={{ fontSize: 13, opacity: active ? 0.62 : 0.45 }}>
-                    {it.hint ? it.hint : "Tap for details"}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Sticky controls */}
-        <div
-          style={{
-            position: "sticky",
-            bottom: 10,
-            marginTop: 14,
-            paddingTop: 10,
-            paddingBottom: 2,
-            background: "var(--card)",
-          }}
-        >
-          <div style={{ display: "grid", gap: 10, padding: "0 4px" }}>
-            {i < items.length - 1 ? (
-              <Button icon="➡️" onClick={goNext}>
-                Next
-              </Button>
-            ) : (
-              <Button
-                icon="✅"
-                onClick={() => {
-                  haptic();
-                  onDone();
-                }}
-              >
-                Done
-              </Button>
-            )}
-
-            {i > 0 ? (
-              <Button icon="←" variant="ghost" onClick={goBack}>
-                Back
-              </Button>
-            ) : null}
+                {i > 0 ? (
+                  <Button icon="←" variant="ghost" onClick={goBack}>
+                    Back
+                  </Button>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
       </Card>
 
-      {selected ? (
-        <ExerciseDetails item={selected} todayISO={isoDate()} onClose={() => setSelected(null)} />
-      ) : null}
+      {selected ? <ExerciseDetails item={selected} todayISO={isoDate()} onClose={() => setSelected(null)} /> : null}
     </Screen>
   );
 }
@@ -446,12 +534,8 @@ function ExerciseDetails({
           <div style={{ fontSize: 13, opacity: 0.65 }}>Load</div>
 
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
-            <div style={{ fontSize: 14, fontWeight: 950 }}>
-              {last.lastLoad ? `Last: ${last.lastLoad}` : "Last: —"}
-            </div>
-            <div style={{ fontSize: 12, opacity: 0.6 }}>
-              {last.lastDateISO ? last.lastDateISO : ""}
-            </div>
+            <div style={{ fontSize: 14, fontWeight: 950 }}>{last.lastLoad ? `Last: ${last.lastLoad}` : "Last: —"}</div>
+            <div style={{ fontSize: 12, opacity: 0.6 }}>{last.lastDateISO ? last.lastDateISO : ""}</div>
           </div>
 
           <input
@@ -519,9 +603,7 @@ function ExerciseDetails({
         {/* Equipment */}
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
           <div style={{ fontSize: 13, opacity: 0.65 }}>Equipment</div>
-          <div style={{ fontSize: 14, fontWeight: 950, textAlign: "right" }}>
-            {item.equipment ?? "—"}
-          </div>
+          <div style={{ fontSize: 14, fontWeight: 950, textAlign: "right" }}>{item.equipment ?? "—"}</div>
         </div>
 
         {/* Description */}
