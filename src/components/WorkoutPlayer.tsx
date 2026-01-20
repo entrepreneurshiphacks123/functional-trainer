@@ -11,9 +11,6 @@ export type WorkoutItem = {
   equipment?: string;
   description?: string;
   hint?: string;
-
-  // Optional override (if you ever want it per exercise)
-  restSec?: number;
 };
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
@@ -27,57 +24,21 @@ function isoDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function formatMMSS(totalSec: number) {
-  const m = Math.floor(totalSec / 60);
+function pad2(n: number) {
+  return n.toString().padStart(2, "0");
+}
+
+function formatHMMSS(totalSec: number) {
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  if (h > 0) return `${h}:${pad2(m)}:${pad2(s)}`;
+  return `${m}:${pad2(s)}`;
 }
 
-// time-based if dose mentions min/sec AND does not include ×
-function parseTimedSeconds(dose: string): number | null {
-  const d = dose.toLowerCase();
+// ------- Persist current position + session timer -------
+const WP_KEY = "wp_state_v3";
 
-  if (d.includes("×")) return null;
-
-  const minMatch = d.match(/(\d+)\s*(?:–|-)?\s*(\d+)?\s*min/);
-  if (minMatch) {
-    const a = Number(minMatch[1]);
-    const b = minMatch[2] ? Number(minMatch[2]) : a;
-    const avg = Math.round((a + b) / 2);
-    return avg * 60;
-  }
-
-  const secMatch = d.match(
-    /(\d+)\s*(?:–|-)?\s*(\d+)?\s*(?:s|sec|secs|second|seconds)\b/
-  );
-  if (secMatch) {
-    const a = Number(secMatch[1]);
-    const b = secMatch[2] ? Number(secMatch[2]) : a;
-    return Math.round((a + b) / 2);
-  }
-
-  return null;
-}
-
-function isRepBased(dose: string) {
-  const d = dose.toLowerCase();
-  return (
-    d.includes("×") ||
-    d.includes("sets") ||
-    d.includes("/side") ||
-    d.includes("carries") ||
-    d.includes("runs")
-  );
-}
-
-function defaultRestForSlot(slot: WorkoutItem["slot"]) {
-  if (slot === "strength") return 60;
-  if (slot === "athletic") return 45;
-  return 0;
-}
-
-// ------- Persist current position + timer -------
-const WP_KEY = "wp_state_v2";
 function itemsSig(items: { id: string }[]) {
   return items.map((x) => x.id).join("|");
 }
@@ -98,12 +59,11 @@ function saveWP(data: any) {
 // iOS haptic (when supported)
 function haptic() {
   try {
-    // not supported everywhere; harmless if absent
     if (navigator.vibrate) navigator.vibrate(10);
   } catch {}
 }
 
-// ------- Modal (fixed: scrollable, safe-area, sticky header) -------
+// ------- Modal (scrollable, safe-area, sticky header) -------
 function Modal({
   title,
   onClose,
@@ -137,7 +97,6 @@ function Modal({
           width: "100%",
           maxWidth: 560,
           margin: "0 auto",
-          // Safe height + internal scrolling (fixes cutoff)
           maxHeight: "min(78vh, 720px)",
           overflow: "hidden",
           boxSizing: "border-box",
@@ -150,24 +109,14 @@ function Modal({
             zIndex: 2,
             background: "var(--card)",
             borderBottom: "1px solid var(--border)",
-            padding:
-              "12px 14px calc(10px + env(safe-area-inset-bottom, 0px))",
+            padding: "12px 14px",
             display: "flex",
             justifyContent: "space-between",
             gap: 12,
             alignItems: "center",
           }}
         >
-          <div
-            style={{
-              fontSize: 16,
-              fontWeight: 900,
-              letterSpacing: "-0.01em",
-              lineHeight: 1.2,
-            }}
-          >
-            {title}
-          </div>
+          <div style={{ fontSize: 16, fontWeight: 950, letterSpacing: "-0.01em" }}>{title}</div>
           <button
             onClick={onClose}
             style={{
@@ -215,11 +164,9 @@ export default function WorkoutPlayer({
   const [i, setI] = React.useState(0);
   const [selected, setSelected] = React.useState<WorkoutItem | null>(null);
 
-  const activeItem = items[i];
-
-  // Timer state
-  const [running, setRunning] = React.useState(false);
-  const [remaining, setRemaining] = React.useState(60);
+  // Session timer
+  const [startedAt, setStartedAt] = React.useState<number | null>(null); // epoch ms
+  const [elapsedSec, setElapsedSec] = React.useState(0);
 
   // Auto-scroll active into view
   const activeRef = React.useRef<HTMLButtonElement | null>(null);
@@ -231,92 +178,133 @@ export default function WorkoutPlayer({
   React.useEffect(() => {
     const saved = loadWP();
     if (!saved) return;
-
     if (saved.sig !== itemsSig(items)) return;
 
     if (typeof saved.i === "number") {
       const safe = Math.max(0, Math.min(items.length - 1, saved.i));
       setI(safe);
     }
-    if (typeof saved.remaining === "number") setRemaining(saved.remaining);
 
-    // Restore paused (native feel: no surprise running timer)
-    setRunning(false);
+    if (typeof saved.startedAt === "number") setStartedAt(saved.startedAt);
+    if (typeof saved.elapsedSec === "number") setElapsedSec(saved.elapsedSec);
   }, [items]);
+
+  // Tick session timer
+  React.useEffect(() => {
+    if (!startedAt) return;
+
+    const t = window.setInterval(() => {
+      const now = Date.now();
+      const sec = Math.max(0, Math.floor((now - startedAt) / 1000));
+      setElapsedSec(sec);
+    }, 500);
+
+    return () => window.clearInterval(t);
+  }, [startedAt]);
 
   // Persist state
   React.useEffect(() => {
     saveWP({
       sig: itemsSig(items),
       i,
-      remaining,
-      running, // stored but not auto-resumed
+      startedAt,
+      elapsedSec,
       ts: Date.now(),
     });
-  }, [items, i, remaining, running]);
+  }, [items, i, startedAt, elapsedSec]);
 
-  // Set timer defaults when active changes
-  React.useEffect(() => {
-    if (!activeItem) return;
+  const startSessionIfNeeded = React.useCallback(() => {
+    if (startedAt) return;
+    setStartedAt(Date.now());
+    setElapsedSec(0);
+  }, [startedAt]);
 
-    const timed = parseTimedSeconds(activeItem.dose);
-    if (timed) {
-      setRemaining(timed);
-      setRunning(false);
-      return;
-    }
-
-    const rep = isRepBased(activeItem.dose);
-    const rest = activeItem.restSec ?? (rep ? 60 : defaultRestForSlot(activeItem.slot));
-    if (rest > 0) setRemaining(rest);
-    setRunning(false);
-  }, [activeItem?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Tick
-  React.useEffect(() => {
-    if (!running) return;
-
-    const t = window.setInterval(() => {
-      setRemaining((r) => {
-        if (r <= 1) {
-          const timed = activeItem ? parseTimedSeconds(activeItem.dose) : null;
-          if (timed) return 0; // timed ends
-
-          const rep = activeItem ? isRepBased(activeItem.dose) : true;
-          const rest =
-            activeItem?.restSec ??
-            (rep ? 60 : defaultRestForSlot(activeItem?.slot ?? "strength"));
-          return rest; // loop for rest timers
-        }
-        return r - 1;
-      });
-    }, 1000);
-
-    return () => window.clearInterval(t);
-  }, [running, activeItem]);
-
-  const showRestTimer = activeItem
-    ? isRepBased(activeItem.dose) && (activeItem.restSec ?? 60) > 0
-    : false;
-
-  const timedSeconds = activeItem ? parseTimedSeconds(activeItem.dose) : null;
-  const showTimedTimer = timedSeconds !== null && timedSeconds > 0;
+  const resetSession = () => {
+    haptic();
+    setStartedAt(null);
+    setElapsedSec(0);
+  };
 
   const goNext = () => {
     haptic();
-    setRunning(false);
+    startSessionIfNeeded();
     setI((x) => Math.min(items.length - 1, x + 1));
   };
 
   const goBack = () => {
     haptic();
-    setRunning(false);
     setI((x) => Math.max(0, x - 1));
   };
+
+  const activeItem = items[i];
 
   return (
     <Screen title={`${dayLabel} ${modeLabel}`}>
       <Card>
+        {/* Top strip = constant timer (about 1/3 visual weight of this screen section) */}
+        <div
+          style={{
+            borderRadius: 16,
+            border: "1px solid var(--border)",
+            background: "var(--card2)",
+            padding: "14px 14px",
+            marginBottom: 12,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <div style={{ display: "grid", gap: 2 }}>
+            <div style={{ fontSize: 12, opacity: 0.65 }}>Session</div>
+            <div style={{ fontSize: 26, fontWeight: 950, letterSpacing: "-0.02em" }}>
+              {formatHMMSS(elapsedSec)}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => {
+                haptic();
+                startSessionIfNeeded();
+              }}
+              style={{
+                borderRadius: 12,
+                border: "1px solid var(--border)",
+                background: "transparent",
+                color: "var(--text)",
+                padding: "10px 12px",
+                fontSize: 14,
+                fontWeight: 900,
+                cursor: "pointer",
+                WebkitTapHighlightColor: "transparent",
+                boxSizing: "border-box",
+              }}
+            >
+              {startedAt ? "Running" : "Start"}
+            </button>
+
+            <button
+              onClick={resetSession}
+              style={{
+                borderRadius: 12,
+                border: "1px solid var(--border)",
+                background: "transparent",
+                color: "var(--text)",
+                padding: "10px 12px",
+                fontSize: 14,
+                fontWeight: 900,
+                cursor: "pointer",
+                WebkitTapHighlightColor: "transparent",
+                boxSizing: "border-box",
+              }}
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
+        {/* Full workout list, current exercise highlighted */}
         <div style={{ display: "grid", gap: 10, padding: "0 4px" }}>
           {items.map((it, idx) => {
             const active = idx === i;
@@ -346,18 +334,11 @@ export default function WorkoutPlayer({
                   WebkitTapHighlightColor: "transparent",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: 14,
-                    alignItems: "baseline",
-                  }}
-                >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "baseline" }}>
                   <div
                     style={{
                       fontSize: active ? 18 : 16,
-                      fontWeight: 900,
+                      fontWeight: 950,
                       opacity: active ? 1 : 0.74,
                       letterSpacing: "-0.01em",
                       minWidth: 0,
@@ -369,7 +350,7 @@ export default function WorkoutPlayer({
                   <div
                     style={{
                       fontSize: active ? 18 : 16,
-                      fontWeight: 900,
+                      fontWeight: 950,
                       opacity: active ? 1 : 0.74,
                       letterSpacing: "-0.01em",
                       whiteSpace: "nowrap",
@@ -388,87 +369,6 @@ export default function WorkoutPlayer({
                     {it.hint ? it.hint : "Tap for details"}
                   </div>
                 </div>
-
-                {/* Timer panel only on active */}
-                {active && (showRestTimer || showTimedTimer) ? (
-                  <div
-                    style={{
-                      marginTop: 10,
-                      padding: "10px 10px",
-                      borderRadius: 14,
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      background: "rgba(255,255,255,0.03)",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: 10,
-                    }}
-                  >
-                    <div style={{ display: "grid", gap: 2 }}>
-                      <div style={{ fontSize: 12, opacity: 0.65 }}>
-                        {showTimedTimer ? "Timer" : "Rest"}
-                      </div>
-                      <div style={{ fontSize: 18, fontWeight: 950, letterSpacing: "-0.01em" }}>
-                        {formatMMSS(remaining)}
-                      </div>
-                    </div>
-
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          haptic();
-                          setRunning((r) => !r);
-                        }}
-                        style={{
-                          borderRadius: 12,
-                          border: "1px solid var(--border)",
-                          background: "var(--card2)",
-                          color: "var(--text)",
-                          padding: "10px 12px",
-                          fontSize: 14,
-                          fontWeight: 900,
-                          cursor: "pointer",
-                          WebkitTapHighlightColor: "transparent",
-                        }}
-                      >
-                        {running ? "Pause" : "Start"}
-                      </button>
-
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          haptic();
-                          setRunning(false);
-
-                          const timed = parseTimedSeconds(it.dose);
-                          if (timed) setRemaining(timed);
-                          else {
-                            const rep = isRepBased(it.dose);
-                            const rest =
-                              it.restSec ?? (rep ? 60 : defaultRestForSlot(it.slot));
-                            setRemaining(rest);
-                          }
-                        }}
-                        style={{
-                          borderRadius: 12,
-                          border: "1px solid var(--border)",
-                          background: "transparent",
-                          color: "var(--text)",
-                          padding: "10px 12px",
-                          fontSize: 14,
-                          fontWeight: 900,
-                          cursor: "pointer",
-                          WebkitTapHighlightColor: "transparent",
-                        }}
-                      >
-                        Reset
-                      </button>
-                    </div>
-                  </div>
-                ) : null}
               </button>
             );
           })}
@@ -491,7 +391,13 @@ export default function WorkoutPlayer({
                 Next
               </Button>
             ) : (
-              <Button icon="✅" onClick={onDone}>
+              <Button
+                icon="✅"
+                onClick={() => {
+                  haptic();
+                  onDone();
+                }}
+              >
                 Done
               </Button>
             )}
@@ -506,11 +412,7 @@ export default function WorkoutPlayer({
       </Card>
 
       {selected ? (
-        <ExerciseDetails
-          item={selected}
-          todayISO={isoDate()}
-          onClose={() => setSelected(null)}
-        />
+        <ExerciseDetails item={selected} todayISO={isoDate()} onClose={() => setSelected(null)} />
       ) : null}
     </Screen>
   );
@@ -539,19 +441,12 @@ function ExerciseDetails({
   return (
     <Modal title={item.name} onClose={onClose}>
       <div style={{ display: "grid", gap: 12 }}>
-        {/* Load logging */}
+        {/* Load */}
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ fontSize: 13, opacity: 0.65 }}>Load</div>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 12,
-              alignItems: "baseline",
-            }}
-          >
-            <div style={{ fontSize: 14, fontWeight: 900 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
+            <div style={{ fontSize: 14, fontWeight: 950 }}>
               {last.lastLoad ? `Last: ${last.lastLoad}` : "Last: —"}
             </div>
             <div style={{ fontSize: 12, opacity: 0.6 }}>
@@ -572,7 +467,7 @@ function ExerciseDetails({
               background: "var(--card2)",
               color: "var(--text)",
               fontSize: 15,
-              fontWeight: 800,
+              fontWeight: 850,
               outline: "none",
               boxSizing: "border-box",
             }}
@@ -622,16 +517,9 @@ function ExerciseDetails({
         <div style={{ borderTop: "1px solid var(--border)", opacity: 0.7 }} />
 
         {/* Equipment */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 12,
-            alignItems: "baseline",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
           <div style={{ fontSize: 13, opacity: 0.65 }}>Equipment</div>
-          <div style={{ fontSize: 14, fontWeight: 900, textAlign: "right" }}>
+          <div style={{ fontSize: 14, fontWeight: 950, textAlign: "right" }}>
             {item.equipment ?? "—"}
           </div>
         </div>
@@ -639,14 +527,7 @@ function ExerciseDetails({
         {/* Description */}
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ fontSize: 13, opacity: 0.65 }}>How</div>
-          <div
-            style={{
-              fontSize: 14,
-              lineHeight: 1.55,
-              fontWeight: 700,
-              whiteSpace: "pre-wrap",
-            }}
-          >
+          <div style={{ fontSize: 14, lineHeight: 1.55, fontWeight: 750, whiteSpace: "pre-wrap" }}>
             {item.description ?? "—"}
           </div>
         </div>
