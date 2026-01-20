@@ -5,7 +5,7 @@ import SorenessCheck from "./components/SorenessCheck";
 import CalendarView from "./components/CalendarView";
 import PlanControls from "./components/PlanControls";
 import Settings from "./components/Settings";
-import { loadState, saveState, Mode, Soreness, AppState } from "./engine/storage";
+import { loadState, saveState, Mode, Soreness, AppState, resetAllAppData } from "./engine/storage";
 import { findPlan, getWorkoutForPlan } from "./engine/plans";
 import { dayIntent, dayLabels } from "./engine/library";
 import { MovementPattern } from "../types/MovementPattern";
@@ -16,7 +16,6 @@ import { toLocalDateKey } from "./utils/date";
 type Step = "mode" | "workout" | "soreness" | "calendar" | "settings";
 
 function nextDayKey(order: string[], last?: string) {
-  // Defensive: corrupted/legacy plans in localStorage can yield empty/undefined day arrays.
   if (!Array.isArray(order) || order.length === 0) return "A";
   if (!last) return order[0];
   const idx = order.indexOf(last);
@@ -24,8 +23,18 @@ function nextDayKey(order: string[], last?: string) {
   return order[(idx + 1) % order.length];
 }
 
+function safeBoot() {
+  try {
+    return { ok: true as const, state: loadState(), error: null as any };
+  } catch (e) {
+    return { ok: false as const, state: {} as AppState, error: e };
+  }
+}
+
 export default function App() {
-  const persisted = useMemo(() => loadState(), []);
+  const boot = useMemo(() => safeBoot(), []);
+  const persisted = boot.state;
+
   const [step, setStep] = useState<Step>("mode");
   const [mode, setMode] = useState<Mode | null>(null);
 
@@ -33,7 +42,9 @@ export default function App() {
   const [soreness, setSoreness] = useState(persisted.soreness);
   const [workoutLog, setWorkoutLog] = useState(persisted.workoutLog ?? []);
 
-  const [activePlanId, setActivePlanId] = useState<string | undefined>(persisted.activePlanId ?? "functional-fitness-45");
+  const [activePlanId, setActivePlanId] = useState<string | undefined>(
+    persisted.activePlanId ?? "functional-fitness-45"
+  );
   const [dayOverride, setDayOverride] = useState<string | null>(persisted.dayOverride ?? null);
 
   const [theme, setTheme] = useState<Theme>(() => loadTheme());
@@ -43,9 +54,51 @@ export default function App() {
     saveTheme(theme);
   }, [theme]);
 
-  const plan = useMemo(() => findPlan(activePlanId), [activePlanId]);
-  const dayKeys = Array.isArray(plan.dayKeys) && plan.dayKeys.length ? plan.dayKeys : ["A", "B", "C", "D"];
+  // Plan fallback (prevents crash if activePlanId points to missing/legacy plan)
+  const plan = useMemo(() => {
+    return (
+      findPlan(activePlanId) ||
+      findPlan("functional-fitness-45") ||
+      null
+    );
+  }, [activePlanId]);
 
+  // If boot succeeded but we still can't resolve a plan, show recovery UI
+  if (!boot.ok || !plan) {
+    return (
+      <div style={{ padding: 16, fontFamily: "system-ui" }}>
+        <h2 style={{ margin: "0 0 10px" }}>App needs a quick reset</h2>
+        <p style={{ opacity: 0.8, lineHeight: 1.4 }}>
+          Your saved data is from an older version (or a plan is missing) and the app can’t load safely.
+          Tap reset to fix it.
+        </p>
+        <button
+          onClick={() => {
+            resetAllAppData();
+            location.reload();
+          }}
+          style={{
+            padding: "12px 16px",
+            borderRadius: 12,
+            border: "1px solid rgba(0,0,0,0.18)",
+            fontSize: 16,
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Reset App Data
+        </button>
+
+        {boot.error ? (
+          <pre style={{ marginTop: 14, opacity: 0.6, fontSize: 12, whiteSpace: "pre-wrap" }}>
+            {String(boot.error)}
+          </pre>
+        ) : null}
+      </div>
+    );
+  }
+
+  const dayKeys = Array.isArray(plan.dayKeys) && plan.dayKeys.length ? plan.dayKeys : ["A", "B", "C", "D"];
   const plannedDay = dayOverride ?? nextDayKey(dayKeys, lastDay);
 
   const workout = useMemo(() => {
@@ -122,17 +175,11 @@ export default function App() {
   );
 
   const calendarBtn = (
-    <TinyIconButton
-      label="📅"
-      onClick={() => setStep((s) => (s === "calendar" ? "mode" : "calendar"))}
-    />
+    <TinyIconButton label="📅" onClick={() => setStep((s) => (s === "calendar" ? "mode" : "calendar"))} />
   );
 
   const settingsBtn = (
-    <TinyIconButton
-      label="⚙️"
-      onClick={() => setStep((s) => (s === "settings" ? "mode" : "settings"))}
-    />
+    <TinyIconButton label="⚙️" onClick={() => setStep((s) => (s === "settings" ? "mode" : "settings"))} />
   );
 
   const topRight = (
@@ -186,9 +233,7 @@ export default function App() {
               setDayOverride(d);
               persist({ dayOverride: d });
             }}
-            onFinish={() => {
-              setStep("soreness");
-            }}
+            onFinish={() => setStep("soreness")}
             onBack={() => {
               setMode(null);
               setStep("mode");
@@ -208,8 +253,6 @@ export default function App() {
               setStep("mode");
             }}
           />
-
-          {/* safety: date key helper used in SorenessCheck. */}
           <div style={{ display: "none" }}>{toLocalDateKey(new Date())}</div>
         </div>
       )}
