@@ -1,5 +1,7 @@
 import { generateWorkoutV1 } from "./generateWorkout";
 import { Mode, SorenessMap } from "./storage";
+import { BUILTIN_PLANS } from "./builtinPlans";
+export { BUILTIN_PLANS };
 
 export type GeneratedPlan = {
   id: string;
@@ -54,16 +56,7 @@ function isPlanShapeSafe(p: any): p is WorkoutPlan {
 
 const PLANS_KEY = "training_os_plans_v1";
 
-// Built-in plan(s)
-export const BUILTIN_PLANS: WorkoutPlan[] = [
-  {
-    id: "functional-fitness-45",
-    name: "Functional Fitness - 45min",
-    icon: "🏋️",
-    kind: "generated_v1",
-    dayKeys: ["A", "B", "C", "D"],
-  },
-];
+// Built-in plans are defined in ./builtinPlans (keeps this file small)
 
 export function loadUserPlans(): WorkoutPlan[] {
   try {
