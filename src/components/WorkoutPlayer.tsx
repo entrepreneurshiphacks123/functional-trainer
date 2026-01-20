@@ -274,6 +274,32 @@ export default function WorkoutPlayer({
 
   return (
     <Screen title={`${dayLabel} ${modeLabel}`}>
+      {/* Day selector (no label) */}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '10px 0 12px' }}>
+        {dayKeys.map((k) => {
+          const active = k === plannedDay;
+          return (
+            <button
+              key={k}
+              type="button"
+              aria-label={`Select Day ${k}`}
+              onClick={() => onPlannedDayChange(k)}
+              style={{
+                padding: '10px 14px',
+                borderRadius: 999,
+                border: active ? '1px solid rgba(124,92,255,0.85)' : '1px solid var(--border)',
+                background: active ? 'rgba(124,92,255,0.14)' : 'var(--card)',
+                fontWeight: 950,
+                cursor: 'pointer',
+                minWidth: 48,
+                textAlign: 'center',
+              }}
+            >
+              {k}
+            </button>
+          );
+        })}
+      </div>
       <Card>
         {/* Layout: timer is a constant 1/3 screen panel (desktop/tablet) */}
         <div

@@ -4,6 +4,7 @@ import WorkoutPlayer from "./components/WorkoutPlayer";
 import SorenessCheck from "./components/SorenessCheck";
 import CalendarView from "./components/CalendarView";
 import PlanControls from "./components/PlanControls";
+import Settings from "./components/Settings";
 import { loadState, saveState, Mode, Soreness, AppState } from "./engine/storage";
 import { findPlan, getWorkoutForPlan } from "./engine/plans";
 import { dayIntent, dayLabels } from "./engine/library";
@@ -12,7 +13,7 @@ import { applyTheme, loadTheme, saveTheme, Theme } from "./ui/theme";
 import { TinyIconButton } from "./ui/Primitives";
 import { toLocalDateKey } from "./utils/date";
 
-type Step = "mode" | "workout" | "soreness" | "calendar";
+type Step = "mode" | "workout" | "soreness" | "calendar" | "settings";
 
 function nextDayKey(order: string[], last?: string) {
   if (!last) return order[0];
@@ -123,7 +124,15 @@ export default function App() {
       label="📅"
       onClick={() => setStep((s) => (s === "calendar" ? "mode" : "calendar"))}
     />
+  
+
+  const settingsBtn = (
+    <TinyIconButton
+      label="⚙️"
+      onClick={() => setStep((s) => (s === "settings" ? "mode" : "settings"))}
+    />
   );
+);
 
   const topRight = (
     <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginBottom: 10 }}>
@@ -141,6 +150,13 @@ export default function App() {
         </div>
       )}
 
+      {step === "settings" && (
+        <div>
+          {topRight}
+          <Settings onBack={() => setStep("mode")} />
+        </div>
+      )}
+
       {step === "mode" && (
         <div>
           {topRight}
@@ -151,12 +167,6 @@ export default function App() {
               setDayOverride(null);
               persist({ activePlanId: id, dayOverride: null });
             }}
-            dayKeys={dayKeys}
-            dayOverride={dayOverride}
-            onDayOverrideChange={(d) => {
-              setDayOverride(d);
-              persist({ dayOverride: d });
-            }}
           />
           <ModeSelect onSelect={start} />
         </div>
@@ -166,10 +176,21 @@ export default function App() {
         <div>
           {topRight}
           <WorkoutPlayer
-            dayLabel={dayLabel}
+            workout={workout}
             modeLabel={modeLabel}
-            items={workout.items}
-            onDone={() => setStep("soreness")}
+            plannedDay={plannedDay}
+            dayKeys={dayKeys}
+            onPlannedDayChange={(d) => {
+              setDayOverride(d);
+              persist({ dayOverride: d });
+            }}
+            onFinish={() => {
+              setStep("soreness");
+            }}
+            onBack={() => {
+              setMode(null);
+              setStep("mode");
+            }}
           />
         </div>
       )}

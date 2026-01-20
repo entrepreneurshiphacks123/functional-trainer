@@ -4,6 +4,7 @@ import { Mode, SorenessMap } from "./storage";
 export type GeneratedPlan = {
   id: string;
   name: string;
+  icon?: string; // emoji / short label
   kind: "generated_v1";
   dayKeys: string[]; // for UI (A-D)
 };
@@ -16,6 +17,7 @@ export type StaticPlanDay = {
 export type StaticPlan = {
   id: string;
   name: string;
+  icon?: string; // emoji / short label
   kind: "static";
   dayKeys: string[];
   days: Record<string, StaticPlanDay>;
@@ -30,6 +32,7 @@ export const BUILTIN_PLANS: WorkoutPlan[] = [
   {
     id: "functional-fitness-45",
     name: "Functional Fitness - 45min",
+    icon: "🏋️",
     kind: "generated_v1",
     dayKeys: ["A", "B", "C", "D"],
   },
@@ -73,6 +76,7 @@ export function validateUploadedPlan(plan: any): string | null {
   if (!plan || typeof plan !== "object") return "Plan must be a JSON object";
   if (typeof plan.id !== "string" || !plan.id.trim()) return "Plan requires string id";
   if (typeof plan.name !== "string" || !plan.name.trim()) return "Plan requires string name";
+  if (plan.icon != null && typeof plan.icon !== "string") return "Plan.icon must be a string if provided";
   if (plan.kind !== "static") return "Only static plans are supported for upload (kind: 'static')";
   if (!Array.isArray(plan.dayKeys) || plan.dayKeys.length < 1) return "Plan requires dayKeys array";
   if (!plan.days || typeof plan.days !== "object") return "Plan requires days object";
