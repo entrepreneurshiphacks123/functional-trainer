@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Card, Screen } from "../ui/Primitives";
-import { fromLocalDateKey, pad2, toLocalDateKey } from "../utils/date";
+import { pad2, toLocalDateKey } from "../utils/date";
 import { WorkoutLogEntry } from "../engine/storage";
 
 function monthKey(d: Date) {
@@ -65,18 +65,10 @@ export default function CalendarView({
       title={"Calendar"}
       right={
         <div style={{ display: "flex", gap: 8 }}>
-          <button
-            type="button"
-            onClick={() => setCursor((d) => addMonths(d, -1))}
-            style={navBtn}
-          >
+          <button type="button" onClick={() => setCursor((d) => addMonths(d, -1))} style={navBtn}>
             ←
           </button>
-          <button
-            type="button"
-            onClick={() => setCursor((d) => addMonths(d, 1))}
-            style={navBtn}
-          >
+          <button type="button" onClick={() => setCursor((d) => addMonths(d, 1))} style={navBtn}>
             →
           </button>
         </div>
@@ -84,15 +76,15 @@ export default function CalendarView({
     >
       <Card>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
-          <div style={{ fontSize: 16, fontWeight: 950 }}>{title}</div>
-          <div style={{ fontSize: 12, opacity: 0.65 }}>Tap a day to view</div>
+          <div style={{ fontSize: 16, fontWeight: 950, color: "var(--text)" }}>{title}</div>
+          <div style={{ fontSize: 12, opacity: 0.7, color: "var(--text)" }}>Tap a completed day</div>
         </div>
 
         <div style={{ height: 10 }} />
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
           {["S", "M", "T", "W", "T", "F", "S"].map((d) => (
-            <div key={d} style={{ textAlign: "center", fontSize: 12, opacity: 0.65, fontWeight: 850 }}>
+            <div key={d} style={{ textAlign: "center", fontSize: 12, opacity: 0.7, fontWeight: 850, color: "var(--text)" }}>
               {d}
             </div>
           ))}
@@ -149,12 +141,13 @@ function DayCell({
           ...cell,
           opacity: inMonth ? 1 : 0.35,
           border: isToday ? "1px solid rgba(124,92,255,0.85)" : "1px solid var(--border)",
-          background: done ? "var(--card2)" : "transparent",
+          background: done ? "var(--card2)" : "var(--card)", // key dark-mode fix: not transparent
           cursor: done ? "pointer" : "default",
+          color: "var(--text)", // key dark-mode fix: force readable text
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontSize: 13, fontWeight: 900 }}>{day}</div>
+          <div style={{ fontSize: 13, fontWeight: 900, color: "var(--text)" }}>{day}</div>
           {done ? (
             <div
               aria-hidden="true"
@@ -170,18 +163,13 @@ function DayCell({
       </button>
 
       {open && entry ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setOpen(false)}
-          style={overlay}
-        >
+        <div role="dialog" aria-modal="true" onClick={() => setOpen(false)} style={overlay}>
           <div onClick={(e) => e.stopPropagation()} style={modal}>
-            <div style={{ fontSize: 16, fontWeight: 950 }}>{entry.dateISO}</div>
+            <div style={{ fontSize: 16, fontWeight: 950, color: "var(--text)" }}>{entry.dateISO}</div>
             <div style={{ height: 6 }} />
-            <div style={{ fontSize: 14, fontWeight: 900 }}>{entry.title}</div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "var(--text)" }}>{entry.title}</div>
             <div style={{ height: 6 }} />
-            <div style={{ fontSize: 12, opacity: 0.7 }}>
+            <div style={{ fontSize: 12, opacity: 0.8, color: "var(--text)" }}>
               Plan: {entry.planId ?? "—"} · Mode: {entry.mode}
             </div>
             <div style={{ height: 12 }} />
