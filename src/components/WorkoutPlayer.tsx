@@ -181,6 +181,22 @@ function Modal({
   );
 }
 
+function cleanWorkoutLabel(raw: string) {
+  const s = (raw ?? "").trim();
+  if (!s) return "";
+  // If someone passed a label like: "Day D — Elastic + Footwork 🔥", strip the leading "Day X —"
+  return s.replace(/^Day\s+[A-Z]\s*(—|-)\s*/i, "").trim();
+}
+
+function modeWithTime(modeLabel: string) {
+  const m = (modeLabel ?? "").trim();
+  const lower = m.toLowerCase();
+  if (lower.includes("performance")) return `${m} • 45 min`;
+  if (lower.includes("feel better") || lower.includes("feel-better") || lower.includes("recovery"))
+    return `${m} • 30 min`;
+  return m;
+}
+
 export default function WorkoutPlayer({
   workout,
   workoutLabel,
@@ -206,6 +222,9 @@ export default function WorkoutPlayer({
 
   const [i, setI] = React.useState(0);
   const [selected, setSelected] = React.useState<WorkoutItem | null>(null);
+
+  // Day picker
+  const [dayPickerOpen, setDayPickerOpen] = React.useState(false);
 
   // Session timer
   const [startedAt, setStartedAt] = React.useState<number | null>(null);
@@ -274,42 +293,20 @@ export default function WorkoutPlayer({
 
   const activeItem = items[i];
 
-  const screenTitle = workoutLabel?.trim()
-    ? `Day ${plannedDay} — ${workoutLabel} ${modeLabel}`
-    : `Day ${plannedDay} ${modeLabel}`;
+  // Fix: prevent "Day D — Day D — ..."
+  const cleanLabel = cleanWorkoutLabel(workoutLabel);
+  const modeTimed = modeWithTime(modeLabel);
+
+  const screenTitle = cleanLabel
+    ? `Day ${plannedDay} — ${cleanLabel} ${modeTimed}`.trim()
+    : `Day ${plannedDay} ${modeTimed}`.trim();
+
+  const keys = Array.isArray(dayKeys) && dayKeys.length ? dayKeys : ["A", "B", "C", "D"];
 
   return (
-    <Screen title={screenTitle}>
-      {/* Day pills only */}
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "10px 0 12px" }}>
-        {(Array.isArray(dayKeys) ? dayKeys : ["A", "B", "C", "D"]).map((k) => {
-          const active = k === plannedDay;
-          return (
-            <button
-              key={k}
-              type="button"
-              aria-label={`Select Day ${k}`}
-              onClick={() => onPlannedDayChange(k)}
-              style={{
-                padding: "10px 14px",
-                borderRadius: 999,
-                border: active ? "1px solid rgba(124,92,255,0.85)" : "1px solid var(--border)",
-                background: active ? "rgba(124,92,255,0.14)" : "var(--card)",
-                color: "var(--text)",
-                fontWeight: 950,
-                cursor: "pointer",
-                minWidth: 48,
-                textAlign: "center",
-                WebkitTapHighlightColor: "transparent",
-              }}
-            >
-              {k}
-            </button>
-          );
-        })}
-
-        <div style={{ flex: 1 }} />
-
+    <Screen
+      title={screenTitle}
+      right={
         <button
           type="button"
           onClick={onBack}
@@ -326,6 +323,29 @@ export default function WorkoutPlayer({
         >
           ←
         </button>
+      }
+    >
+      {/* Single Day button (no row of pills) */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "10px 0 12px" }}>
+        <button
+          type="button"
+          onClick={() => setDayPickerOpen(true)}
+          aria-label={`Select workout day. Current day ${plannedDay}`}
+          style={{
+            padding: "10px 14px",
+            borderRadius: 999,
+            border: "1px solid rgba(124,92,255,0.85)",
+            background: "rgba(124,92,255,0.14)",
+            color: "var(--text)",
+            fontWeight: 950,
+            cursor: "pointer",
+            WebkitTapHighlightColor: "transparent",
+          }}
+        >
+          Day {plannedDay} ▾
+        </button>
+
+        <div style={{ fontSize: 12, opacity: 0.65, color: "var(--text)" }}>Tap to switch days</div>
       </div>
 
       <Card>
@@ -571,6 +591,41 @@ export default function WorkoutPlayer({
       </Card>
 
       {selected ? <ExerciseDetails item={selected} todayISO={isoDate()} onClose={() => setSelected(null)} /> : null}
+
+      {dayPickerOpen ? (
+        <Modal title="Choose Day" onClose={() => setDayPickerOpen(false)}>
+          <div style={{ display: "grid", gap: 10 }}>
+            {keys.map((k) => {
+              const active = k === plannedDay;
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => {
+                    haptic();
+                    setDayPickerOpen(false);
+                    onPlannedDayChange(k);
+                  }}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    padding: 14,
+                    borderRadius: 14,
+                    border: active ? "1px solid rgba(124,92,255,0.85)" : "1px solid var(--border)",
+                    background: active ? "rgba(124,92,255,0.14)" : "var(--card2)",
+                    color: "var(--text)",
+                    cursor: "pointer",
+                    fontWeight: 950,
+                    WebkitTapHighlightColor: "transparent",
+                  }}
+                >
+                  Day {k} {active ? "✓" : ""}
+                </button>
+              );
+            })}
+          </div>
+        </Modal>
+      ) : null}
     </Screen>
   );
 }
