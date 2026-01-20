@@ -7,7 +7,7 @@ import PlanControls from "./components/PlanControls";
 import Settings from "./components/Settings";
 import { loadState, saveState, Mode, Soreness, AppState, resetAllAppData } from "./engine/storage";
 import { findPlan, getWorkoutForPlan } from "./engine/plans";
-import { dayIntent, dayLabels } from "./engine/library";
+import { dayIntent } from "./engine/library";
 import { MovementPattern } from "../types/MovementPattern";
 import { applyTheme, loadTheme, saveTheme, Theme } from "./ui/theme";
 import { TinyIconButton } from "./ui/Primitives";
@@ -56,11 +56,7 @@ export default function App() {
 
   // Plan fallback (prevents crash if activePlanId points to missing/legacy plan)
   const plan = useMemo(() => {
-    return (
-      findPlan(activePlanId) ||
-      findPlan("functional-fitness-45") ||
-      null
-    );
+    return findPlan(activePlanId) || findPlan("functional-fitness-45") || null;
   }, [activePlanId]);
 
   // If boot succeeded but we still can't resolve a plan, show recovery UI
@@ -106,11 +102,30 @@ export default function App() {
     return getWorkoutForPlan({ plan, dayKey: plannedDay, lastDay, mode, soreness });
   }, [lastDay, mode, soreness, plan, plannedDay]);
 
-  const dayLabel = workout
-    ? `${dayLabels[workout.day as any] ?? `Day ${workout.day}`} — ${dayIntent[workout.day as any] ?? ""}`
-    : "";
+  /**
+   * Title must change based on selected plan + selected day.
+   * - Static plans: use plan.days[plannedDay].title
+   * - Generated plan: use dayIntent mapping (existing behavior)
+   */
+  const workoutTitle = useMemo(() => {
+    if (!workout) return "";
 
-  const modeLabel = mode === "high_performance" ? "🔥" : "🌱";
+    if ((plan as any).kind === "static") {
+      const t = (plan as any).days?.[plannedDay]?.title;
+      return (t ?? "").trim();
+    }
+
+    return (dayIntent[workout.day as any] ?? "").trim();
+  }, [workout, plan, plannedDay]);
+
+  // For WorkoutPlayer header (WorkoutPlayer will prepend "Day {plannedDay} — ...")
+  const workoutLabel = workoutTitle;
+
+  // For workout log (store with the day included)
+  const logTitle = workoutTitle ? `Day ${plannedDay} — ${workoutTitle}` : `Day ${plannedDay}`;
+
+  // Mode label MUST include words so WorkoutPlayer can add time estimates
+  const modeLabel = mode === "high_performance" ? "Performance 🔥" : "Feel Better 🌱";
 
   const persist = (patch: Partial<AppState>) => {
     const prev = loadState();
@@ -139,7 +154,7 @@ export default function App() {
             planId: plan.id,
             day: workout.day,
             mode,
-            title: dayLabel,
+            title: logTitle,
             items: workout.items,
           }
         : null;
@@ -225,24 +240,23 @@ export default function App() {
         <div>
           {topRight}
           <WorkoutPlayer
-  workout={workout}
-  workoutLabel={dayLabel}
-  modeLabel={modeLabel}
-  plannedDay={plannedDay}
-  dayKeys={dayKeys}
-  onPlannedDayChange={(d) => {
-    setDayOverride(d);
-    persist({ dayOverride: d });
-  }}
-  onFinish={() => {
-    setStep("soreness");
-  }}
-  onBack={() => {
-    setMode(null);
-    setStep("mode");
-  }}
-/>
-
+            workout={workout}
+            workoutLabel={workoutLabel}
+            modeLabel={modeLabel}
+            plannedDay={plannedDay}
+            dayKeys={dayKeys}
+            onPlannedDayChange={(d) => {
+              setDayOverride(d);
+              persist({ dayOverride: d });
+            }}
+            onFinish={() => {
+              setStep("soreness");
+            }}
+            onBack={() => {
+              setMode(null);
+              setStep("mode");
+            }}
+          />
         </div>
       )}
 
