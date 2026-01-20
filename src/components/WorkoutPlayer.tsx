@@ -183,6 +183,7 @@ function Modal({
 
 export default function WorkoutPlayer({
   workout,
+  workoutLabel,
   modeLabel,
   plannedDay,
   dayKeys,
@@ -191,6 +192,7 @@ export default function WorkoutPlayer({
   onBack,
 }: {
   workout: WorkoutData;
+  workoutLabel: string;
   modeLabel: string;
   plannedDay: string;
   dayKeys: string[];
@@ -272,9 +274,13 @@ export default function WorkoutPlayer({
 
   const activeItem = items[i];
 
+  const screenTitle = workoutLabel?.trim()
+    ? `Day ${plannedDay} — ${workoutLabel} ${modeLabel}`
+    : `Day ${plannedDay} ${modeLabel}`;
+
   return (
-    <Screen title={`Day ${plannedDay} ${modeLabel}`}>
-      {/* Day pills only (no text label) */}
+    <Screen title={screenTitle}>
+      {/* Day pills only */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "10px 0 12px" }}>
         {(Array.isArray(dayKeys) ? dayKeys : ["A", "B", "C", "D"]).map((k) => {
           const active = k === plannedDay;
@@ -352,37 +358,54 @@ export default function WorkoutPlayer({
               color: "var(--text)",
             }}
           >
-            <div style={{ display: "grid", gap: 6 }}>
-              <div style={{ fontSize: 12, opacity: 0.65 }}>Session</div>
-              <div
-                style={{
-                  fontSize: isNarrow ? 44 : 56,
-                  fontWeight: 950,
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.02,
-                  fontVariantNumeric: "tabular-nums",
-                }}
-              >
-                {formatHMMSS(elapsedSec)}
+            {/* BIG TIMER + SIDE BUTTONS */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "stretch",
+                justifyContent: "space-between",
+                gap: 12,
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 12, opacity: 0.65 }}>Session</div>
+                <div
+                  style={{
+                    fontSize: isNarrow ? 54 : 68,
+                    fontWeight: 950,
+                    letterSpacing: "-0.03em",
+                    lineHeight: 1.0,
+                    fontVariantNumeric: "tabular-nums",
+                    marginTop: 4,
+                  }}
+                >
+                  {formatHMMSS(elapsedSec)}
+                </div>
               </div>
 
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gap: 8,
+                  alignContent: "start",
+                  minWidth: 110,
+                }}
+              >
                 <button
                   onClick={() => {
                     haptic();
                     startSessionIfNeeded();
                   }}
                   style={{
-                    borderRadius: 12,
+                    borderRadius: 14,
                     border: "1px solid var(--border)",
                     background: "transparent",
                     color: "var(--text)",
-                    padding: "10px 12px",
+                    padding: "12px 12px",
                     fontSize: 14,
-                    fontWeight: 900,
+                    fontWeight: 950,
                     cursor: "pointer",
                     WebkitTapHighlightColor: "transparent",
-                    boxSizing: "border-box",
                   }}
                 >
                   {startedAt ? "Running" : "Start"}
@@ -391,16 +414,15 @@ export default function WorkoutPlayer({
                 <button
                   onClick={resetSession}
                   style={{
-                    borderRadius: 12,
+                    borderRadius: 14,
                     border: "1px solid var(--border)",
                     background: "transparent",
                     color: "var(--text)",
-                    padding: "10px 12px",
+                    padding: "12px 12px",
                     fontSize: 14,
-                    fontWeight: 900,
+                    fontWeight: 950,
                     cursor: "pointer",
                     WebkitTapHighlightColor: "transparent",
-                    boxSizing: "border-box",
                   }}
                 >
                   Reset
@@ -408,6 +430,7 @@ export default function WorkoutPlayer({
               </div>
             </div>
 
+            {/* CURRENT EXERCISE PREVIEW */}
             <div
               style={{
                 borderTop: "1px solid var(--border)",
