@@ -225,20 +225,24 @@ export default function App() {
         <div>
           {topRight}
           <WorkoutPlayer
-            workout={workout}
-            modeLabel={modeLabel}
-            plannedDay={plannedDay}
-            dayKeys={dayKeys}
-            onPlannedDayChange={(d) => {
-              setDayOverride(d);
-              persist({ dayOverride: d });
-            }}
-            onFinish={() => setStep("soreness")}
-            onBack={() => {
-              setMode(null);
-              setStep("mode");
-            }}
-          />
+  workout={workout}
+  workoutLabel={dayLabel}
+  modeLabel={modeLabel}
+  plannedDay={plannedDay}
+  dayKeys={dayKeys}
+  onPlannedDayChange={(d) => {
+    setDayOverride(d);
+    persist({ dayOverride: d });
+  }}
+  onFinish={() => {
+    setStep("soreness");
+  }}
+  onBack={() => {
+    setMode(null);
+    setStep("mode");
+  }}
+/>
+
         </div>
       )}
 
