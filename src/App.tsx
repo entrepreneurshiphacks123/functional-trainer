@@ -3,22 +3,35 @@ import ModeSelect from "./components/ModeSelect";
 import WorkoutPlayer from "./components/WorkoutPlayer";
 import SorenessCheck from "./components/SorenessCheck";
 import CalendarView from "./components/CalendarView";
+import PlanControls from "./components/PlanControls";
 import { loadState, saveState, Mode, Soreness, AppState } from "./engine/storage";
-import { generateWorkoutV1 } from "./engine/generateWorkout";
+import { findPlan, getWorkoutForPlan } from "./engine/plans";
 import { dayIntent, dayLabels } from "./engine/library";
 import { MovementPattern } from "../types/MovementPattern";
 import { applyTheme, loadTheme, saveTheme, Theme } from "./ui/theme";
 import { TinyIconButton } from "./ui/Primitives";
+import { toLocalDateKey } from "./utils/date";
 
 type Step = "mode" | "workout" | "soreness" | "calendar";
+
+function nextDayKey(order: string[], last?: string) {
+  if (!last) return order[0];
+  const idx = order.indexOf(last);
+  if (idx < 0) return order[0];
+  return order[(idx + 1) % order.length];
+}
 
 export default function App() {
   const persisted = useMemo(() => loadState(), []);
   const [step, setStep] = useState<Step>("mode");
   const [mode, setMode] = useState<Mode | null>(null);
+
   const [lastDay, setLastDay] = useState(persisted.lastDay);
   const [soreness, setSoreness] = useState(persisted.soreness);
   const [workoutLog, setWorkoutLog] = useState(persisted.workoutLog ?? []);
+
+  const [activePlanId, setActivePlanId] = useState<string | undefined>(persisted.activePlanId ?? "functional-fitness-45");
+  const [dayOverride, setDayOverride] = useState<string | null>(persisted.dayOverride ?? null);
 
   const [theme, setTheme] = useState<Theme>(() => loadTheme());
 
@@ -27,38 +40,47 @@ export default function App() {
     saveTheme(theme);
   }, [theme]);
 
+  const plan = useMemo(() => findPlan(activePlanId), [activePlanId]);
+  const dayKeys = plan.dayKeys;
+
+  const plannedDay = dayOverride ?? nextDayKey(dayKeys, lastDay);
+
+  const workout = useMemo(() => {
+    if (!mode) return null;
+    return getWorkoutForPlan({ plan, dayKey: plannedDay, lastDay, mode, soreness });
+  }, [lastDay, mode, soreness, plan, plannedDay]);
+
+  const dayLabel = workout
+    ? `${dayLabels[workout.day as any] ?? `Day ${workout.day}`} — ${dayIntent[workout.day as any] ?? ""}`
+    : "";
+
+  const modeLabel = mode === "high_performance" ? "🔥" : "🌱";
+
+  const persist = (patch: Partial<AppState>) => {
+    const prev = loadState();
+    saveState({ ...prev, ...patch });
+  };
+
   const start = (m: Mode) => {
     setMode(m);
     setStep("workout");
   };
 
-  const workout = useMemo(() => {
-    if (!mode) return null;
-    return generateWorkoutV1({ lastDay, mode, soreness });
-  }, [lastDay, mode, soreness]);
-
-  const dayLabel = workout ? `${dayLabels[workout.day]} — ${dayIntent[workout.day]}` : "";
-  const modeLabel = mode === "high_performance" ? "🔥" : "🌱";
-
-  const saveSorenessAndLogWorkout = (
-    data: Partial<Record<MovementPattern, Soreness>>,
-    dateISO: string
-  ) => {
+  const saveSorenessAndLogWorkout = (data: Partial<Record<MovementPattern, Soreness>>, dateISO: string) => {
     setSoreness(data);
 
     const prev: AppState = loadState();
 
-    // soreness history (dated)
     const nextSorenessLog = [
       ...(prev.sorenessLog ?? []).filter((e) => e.dateISO !== dateISO),
       { dateISO, soreness: data },
     ].sort((a, b) => (a.dateISO < b.dateISO ? 1 : -1));
 
-    // workout history (dated) — logged when soreness is saved
     const workoutEntry =
       workout && mode
         ? {
             dateISO,
+            planId: plan.id,
             day: workout.day,
             mode,
             title: dayLabel,
@@ -74,14 +96,18 @@ export default function App() {
       : prev.workoutLog ?? [];
 
     const next: AppState = {
+      ...prev,
       lastDay: workout?.day ?? lastDay,
       soreness: data,
       sorenessLog: nextSorenessLog,
       workoutLog: nextWorkoutLog,
+      activePlanId: plan.id,
+      dayOverride: null, // clear after saving
     };
 
     setLastDay(next.lastDay);
     setWorkoutLog(nextWorkoutLog);
+    setDayOverride(null);
     saveState(next);
   };
 
@@ -118,6 +144,20 @@ export default function App() {
       {step === "mode" && (
         <div>
           {topRight}
+          <PlanControls
+            activePlanId={plan.id}
+            onPlanChange={(id) => {
+              setActivePlanId(id);
+              setDayOverride(null);
+              persist({ activePlanId: id, dayOverride: null });
+            }}
+            dayKeys={dayKeys}
+            dayOverride={dayOverride}
+            onDayOverrideChange={(d) => {
+              setDayOverride(d);
+              persist({ dayOverride: d });
+            }}
+          />
           <ModeSelect onSelect={start} />
         </div>
       )}
@@ -145,6 +185,9 @@ export default function App() {
               setStep("mode");
             }}
           />
+
+          {/* safety: date key helper used in SorenessCheck. */}
+          <div style={{ display: "none" }}>{toLocalDateKey(new Date())}</div>
         </div>
       )}
     </>

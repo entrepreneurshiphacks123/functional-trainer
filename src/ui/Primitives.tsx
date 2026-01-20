@@ -218,6 +218,7 @@ export function TinyIconButton({
   );
 }
 
+
 export function Segmented<T extends string>({
   value,
   options,
@@ -225,8 +226,10 @@ export function Segmented<T extends string>({
 }: {
   value: T;
   options: Array<{
-    value: T;
-    label: string;
+    // Accept both "value" (new) and legacy "key" (old)
+    value?: T;
+    key?: T;
+    label?: string;
     tone?: "neutral" | "good" | "warn" | "bad";
   }>;
   onChange: (v: T) => void;
@@ -246,13 +249,15 @@ export function Segmented<T extends string>({
         gap: 8,
       }}
     >
-      {options.map((opt) => {
-        const active = opt.value === value;
+      {options.map((opt, idx) => {
+        const optValue = (opt.value ?? opt.key) as T | undefined;
+        if (!optValue) return null;
+        const active = optValue === value;
 
         return (
           <button
-            key={opt.value}
-            onClick={() => onChange(opt.value)}
+            key={`${optValue}-${idx}`}
+            onClick={() => onChange(optValue)}
             style={{
               borderRadius: 14,
               padding: "10px 10px",
@@ -263,7 +268,8 @@ export function Segmented<T extends string>({
               fontSize: 14,
               cursor: "pointer",
               WebkitTapHighlightColor: "transparent",
-              transition: "transform 120ms ease, filter 120ms ease, background 120ms ease, border-color 120ms ease",
+              transition:
+                "transform 120ms ease, filter 120ms ease, background 120ms ease, border-color 120ms ease",
               transform: "translateZ(0)",
             }}
             onPointerDown={(e) => {
@@ -287,11 +293,10 @@ export function Segmented<T extends string>({
               el.style.filter = "brightness(1)";
             }}
           >
-            {opt.label}
+            {opt.label ?? ""}
           </button>
         );
       })}
     </div>
   );
 }
-

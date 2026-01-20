@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Screen, Button } from "../ui/Primitives";
 import { getLoadFor, setLoadFor } from "../engine/loadLog";
+import { toLocalDateKey } from "../utils/date";
 
 export type WorkoutItem = {
   id: string;
@@ -21,7 +22,8 @@ const slotLabel: Record<WorkoutItem["slot"], string> = {
 };
 
 function isoDate() {
-  return new Date().toISOString().slice(0, 10);
+  // IMPORTANT: local YYYY-MM-DD (prevents date shifting / calendar bugs)
+  return toLocalDateKey(new Date());
 }
 
 function pad2(n: number) {
@@ -64,7 +66,7 @@ function haptic() {
 }
 
 // Small hook: treat narrow screens as “mobile”
-function useIsNarrow(breakpointPx = 860) {
+function useIsNarrow(breakpointPx = 680) {
   const [isNarrow, setIsNarrow] = React.useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia(`(max-width: ${breakpointPx}px)`).matches;
@@ -187,7 +189,9 @@ export default function WorkoutPlayer({
   items: WorkoutItem[];
   onDone: () => void;
 }) {
-  const isNarrow = useIsNarrow(860);
+  // Narrow = stack timer above list. Otherwise: timer takes ~1/3 width.
+  // Keep the horizontal split (timer = 1/3 width) until fairly narrow screens.
+  const isNarrow = useIsNarrow(680);
 
   const [i, setI] = React.useState(0);
   const [selected, setSelected] = React.useState<WorkoutItem | null>(null);
@@ -271,11 +275,11 @@ export default function WorkoutPlayer({
   return (
     <Screen title={`${dayLabel} ${modeLabel}`}>
       <Card>
-        {/* Layout: timer is a constant ~1/3 screen panel */}
+        {/* Layout: timer is a constant 1/3 screen panel (desktop/tablet) */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: isNarrow ? "1fr" : "0.95fr 2fr", // ~1/3 vs 2/3
+            gridTemplateColumns: isNarrow ? "1fr" : "1fr 2fr", // EXACT 1/3 vs 2/3
             gap: 12,
           }}
         >
@@ -291,8 +295,8 @@ export default function WorkoutPlayer({
               alignSelf: "start",
               boxSizing: "border-box",
 
-              // On mobile: keep it visually ~1/3 of the viewport height
-              height: isNarrow ? "33vh" : "calc(100vh - 140px)",
+              // On mobile: keep it compact; on desktop: allow sticky panel
+              height: isNarrow ? "auto" : "calc(100vh - 140px)",
               minHeight: isNarrow ? 220 : 420,
               maxHeight: isNarrow ? 360 : 820,
               overflow: "hidden",
@@ -400,7 +404,11 @@ export default function WorkoutPlayer({
                   <button
                     ref={active ? activeRef : null}
                     key={it.id}
-                    onClick={() => setSelected(it)}
+                    onClick={() => {
+                      // Allow jumping/selecting any exercise directly
+                      setI(idx);
+                      setSelected(it);
+                    }}
                     style={{
                       textAlign: "left",
                       width: "100%",
