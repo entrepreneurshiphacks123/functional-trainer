@@ -14,6 +14,11 @@ export type WorkoutItem = {
   hint?: string;
 };
 
+export type WorkoutData = {
+  day: string; // "A","B","C","D" etc
+  items: WorkoutItem[];
+};
+
 const slotLabel: Record<WorkoutItem["slot"], string> = {
   prep: "Warm-up",
   strength: "Strength",
@@ -22,8 +27,7 @@ const slotLabel: Record<WorkoutItem["slot"], string> = {
 };
 
 function isoDate() {
-  // IMPORTANT: local YYYY-MM-DD (prevents date shifting / calendar bugs)
-  return toLocalDateKey(new Date());
+  return toLocalDateKey(new Date()); // LOCAL YYYY-MM-DD
 }
 
 function pad2(n: number) {
@@ -65,7 +69,6 @@ function haptic() {
   } catch {}
 }
 
-// Small hook: treat narrow screens as “mobile”
 function useIsNarrow(breakpointPx = 680) {
   const [isNarrow, setIsNarrow] = React.useState(() => {
     if (typeof window === "undefined") return false;
@@ -76,7 +79,6 @@ function useIsNarrow(breakpointPx = 680) {
     const mq = window.matchMedia(`(max-width: ${breakpointPx}px)`);
     const handler = () => setIsNarrow(mq.matches);
 
-    // Safari compatibility
     if ((mq as any).addEventListener) (mq as any).addEventListener("change", handler);
     else (mq as any).addListener(handler);
 
@@ -91,7 +93,7 @@ function useIsNarrow(breakpointPx = 680) {
   return isNarrow;
 }
 
-// ------- Modal (scrollable, safe-area, sticky header) -------
+// ------- Modal -------
 function Modal({
   title,
   onClose,
@@ -169,6 +171,7 @@ function Modal({
             paddingBottom: "max(14px, env(safe-area-inset-bottom))",
             overflowY: "auto",
             WebkitOverflowScrolling: "touch",
+            color: "var(--text)",
           }}
         >
           {children}
@@ -179,34 +182,38 @@ function Modal({
 }
 
 export default function WorkoutPlayer({
-  dayLabel,
+  workout,
   modeLabel,
-  items,
-  onDone,
+  plannedDay,
+  dayKeys,
+  onPlannedDayChange,
+  onFinish,
+  onBack,
 }: {
-  dayLabel: string;
+  workout: WorkoutData;
   modeLabel: string;
-  items: WorkoutItem[];
-  onDone: () => void;
+  plannedDay: string;
+  dayKeys: string[];
+  onPlannedDayChange: (d: string) => void;
+  onFinish: () => void;
+  onBack: () => void;
 }) {
-  // Narrow = stack timer above list. Otherwise: timer takes ~1/3 width.
-  // Keep the horizontal split (timer = 1/3 width) until fairly narrow screens.
   const isNarrow = useIsNarrow(680);
+
+  const items = workout.items;
 
   const [i, setI] = React.useState(0);
   const [selected, setSelected] = React.useState<WorkoutItem | null>(null);
 
   // Session timer
-  const [startedAt, setStartedAt] = React.useState<number | null>(null); // epoch ms
+  const [startedAt, setStartedAt] = React.useState<number | null>(null);
   const [elapsedSec, setElapsedSec] = React.useState(0);
 
-  // Auto-scroll active into view
   const activeRef = React.useRef<HTMLButtonElement | null>(null);
   React.useEffect(() => {
     activeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [i]);
 
-  // Restore state on mount / when items change
   React.useEffect(() => {
     const saved = loadWP();
     if (!saved) return;
@@ -216,25 +223,20 @@ export default function WorkoutPlayer({
       const safe = Math.max(0, Math.min(items.length - 1, saved.i));
       setI(safe);
     }
-
     if (typeof saved.startedAt === "number") setStartedAt(saved.startedAt);
     if (typeof saved.elapsedSec === "number") setElapsedSec(saved.elapsedSec);
   }, [items]);
 
-  // Tick session timer
   React.useEffect(() => {
     if (!startedAt) return;
-
     const t = window.setInterval(() => {
       const now = Date.now();
       const sec = Math.max(0, Math.floor((now - startedAt) / 1000));
       setElapsedSec(sec);
     }, 500);
-
     return () => window.clearInterval(t);
   }, [startedAt]);
 
-  // Persist state
   React.useEffect(() => {
     saveWP({
       sig: itemsSig(items),
@@ -259,13 +261,11 @@ export default function WorkoutPlayer({
 
   const goNext = () => {
     haptic();
-    // “Starts when I start the first workout” = first real action.
-    // Next always starts the session if it isn’t already running.
     startSessionIfNeeded();
     setI((x) => Math.min(items.length - 1, x + 1));
   };
 
-  const goBack = () => {
+  const goBackIdx = () => {
     haptic();
     setI((x) => Math.max(0, x - 1));
   };
@@ -273,10 +273,10 @@ export default function WorkoutPlayer({
   const activeItem = items[i];
 
   return (
-    <Screen title={`${dayLabel} ${modeLabel}`}>
-      {/* Day selector (no label) */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '10px 0 12px' }}>
-        {dayKeys.map((k) => {
+    <Screen title={`Day ${plannedDay} ${modeLabel}`}>
+      {/* Day pills only (no text label) */}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "10px 0 12px" }}>
+        {(Array.isArray(dayKeys) ? dayKeys : ["A", "B", "C", "D"]).map((k) => {
           const active = k === plannedDay;
           return (
             <button
@@ -285,23 +285,44 @@ export default function WorkoutPlayer({
               aria-label={`Select Day ${k}`}
               onClick={() => onPlannedDayChange(k)}
               style={{
-                padding: '10px 14px',
+                padding: "10px 14px",
                 borderRadius: 999,
-                border: active ? '1px solid rgba(124,92,255,0.85)' : '1px solid var(--border)',
-                background: active ? 'rgba(124,92,255,0.14)' : 'var(--card)',
+                border: active ? "1px solid rgba(124,92,255,0.85)" : "1px solid var(--border)",
+                background: active ? "rgba(124,92,255,0.14)" : "var(--card)",
+                color: "var(--text)",
                 fontWeight: 950,
-                cursor: 'pointer',
+                cursor: "pointer",
                 minWidth: 48,
-                textAlign: 'center',
+                textAlign: "center",
+                WebkitTapHighlightColor: "transparent",
               }}
             >
               {k}
             </button>
           );
         })}
+
+        <div style={{ flex: 1 }} />
+
+        <button
+          type="button"
+          onClick={onBack}
+          style={{
+            padding: "10px 14px",
+            borderRadius: 999,
+            border: "1px solid var(--border)",
+            background: "var(--card)",
+            color: "var(--text)",
+            fontWeight: 900,
+            cursor: "pointer",
+            WebkitTapHighlightColor: "transparent",
+          }}
+        >
+          ←
+        </button>
       </div>
+
       <Card>
-        {/* Layout: timer is a constant 1/3 screen panel (desktop/tablet) */}
         <div
           style={{
             display: "grid",
@@ -320,8 +341,6 @@ export default function WorkoutPlayer({
               top: 10,
               alignSelf: "start",
               boxSizing: "border-box",
-
-              // On mobile: keep it compact; on desktop: allow sticky panel
               height: isNarrow ? "auto" : "calc(100vh - 140px)",
               minHeight: isNarrow ? 220 : 420,
               maxHeight: isNarrow ? 360 : 820,
@@ -330,6 +349,7 @@ export default function WorkoutPlayer({
               flexDirection: "column",
               justifyContent: "space-between",
               gap: 12,
+              color: "var(--text)",
             }}
           >
             <div style={{ display: "grid", gap: 6 }}>
@@ -388,7 +408,6 @@ export default function WorkoutPlayer({
               </div>
             </div>
 
-            {/* CURRENT EXERCISE PREVIEW (helps this panel feel “worth” 1/3 of screen) */}
             <div
               style={{
                 borderTop: "1px solid var(--border)",
@@ -419,9 +438,8 @@ export default function WorkoutPlayer({
             </div>
           </div>
 
-          {/* RIGHT SIDE: workout list + sticky controls */}
-          <div style={{ minWidth: 0 }}>
-            {/* Full workout list, current exercise highlighted */}
+          {/* RIGHT SIDE */}
+          <div style={{ minWidth: 0, color: "var(--text)" }}>
             <div style={{ display: "grid", gap: 10, padding: "0 4px" }}>
               {items.map((it, idx) => {
                 const active = idx === i;
@@ -431,7 +449,6 @@ export default function WorkoutPlayer({
                     ref={active ? activeRef : null}
                     key={it.id}
                     onClick={() => {
-                      // Allow jumping/selecting any exercise directly
                       setI(idx);
                       setSelected(it);
                     }}
@@ -451,21 +468,15 @@ export default function WorkoutPlayer({
                       transition:
                         "transform 160ms ease, background 160ms ease, padding 160ms ease, box-shadow 160ms ease, border-color 160ms ease",
                       WebkitTapHighlightColor: "transparent",
+                      color: "var(--text)",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        gap: 14,
-                        alignItems: "baseline",
-                      }}
-                    >
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "baseline" }}>
                       <div
                         style={{
                           fontSize: active ? 18 : 16,
                           fontWeight: 950,
-                          opacity: active ? 1 : 0.74,
+                          opacity: active ? 1 : 0.84,
                           letterSpacing: "-0.01em",
                           minWidth: 0,
                         }}
@@ -477,7 +488,7 @@ export default function WorkoutPlayer({
                         style={{
                           fontSize: active ? 18 : 16,
                           fontWeight: 950,
-                          opacity: active ? 1 : 0.74,
+                          opacity: active ? 1 : 0.84,
                           letterSpacing: "-0.01em",
                           whiteSpace: "nowrap",
                           flexShrink: 0,
@@ -488,15 +499,16 @@ export default function WorkoutPlayer({
                     </div>
 
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                      <div style={{ fontSize: 13, opacity: active ? 0.62 : 0.45 }}>{slotLabel[it.slot]}</div>
-                      <div style={{ fontSize: 13, opacity: active ? 0.62 : 0.45 }}>{it.hint ? it.hint : "Tap for details"}</div>
+                      <div style={{ fontSize: 13, opacity: active ? 0.62 : 0.55 }}>{slotLabel[it.slot]}</div>
+                      <div style={{ fontSize: 13, opacity: active ? 0.62 : 0.55 }}>
+                        {it.hint ? it.hint : "Tap for details"}
+                      </div>
                     </div>
                   </button>
                 );
               })}
             </div>
 
-            {/* Sticky controls */}
             <div
               style={{
                 position: "sticky",
@@ -517,7 +529,7 @@ export default function WorkoutPlayer({
                     icon="✅"
                     onClick={() => {
                       haptic();
-                      onDone();
+                      onFinish();
                     }}
                   >
                     Done
@@ -525,7 +537,7 @@ export default function WorkoutPlayer({
                 )}
 
                 {i > 0 ? (
-                  <Button icon="←" variant="ghost" onClick={goBack}>
+                  <Button icon="←" variant="ghost" onClick={goBackIdx}>
                     Back
                   </Button>
                 ) : null}
@@ -562,13 +574,14 @@ function ExerciseDetails({
 
   return (
     <Modal title={item.name} onClose={onClose}>
-      <div style={{ display: "grid", gap: 12 }}>
-        {/* Load */}
+      <div style={{ display: "grid", gap: 12, color: "var(--text)" }}>
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ fontSize: 13, opacity: 0.65 }}>Load</div>
 
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
-            <div style={{ fontSize: 14, fontWeight: 950 }}>{last.lastLoad ? `Last: ${last.lastLoad}` : "Last: —"}</div>
+            <div style={{ fontSize: 14, fontWeight: 950 }}>
+              {last.lastLoad ? `Last: ${last.lastLoad}` : "Last: —"}
+            </div>
             <div style={{ fontSize: 12, opacity: 0.6 }}>{last.lastDateISO ? last.lastDateISO : ""}</div>
           </div>
 
@@ -634,13 +647,11 @@ function ExerciseDetails({
 
         <div style={{ borderTop: "1px solid var(--border)", opacity: 0.7 }} />
 
-        {/* Equipment */}
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
           <div style={{ fontSize: 13, opacity: 0.65 }}>Equipment</div>
           <div style={{ fontSize: 14, fontWeight: 950, textAlign: "right" }}>{item.equipment ?? "—"}</div>
         </div>
 
-        {/* Description */}
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ fontSize: 13, opacity: 0.65 }}>How</div>
           <div style={{ fontSize: 14, lineHeight: 1.55, fontWeight: 750, whiteSpace: "pre-wrap" }}>
