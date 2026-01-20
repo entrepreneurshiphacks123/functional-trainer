@@ -16,6 +16,8 @@ import { toLocalDateKey } from "./utils/date";
 type Step = "mode" | "workout" | "soreness" | "calendar" | "settings";
 
 function nextDayKey(order: string[], last?: string) {
+  // Defensive: corrupted/legacy plans in localStorage can yield empty/undefined day arrays.
+  if (!Array.isArray(order) || order.length === 0) return "A";
   if (!last) return order[0];
   const idx = order.indexOf(last);
   if (idx < 0) return order[0];
@@ -42,7 +44,7 @@ export default function App() {
   }, [theme]);
 
   const plan = useMemo(() => findPlan(activePlanId), [activePlanId]);
-  const dayKeys = plan.dayKeys;
+  const dayKeys = Array.isArray(plan.dayKeys) && plan.dayKeys.length ? plan.dayKeys : ["A", "B", "C", "D"];
 
   const plannedDay = dayOverride ?? nextDayKey(dayKeys, lastDay);
 

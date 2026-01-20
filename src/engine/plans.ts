@@ -25,6 +25,33 @@ export type StaticPlan = {
 
 export type WorkoutPlan = GeneratedPlan | StaticPlan;
 
+function isNonEmptyString(x: any): x is string {
+  return typeof x === "string" && x.trim().length > 0;
+}
+
+function isPlanShapeSafe(p: any): p is WorkoutPlan {
+  if (!p || typeof p !== "object") return false;
+  if (!isNonEmptyString(p.id) || !isNonEmptyString(p.name)) return false;
+
+  if (p.kind === "generated_v1") {
+    return Array.isArray(p.dayKeys) && p.dayKeys.length > 0;
+  }
+
+  if (p.kind === "static") {
+    if (!Array.isArray(p.dayKeys) || p.dayKeys.length === 0) return false;
+    if (!p.days || typeof p.days !== "object") return false;
+    for (const k of p.dayKeys) {
+      const d = p.days[k];
+      if (!d || typeof d !== "object") return false;
+      if (!isNonEmptyString(d.title)) return false;
+      if (!Array.isArray(d.items)) return false;
+    }
+    return true;
+  }
+
+  return false;
+}
+
 const PLANS_KEY = "training_os_plans_v1";
 
 // Built-in plan(s)
@@ -44,12 +71,12 @@ export function loadUserPlans(): WorkoutPlan[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed;
+    // Filter out legacy/corrupted plans so the app can't crash on undefined dayKeys.
+    return parsed.filter(isPlanShapeSafe);
   } catch {
     return [];
   }
 }
-
 export function saveUserPlans(plans: WorkoutPlan[]) {
   try {
     localStorage.setItem(PLANS_KEY, JSON.stringify(plans));
@@ -107,7 +134,9 @@ export function getWorkoutForPlan(args: {
   const { plan, dayKey, mode, soreness, lastDay } = args;
 
   if (plan.kind === "static") {
-    const d = plan.days[dayKey] ?? plan.days[plan.dayKeys[0]];
+    // Defensive: if dayKeys missing somehow, fall back to first key in days.
+    const fallbackKey = plan.dayKeys?.[0] ?? Object.keys(plan.days)[0] ?? dayKey;
+    const d = plan.days[dayKey] ?? plan.days[fallbackKey];
     return { day: dayKey, items: d.items };
   }
 
