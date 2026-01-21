@@ -16,7 +16,6 @@ import { toLocalDateKey } from "./utils/date";
 type Step = "mode" | "workout" | "soreness" | "calendar" | "settings";
 
 function nextDayKey(order: string[], last?: string) {
-  // Defensive: corrupted/legacy plans in localStorage can yield empty/undefined day arrays.
   if (!Array.isArray(order) || order.length === 0) return "A";
   if (!last) return order[0];
   const idx = order.indexOf(last);
@@ -33,7 +32,9 @@ export default function App() {
   const [soreness, setSoreness] = useState(persisted.soreness);
   const [workoutLog, setWorkoutLog] = useState(persisted.workoutLog ?? []);
 
-  const [activePlanId, setActivePlanId] = useState<string | undefined>(persisted.activePlanId ?? "functional-fitness-45");
+  const [activePlanId, setActivePlanId] = useState<string | undefined>(
+    persisted.activePlanId ?? "functional-fitness-45"
+  );
   const [dayOverride, setDayOverride] = useState<string | null>(persisted.dayOverride ?? null);
 
   const [theme, setTheme] = useState<Theme>(() => loadTheme());
@@ -46,7 +47,11 @@ export default function App() {
   const plan = useMemo(() => findPlan(activePlanId), [activePlanId]);
   const dayKeys = Array.isArray(plan.dayKeys) && plan.dayKeys.length ? plan.dayKeys : ["A", "B", "C", "D"];
 
-  const plannedDay = dayOverride ?? nextDayKey(dayKeys, lastDay);
+  const computedPlannedDay = dayOverride ?? nextDayKey(dayKeys, lastDay);
+
+  // ✅ Keep your original soreness behavior: if shoulders are red, avoid C by showing D
+  const plannedDay =
+    soreness?.shoulder_stability === "red" && computedPlannedDay === "C" ? "D" : computedPlannedDay;
 
   const workout = useMemo(() => {
     if (!mode) return null;
@@ -92,10 +97,9 @@ export default function App() {
         : null;
 
     const nextWorkoutLog = workoutEntry
-      ? [
-          ...(prev.workoutLog ?? []).filter((e) => e.dateISO !== dateISO),
-          workoutEntry,
-        ].sort((a, b) => (a.dateISO < b.dateISO ? 1 : -1))
+      ? [...(prev.workoutLog ?? []).filter((e) => e.dateISO !== dateISO), workoutEntry].sort((a, b) =>
+          a.dateISO < b.dateISO ? 1 : -1
+        )
       : prev.workoutLog ?? [];
 
     const next: AppState = {
@@ -105,7 +109,7 @@ export default function App() {
       sorenessLog: nextSorenessLog,
       workoutLog: nextWorkoutLog,
       activePlanId: plan.id,
-      dayOverride: null, // clear after saving
+      dayOverride: null,
     };
 
     setLastDay(next.lastDay);
@@ -121,19 +125,9 @@ export default function App() {
     />
   );
 
-  const calendarBtn = (
-    <TinyIconButton
-      label="📅"
-      onClick={() => setStep((s) => (s === "calendar" ? "mode" : "calendar"))}
-    />
-  );
+  const calendarBtn = <TinyIconButton label="📅" onClick={() => setStep((s) => (s === "calendar" ? "mode" : "calendar"))} />;
 
-  const settingsBtn = (
-    <TinyIconButton
-      label="⚙️"
-      onClick={() => setStep((s) => (s === "settings" ? "mode" : "settings"))}
-    />
-  );
+  const settingsBtn = <TinyIconButton label="⚙️" onClick={() => setStep((s) => (s === "settings" ? "mode" : "settings"))} />;
 
   const topRight = (
     <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginBottom: 10 }}>
@@ -186,9 +180,7 @@ export default function App() {
               setDayOverride(d);
               persist({ dayOverride: d });
             }}
-            onFinish={() => {
-              setStep("soreness");
-            }}
+            onFinish={() => setStep("soreness")}
             onBack={() => {
               setMode(null);
               setStep("mode");
@@ -208,8 +200,6 @@ export default function App() {
               setStep("mode");
             }}
           />
-
-          {/* safety: date key helper used in SorenessCheck. */}
           <div style={{ display: "none" }}>{toLocalDateKey(new Date())}</div>
         </div>
       )}
