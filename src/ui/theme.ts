@@ -20,9 +20,6 @@ export function saveTheme(theme: Theme) {
 }
 
 export function applyTheme(theme: Theme) {
-  // Minimal approach: attach data-theme to <html> so CSS can react
+  // Use a single, consistent hook that CSS can read.
   document.documentElement.setAttribute("data-theme", theme);
-
-  // Also add/remove a class for convenience
-  document.documentElement.classList.toggle("dark", theme === "dark");
 }
