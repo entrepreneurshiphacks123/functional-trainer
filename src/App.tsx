@@ -173,6 +173,7 @@ export default function App() {
           {topRight}
           <WorkoutPlayer
             workout={workout}
+            title={dayLabel}
             modeLabel={modeLabel}
             plannedDay={plannedDay}
             dayKeys={dayKeys}
