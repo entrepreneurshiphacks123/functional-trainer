@@ -1,0 +1,49 @@
+/* src/index.css */
+
+/* Basic reset */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Default (light) theme variables */
+:root {
+  --bg: #f4f7ff;
+  --text: #111111;
+
+  --card: #ffffff;
+  --card2: #f7f7ff;
+
+  --border: rgba(0,0,0,0.10);
+
+  --accent: #7c5cff;
+
+  --good: #22c55e;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+}
+
+/* Dark theme variables */
+html[data-theme="dark"] {
+  --bg: #0b0f1a;
+  --text: #f2f3f7;
+
+  --card: rgba(255,255,255,0.06);
+  --card2: rgba(255,255,255,0.10);
+
+  --border: rgba(255,255,255,0.16);
+
+  --accent: #7c5cff;
+
+  --good: #22c55e;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+}
+
+/* Optional: make tap highlights cleaner on mobile */
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
