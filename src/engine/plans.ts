@@ -23,6 +23,9 @@ export type StaticPlan = {
   kind: "static";
   dayKeys: string[];
   days: Record<string, StaticPlanDay>;
+
+  // ✅ Plan-specific add-on only for high_performance mode
+  highPerformanceExtraByDay?: Partial<Record<string, any>>;
 };
 
 export type WorkoutPlan = GeneratedPlan | StaticPlan;
@@ -56,20 +59,18 @@ function isPlanShapeSafe(p: any): p is WorkoutPlan {
 
 const PLANS_KEY = "training_os_plans_v1";
 
-// Built-in plans are defined in ./builtinPlans (keeps this file small)
-
 export function loadUserPlans(): WorkoutPlan[] {
   try {
     const raw = localStorage.getItem(PLANS_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    // Filter out legacy/corrupted plans so the app can't crash on undefined dayKeys.
     return parsed.filter(isPlanShapeSafe);
   } catch {
     return [];
   }
 }
+
 export function saveUserPlans(plans: WorkoutPlan[]) {
   try {
     localStorage.setItem(PLANS_KEY, JSON.stringify(plans));
@@ -117,6 +118,12 @@ export function upsertUserPlan(plan: WorkoutPlan) {
   saveUserPlans(existing);
 }
 
+function insertBeforeFinish(items: any[], extra: any) {
+  const idxFinish = items.map((x) => x.slot).lastIndexOf("finish");
+  if (idxFinish >= 0) return [...items.slice(0, idxFinish), extra, ...items.slice(idxFinish)];
+  return [...items, extra];
+}
+
 export function getWorkoutForPlan(args: {
   plan: WorkoutPlan;
   dayKey: string;
@@ -127,15 +134,21 @@ export function getWorkoutForPlan(args: {
   const { plan, dayKey, mode, soreness, lastDay } = args;
 
   if (plan.kind === "static") {
-    // Defensive: if dayKeys missing somehow, fall back to first key in days.
     const fallbackKey = plan.dayKeys?.[0] ?? Object.keys(plan.days)[0] ?? dayKey;
     const d = plan.days[dayKey] ?? plan.days[fallbackKey];
-    return { day: dayKey, items: d.items };
+
+    let items = d.items;
+
+    // ✅ Add plan-specific extra only in high_performance
+    if (mode === "high_performance") {
+      const extra = plan.highPerformanceExtraByDay?.[dayKey];
+      if (extra) items = insertBeforeFinish(items, extra);
+    }
+
+    return { day: dayKey, items };
   }
 
   // generated_v1
-  // dayKey is ignored by generator unless we override lastDay.
-  // We simulate “next day == dayKey” by setting lastDay to the previous day.
   const keys = plan.dayKeys;
   const idx = keys.indexOf(dayKey);
   const prevKey = idx <= 0 ? keys[keys.length - 1] : keys[idx - 1];
@@ -143,8 +156,6 @@ export function getWorkoutForPlan(args: {
   return w;
 }
 
-// --- Day titles (used for headers / labels) ---
-// The generated plan doesn't carry titles in its payload, so we define them here.
 const GENERATED_V1_DAY_TITLES: Record<string, string> = {
   A: "Accel + Rotation 🔥",
   B: "Decel + Single-leg",
@@ -152,11 +163,6 @@ const GENERATED_V1_DAY_TITLES: Record<string, string> = {
   D: "Elastic + Footwork 🔥",
 };
 
-/**
- * Returns the human-friendly day title for a plan/day.
- * - Static plans: uses plan.days[dayKey].title
- * - Generated plan: uses the built-in map above
- */
 export function getDayTitleForPlan(plan: WorkoutPlan, dayKey: string): string {
   if (plan.kind === "static") {
     const fallbackKey = plan.dayKeys?.[0] ?? Object.keys(plan.days)[0] ?? dayKey;
