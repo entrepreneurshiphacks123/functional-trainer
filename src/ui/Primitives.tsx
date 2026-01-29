@@ -3,13 +3,15 @@ import React from "react";
 type CSS = React.CSSProperties;
 
 const wrap: CSS = {
-  minHeight: "100%",
+  height: "100%",
+  width: "100%",
   background: "var(--bg)",
   color: "var(--text)",
   padding:
     "max(12px, env(safe-area-inset-top)) 12px calc(80px + env(safe-area-inset-bottom))",
   overflowY: "auto",
   WebkitOverflowScrolling: "touch",
+  boxSizing: "border-box",
 };
 
 const shell: CSS = {

@@ -144,6 +144,7 @@ export default function App() {
           <>
             {step === "mode" && (
               <div style={{ display: "grid", gap: 12 }}>
+                <ModeSelect onSelect={start} />
                 <PlanControls
                   activePlanId={plan.id}
                   onPlanChange={(id) => {
@@ -152,7 +153,6 @@ export default function App() {
                     persist({ activePlanId: id, dayOverride: null });
                   }}
                 />
-                <ModeSelect onSelect={start} />
               </div>
             )}
 

@@ -1,8 +1,15 @@
 /* src/index.css */
 
 /* Basic reset */
-* { box-sizing: border-box; }
-html, body { height: 100%; }
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -28,7 +35,7 @@ body {
   --bad: #ff0000;
 
   /* Blocky style defaults */
-  --radius: 0px; 
+  --radius: 0px;
   --bw: 2px;
 }
 
@@ -52,29 +59,31 @@ html[data-theme="dark"] {
 }
 
 /* Mobile Resets & Optimizations */
-* { 
-  box-sizing: border-box; 
+* {
+  box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 
-html, body { 
-  height: 100%; 
-  overflow: hidden; /* Prevent elastic scroll on body */
-  position: fixed; /* Extra insurance for iOS standalone mode */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* Lock the body to prevent double-scroll/bounce */
   width: 100%;
+  background: var(--bg);
 }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 /* Optional: make tap highlights cleaner on mobile */
-button, a {
+button,
+a {
   -webkit-tap-highlight-color: transparent;
 }
