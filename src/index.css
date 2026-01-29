@@ -1,19 +1,29 @@
 /* src/index.css */
 
 /* Basic reset */
+/* Global Sans-Serif & Mobile Optimization */
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
 }
 
 html,
 body {
   height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background: var(--bg);
+  position: relative;
 }
 
 body {
-  margin: 0;
   background: var(--bg);
   color: var(--text);
+  margin: 0;
+  padding: 0;
 }
 
 /* Default (light) theme variables - Solid & Clean */
@@ -58,28 +68,9 @@ html[data-theme="dark"] {
   --bad: #ff0000;
 }
 
-/* Mobile Resets & Optimizations */
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  /* Lock the body to prevent double-scroll/bounce */
-  width: 100%;
-  background: var(--bg);
-}
-
 #root {
   height: 100%;
   width: 100%;
-  overflow: hidden;
 }
 
 /* Optional: make tap highlights cleaner on mobile */

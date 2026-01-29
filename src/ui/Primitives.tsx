@@ -3,14 +3,12 @@ import React from "react";
 type CSS = React.CSSProperties;
 
 const wrap: CSS = {
-  height: "100%",
+  minHeight: "100vh",
   width: "100%",
   background: "var(--bg)",
   color: "var(--text)",
   padding:
-    "max(12px, env(safe-area-inset-top)) 12px calc(80px + env(safe-area-inset-bottom))",
-  overflowY: "auto",
-  WebkitOverflowScrolling: "touch",
+    "max(12px, env(safe-area-inset-top)) 12px calc(100px + env(safe-area-inset-bottom))",
   boxSizing: "border-box",
 };
 
@@ -362,8 +360,8 @@ export function Modal({
         background: "rgba(0,0,0,0.6)",
         display: "grid",
         alignItems: "end",
-        padding: "12px",
-        zIndex: 200,
+        padding: "8px",
+        zIndex: 1000, // Above bottom nav
       }}
     >
       <div
