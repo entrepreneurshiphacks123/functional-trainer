@@ -3,12 +3,13 @@ import React from "react";
 type CSS = React.CSSProperties;
 
 const wrap: CSS = {
-  minHeight: "100vh",
   width: "100%",
   background: "var(--bg)",
   color: "var(--text)",
-  padding:
-    "max(12px, env(safe-area-inset-top)) 12px calc(100px + env(safe-area-inset-bottom))",
+  paddingTop: "max(12px, env(safe-area-inset-top))",
+  paddingLeft: 12,
+  paddingRight: 12,
+  paddingBottom: "calc(100px + env(safe-area-inset-bottom))", // Ensure space for bottom nav
   boxSizing: "border-box",
 };
 
@@ -353,69 +354,65 @@ export function Modal({
     <div
       role="dialog"
       aria-modal="true"
-      onClick={onClose}
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(0,0,0,0.6)",
-        display: "grid",
-        alignItems: "end",
-        padding: "8px",
-        zIndex: 1000, // Above bottom nav
+        background: "rgba(0,0,0,0.8)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "16px",
+        zIndex: 2000, // Very high level
       }}
+      onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: "var(--card)",
+          background: "var(--bg)",
           border: "var(--bw) solid var(--border)",
           width: "100%",
-          maxWidth: 560,
-          margin: "0 auto",
-          maxHeight: "min(85vh, 720px)",
-          overflow: "hidden",
-          boxSizing: "border-box",
+          maxWidth: 420,
+          maxHeight: "90vh",
           display: "flex",
           flexDirection: "column",
+          borderRadius: "var(--radius)",
         }}
       >
         <div
           style={{
-            background: "var(--bg)",
-            borderBottom: "var(--bw) solid var(--border)",
             padding: "16px",
+            borderBottom: "var(--bw) solid var(--border)",
             display: "flex",
             justifyContent: "space-between",
-            gap: 12,
             alignItems: "center",
+            background: "var(--card2)",
           }}
         >
-          <div style={{ fontSize: 16, fontWeight: 950, textTransform: "uppercase" }}>{title}</div>
+          <div style={{ fontWeight: 950, textTransform: "uppercase", fontSize: 16 }}>{title}</div>
           <button
             onClick={onClose}
             style={{
-              border: "var(--bw) solid var(--border)",
-              background: "var(--card2)",
-              color: "var(--text)",
               padding: "6px 12px",
-              fontSize: 12,
+              border: "var(--bw) solid var(--border)",
+              background: "var(--bg)",
+              color: "var(--text)",
               fontWeight: 950,
               textTransform: "uppercase",
+              fontSize: 12,
               cursor: "pointer",
-              WebkitTapHighlightColor: "transparent",
             }}
           >
             Close
           </button>
         </div>
-
         <div
           style={{
-            padding: 16,
-            paddingBottom: "max(16px, env(safe-area-inset-bottom))",
+            padding: "20px 16px",
             overflowY: "auto",
             WebkitOverflowScrolling: "touch",
-            color: "var(--text)",
+            flex: 1,
           }}
         >
           {children}
