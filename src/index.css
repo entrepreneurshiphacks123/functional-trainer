@@ -9,38 +9,69 @@ body {
   color: var(--text);
 }
 
-/* Default (light) theme variables */
+/* Default (light) theme variables - Solid & Clean */
 :root {
-  --bg: #f4f7ff;
-  --text: #111111;
+  --bg: #ffffff;
+  --text: #000000;
 
   --card: #ffffff;
-  --card2: #f7f7ff;
+  --card2: #f8f9fa;
 
-  --border: rgba(0,0,0,0.10);
+  --border: #000000;
+  --border-light: #e0e0e0;
 
-  --accent: #7c5cff;
+  --accent: #000000;
+  --accent-text: #ffffff;
 
-  --good: #22c55e;
-  --warn: #f59e0b;
-  --bad: #ef4444;
+  --good: #00ff00;
+  --warn: #ffff00;
+  --bad: #ff0000;
+
+  /* Blocky style defaults */
+  --radius: 0px; 
+  --bw: 2px;
 }
 
-/* Dark theme variables */
+/* Dark theme variables - High Contrast */
 html[data-theme="dark"] {
-  --bg: #0b0f1a;
-  --text: #f2f3f7;
+  --bg: #000000;
+  --text: #ffffff;
 
-  --card: rgba(255,255,255,0.06);
-  --card2: rgba(255,255,255,0.10);
+  --card: #000000;
+  --card2: #1a1a1a;
 
-  --border: rgba(255,255,255,0.16);
+  --border: #ffffff;
+  --border-light: #333333;
 
-  --accent: #7c5cff;
+  --accent: #ffffff;
+  --accent-text: #000000;
 
-  --good: #22c55e;
-  --warn: #f59e0b;
-  --bad: #ef4444;
+  --good: #00ff00;
+  --warn: #ffff00;
+  --bad: #ff0000;
+}
+
+/* Mobile Resets & Optimizations */
+* { 
+  box-sizing: border-box; 
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+html, body { 
+  height: 100%; 
+  overflow: hidden; /* Prevent elastic scroll on body */
+  position: fixed; /* Extra insurance for iOS standalone mode */
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Optional: make tap highlights cleaner on mobile */

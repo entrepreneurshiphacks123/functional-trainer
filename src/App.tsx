@@ -10,10 +10,10 @@ import { findPlan, getWorkoutForPlan } from "./engine/plans";
 import { dayIntent, dayLabels } from "./engine/library";
 import { MovementPattern } from "../types/MovementPattern";
 import { applyTheme, loadTheme, saveTheme, Theme } from "./ui/theme";
-import { TinyIconButton } from "./ui/Primitives";
-import { toLocalDateKey } from "./utils/date";
+import { BottomNav } from "./ui/Primitives";
 
-type Step = "mode" | "workout" | "soreness" | "calendar" | "settings";
+type Step = "mode" | "workout" | "soreness";
+type Tab = "workout" | "calendar" | "settings";
 
 function nextDayKey(order: string[], last?: string) {
   if (!Array.isArray(order) || order.length === 0) return "A";
@@ -25,6 +25,7 @@ function nextDayKey(order: string[], last?: string) {
 
 export default function App() {
   const persisted = useMemo(() => loadState(), []);
+  const [activeTab, setActiveTab] = useState<Tab>("workout");
   const [step, setStep] = useState<Step>("mode");
   const [mode, setMode] = useState<Mode | null>(null);
 
@@ -49,7 +50,6 @@ export default function App() {
 
   const computedPlannedDay = dayOverride ?? nextDayKey(dayKeys, lastDay);
 
-  // ✅ Keep your original soreness behavior: if shoulders are red, avoid C by showing D
   const plannedDay =
     soreness?.shoulder_stability === "red" && computedPlannedDay === "C" ? "D" : computedPlannedDay;
 
@@ -59,7 +59,7 @@ export default function App() {
   }, [lastDay, mode, soreness, plan, plannedDay]);
 
   const dayLabel = workout
-    ? `${dayLabels[workout.day as any] ?? `Day ${workout.day}`} — ${dayIntent[workout.day as any] ?? ""}`
+    ? `${(dayLabels as any)[workout.day] ?? `Day ${workout.day}`} — ${(dayIntent as any)[workout.day] ?? ""}`
     : "";
 
   const modeLabel = mode === "high_performance" ? "🔥" : "🌱";
@@ -76,9 +76,7 @@ export default function App() {
 
   const saveSorenessAndLogWorkout = (data: Partial<Record<MovementPattern, Soreness>>, dateISO: string) => {
     setSoreness(data);
-
     const prev: AppState = loadState();
-
     const nextSorenessLog = [
       ...(prev.sorenessLog ?? []).filter((e) => e.dateISO !== dateISO),
       { dateISO, soreness: data },
@@ -87,19 +85,19 @@ export default function App() {
     const workoutEntry =
       workout && mode
         ? {
-            dateISO,
-            planId: plan.id,
-            day: workout.day,
-            mode,
-            title: dayLabel,
-            items: workout.items,
-          }
+          dateISO,
+          planId: plan.id,
+          day: workout.day,
+          mode,
+          title: dayLabel,
+          items: workout.items,
+        }
         : null;
 
     const nextWorkoutLog = workoutEntry
       ? [...(prev.workoutLog ?? []).filter((e) => e.dateISO !== dateISO), workoutEntry].sort((a, b) =>
-          a.dateISO < b.dateISO ? 1 : -1
-        )
+        a.dateISO < b.dateISO ? 1 : -1
+      )
       : prev.workoutLog ?? [];
 
     const next: AppState = {
@@ -118,92 +116,80 @@ export default function App() {
     saveState(next);
   };
 
-  const themeToggle = (
-    <TinyIconButton
-      label={theme === "dark" ? "☀︎" : "☾"}
-      onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-    />
-  );
-
-  const calendarBtn = <TinyIconButton label="📅" onClick={() => setStep((s) => (s === "calendar" ? "mode" : "calendar"))} />;
-
-  const settingsBtn = <TinyIconButton label="⚙️" onClick={() => setStep((s) => (s === "settings" ? "mode" : "settings"))} />;
-
-  const topRight = (
-    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginBottom: 10 }}>
-      {calendarBtn}
-      {settingsBtn}
-      {themeToggle}
-    </div>
-  );
+  const onTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    // When switching to workout tab, if we were in soreness result, go back to mode selection
+    if (tab === "workout" && step === "soreness") {
+      setStep("mode");
+      setMode(null);
+    }
+  };
 
   return (
     <>
-      {step === "calendar" && (
-        <div>
-          {topRight}
-          <CalendarView logs={workoutLog} onBack={() => setStep("mode")} />
-        </div>
-      )}
+      <main>
+        {activeTab === "calendar" && (
+          <CalendarView logs={workoutLog} onBack={() => setActiveTab("workout")} />
+        )}
 
-      {step === "settings" && (
-        <div>
-          {topRight}
-          <Settings onBack={() => setStep("mode")} />
-        </div>
-      )}
-
-      {step === "mode" && (
-        <div>
-          {topRight}
-          <PlanControls
-            activePlanId={plan.id}
-            onPlanChange={(id) => {
-              setActivePlanId(id);
-              setDayOverride(null);
-              persist({ activePlanId: id, dayOverride: null });
-            }}
+        {activeTab === "settings" && (
+          <Settings
+            theme={theme}
+            onThemeToggle={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+            onBack={() => setActiveTab("workout")}
           />
-          <ModeSelect onSelect={start} />
-        </div>
-      )}
+        )}
 
-      {step === "workout" && workout && mode && (
-        <div>
-          {topRight}
-          <WorkoutPlayer
-            workout={workout}
-            title={dayLabel}
-            modeLabel={modeLabel}
-            plannedDay={plannedDay}
-            dayKeys={dayKeys}
-            onPlannedDayChange={(d) => {
-              setDayOverride(d);
-              persist({ dayOverride: d });
-            }}
-            onFinish={() => setStep("soreness")}
-            onBack={() => {
-              setMode(null);
-              setStep("mode");
-            }}
-          />
-        </div>
-      )}
+        {activeTab === "workout" && (
+          <>
+            {step === "mode" && (
+              <div style={{ display: "grid", gap: 12 }}>
+                <PlanControls
+                  activePlanId={plan.id}
+                  onPlanChange={(id) => {
+                    setActivePlanId(id);
+                    setDayOverride(null);
+                    persist({ activePlanId: id, dayOverride: null });
+                  }}
+                />
+                <ModeSelect onSelect={start} />
+              </div>
+            )}
 
-      {step === "soreness" && (
-        <div>
-          {topRight}
-          <SorenessCheck
-            initial={soreness}
-            onSave={saveSorenessAndLogWorkout}
-            onDone={() => {
-              setMode(null);
-              setStep("mode");
-            }}
-          />
-          <div style={{ display: "none" }}>{toLocalDateKey(new Date())}</div>
-        </div>
-      )}
+            {step === "workout" && workout && mode && (
+              <WorkoutPlayer
+                workout={workout as any}
+                workoutLabel={dayLabel}
+                modeLabel={modeLabel}
+                plannedDay={plannedDay}
+                dayKeys={dayKeys}
+                onPlannedDayChange={(d) => {
+                  setDayOverride(d);
+                  persist({ dayOverride: d });
+                }}
+                onFinish={() => setStep("soreness")}
+                onBack={() => {
+                  setMode(null);
+                  setStep("mode");
+                }}
+              />
+            )}
+
+            {step === "soreness" && (
+              <SorenessCheck
+                initial={soreness}
+                onSave={saveSorenessAndLogWorkout}
+                onDone={() => {
+                  setMode(null);
+                  setStep("mode");
+                }}
+              />
+            )}
+          </>
+        )}
+      </main>
+
+      <BottomNav active={activeTab} onTabChange={onTabChange} />
     </>
   );
 }

@@ -1,19 +1,7 @@
 import React from "react";
-import { Button, Card, Screen } from "../ui/Primitives";
-import { fromLocalDateKey, pad2, toLocalDateKey } from "../utils/date";
+import { Button, Card, Screen, Modal } from "../ui/Primitives";
+import { pad2, toLocalDateKey } from "../utils/date";
 import { WorkoutLogEntry } from "../engine/storage";
-
-function monthKey(d: Date) {
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
-}
-
-function startOfMonth(d: Date) {
-  return new Date(d.getFullYear(), d.getMonth(), 1);
-}
-
-function addMonths(d: Date, delta: number) {
-  return new Date(d.getFullYear(), d.getMonth() + delta, 1);
-}
 
 export default function CalendarView({
   logs,
@@ -23,23 +11,23 @@ export default function CalendarView({
   onBack: () => void;
 }) {
   const todayKey = toLocalDateKey(new Date());
-  const [cursor, setCursor] = React.useState<Date>(() => startOfMonth(new Date()));
+  const [cursor, setCursor] = React.useState<Date>(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  });
 
   const logByDate = React.useMemo(() => {
     const m = new Map<string, WorkoutLogEntry>();
     for (const e of logs ?? []) {
-      // newest wins
       if (!m.has(e.dateISO)) m.set(e.dateISO, e);
     }
     return m;
   }, [logs]);
 
   const cells = React.useMemo(() => {
-    const start = startOfMonth(cursor);
+    const start = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
     const month = start.getMonth();
-
-    // Calendar grid: Sun..Sat, 6 rows
-    const firstDow = start.getDay(); // 0=Sun
+    const firstDow = start.getDay();
     const gridStart = new Date(start);
     gridStart.setDate(start.getDate() - firstDow);
 
@@ -62,63 +50,45 @@ export default function CalendarView({
 
   return (
     <Screen
-      title={"Calendar"}
+      title="History"
       right={
         <div style={{ display: "flex", gap: 8 }}>
-          <button
-            type="button"
-            onClick={() => setCursor((d) => addMonths(d, -1))}
-            style={navBtn}
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            onClick={() => setCursor((d) => addMonths(d, 1))}
-            style={navBtn}
-          >
-            →
-          </button>
+          <button onClick={() => setCursor(d => new Date(d.getFullYear(), d.getMonth() - 1, 1))} style={navBtn}>←</button>
+          <button onClick={() => setCursor(d => new Date(d.getFullYear(), d.getMonth() + 1, 1))} style={navBtn}>→</button>
         </div>
       }
     >
-      <Card>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
-          <div style={{ fontSize: 16, fontWeight: 950 }}>{title}</div>
-          <div style={{ fontSize: 12, opacity: 0.65 }}>Tap a day to view</div>
-        </div>
-
-        <div style={{ height: 10 }} />
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
+      <Card title={title}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, background: "var(--border)", border: "var(--bw) solid var(--border)" }}>
           {["S", "M", "T", "W", "T", "F", "S"].map((d) => (
-            <div key={d} style={{ textAlign: "center", fontSize: 12, opacity: 0.65, fontWeight: 850 }}>
+            <div key={d} style={{ textAlign: "center", fontSize: 11, fontWeight: 950, padding: "8px 0", background: "var(--card2)", color: "var(--text)", textTransform: "uppercase" }}>
               {d}
             </div>
           ))}
 
-          {cells.map((c) => {
-            const done = !!c.entry;
-            const isToday = c.key === todayKey;
-
-            return (
-              <DayCell
-                key={c.key}
-                day={c.date.getDate()}
-                inMonth={c.inMonth}
-                done={done}
-                isToday={isToday}
-                entry={c.entry}
-              />
-            );
-          })}
+          {cells.map((c) => (
+            <DayCell
+              key={c.key}
+              day={c.date.getDate()}
+              inMonth={c.inMonth}
+              isToday={c.key === todayKey}
+              entry={c.entry}
+            />
+          ))}
         </div>
 
-        <div style={{ height: 12 }} />
+        <div style={{ height: 20 }} />
 
-        <Button icon="←" variant="ghost" onClick={onBack}>
-          Back
-        </Button>
+        <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>Recent Activity</div>
+          {logs.slice(0, 5).map(log => (
+            <div key={log.dateISO} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", border: "1px solid var(--border-light)", background: "var(--card)" }}>
+              <div style={{ fontWeight: 900 }}>{log.title}</div>
+              <div style={{ fontSize: 12, opacity: 0.7 }}>{log.dateISO}</div>
+            </div>
+          ))}
+          {logs.length === 0 && <div style={{ fontSize: 14, opacity: 0.5, textAlign: "center", padding: "20px 0" }}>No workouts yet.</div>}
+        </div>
       </Card>
     </Screen>
   );
@@ -127,13 +97,11 @@ export default function CalendarView({
 function DayCell({
   day,
   inMonth,
-  done,
   isToday,
   entry,
 }: {
   day: number;
   inMonth: boolean;
-  done: boolean;
   isToday: boolean;
   entry?: WorkoutLogEntry;
 }) {
@@ -143,107 +111,70 @@ function DayCell({
     <>
       <button
         type="button"
-        onClick={() => done && setOpen(true)}
-        disabled={!done}
+        onPointerDown={() => entry && setOpen(true)}
         style={{
           ...cell,
-          opacity: inMonth ? 1 : 0.35,
-          border: isToday ? "1px solid rgba(124,92,255,0.85)" : "1px solid var(--border)",
-          background: done ? "var(--card2)" : "transparent",
-          cursor: done ? "pointer" : "default",
+          opacity: inMonth ? 1 : 0.2,
+          background: entry ? "var(--accent)" : "var(--bg)",
+          color: entry ? "var(--accent-text)" : "var(--text)",
+          border: isToday ? "var(--bw) solid var(--bad)" : "none",
+          cursor: entry ? "pointer" : "default",
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontSize: 13, fontWeight: 900 }}>{day}</div>
-          {done ? (
-            <div
-              aria-hidden="true"
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: 999,
-                background: "var(--good)",
-              }}
-            />
-          ) : null}
-        </div>
+        <span style={{ fontSize: 14, fontWeight: 900 }}>{day}</span>
       </button>
 
       {open && entry ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setOpen(false)}
-          style={overlay}
-        >
-          <div onClick={(e) => e.stopPropagation()} style={modal}>
-            <div style={{ fontSize: 16, fontWeight: 950 }}>{entry.dateISO}</div>
-            <div style={{ height: 6 }} />
-            <div style={{ fontSize: 14, fontWeight: 900 }}>{entry.title}</div>
-            <div style={{ height: 6 }} />
-            <div style={{ fontSize: 12, opacity: 0.7 }}>
-              Plan: {entry.planId ?? "—"} · Mode: {entry.mode}
+        <Modal title="Workout Detail" onClose={() => setOpen(false)}>
+          <div style={{ display: "grid", gap: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <div style={{ fontSize: 18, fontWeight: 950 }}>{entry.title}</div>
+              <div style={{ fontSize: 13, fontWeight: 800, opacity: 0.6 }}>{entry.dateISO}</div>
             </div>
-            <div style={{ height: 12 }} />
-            <button type="button" onClick={() => setOpen(false)} style={closeBtn}>
-              Close
-            </button>
+
+            <div style={{ fontSize: 12, opacity: 0.7, textTransform: "uppercase", fontWeight: 900 }}>
+              Plan: {entry.planId} • Mode: {entry.mode === 'high_performance' ? '🔥 Performance' : '🌱 Base'}
+            </div>
+
+            <div style={{ borderTop: "var(--bw) solid var(--border)", margin: "8px 0" }} />
+
+            <div style={{ display: "grid", gap: 10 }}>
+              <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>Exercises Completed</div>
+              {entry.items.map((it, idx) => (
+                <div key={idx} style={{ padding: "10px 12px", background: "var(--card2)", border: "1px solid var(--border-light)" }}>
+                  <div style={{ fontWeight: 900, fontSize: 14 }}>{it.name}</div>
+                  <div style={{ fontSize: 12, opacity: 0.7 }}>{it.dose}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              <Button onClick={() => setOpen(false)}>Close</Button>
+            </div>
           </div>
-        </div>
+        </Modal>
       ) : null}
     </>
   );
 }
 
 const navBtn: React.CSSProperties = {
-  borderRadius: 12,
-  border: "1px solid var(--border)",
-  background: "var(--card2)",
+  background: "var(--bg)",
   color: "var(--text)",
-  padding: "10px 12px",
-  fontSize: 14,
-  fontWeight: 900,
+  border: "var(--bw) solid var(--border)",
+  padding: "8px 12px",
+  fontSize: 16,
+  fontWeight: 950,
   cursor: "pointer",
-  WebkitTapHighlightColor: "transparent",
 };
 
 const cell: React.CSSProperties = {
-  borderRadius: 12,
-  padding: "10px 10px",
-  minHeight: 44,
-  textAlign: "left",
-  WebkitTapHighlightColor: "transparent",
-};
-
-const overlay: React.CSSProperties = {
-  position: "fixed",
-  inset: 0,
-  background: "rgba(0,0,0,0.55)",
-  display: "grid",
-  alignItems: "end",
-  padding: 12,
-  zIndex: 50,
-};
-
-const modal: React.CSSProperties = {
-  width: "100%",
-  maxWidth: 560,
-  margin: "0 auto",
-  background: "var(--card)",
-  border: "1px solid var(--border)",
-  borderRadius: 18,
-  padding: 14,
-};
-
-const closeBtn: React.CSSProperties = {
-  width: "100%",
-  borderRadius: 14,
-  padding: "12px 12px",
-  border: "1px solid var(--border)",
-  background: "var(--card2)",
-  color: "var(--text)",
-  fontSize: 15,
-  fontWeight: 900,
-  cursor: "pointer",
+  padding: 0,
+  aspectRatio: "1 / 1",
+  textAlign: "center",
   WebkitTapHighlightColor: "transparent",
 };

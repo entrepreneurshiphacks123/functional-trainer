@@ -1,15 +1,15 @@
 import React from "react";
-import { colors, font } from "./styles";
 
 type CSS = React.CSSProperties;
 
 const wrap: CSS = {
-  minHeight: "100vh",
-  background: colors.bg,
-  color: colors.text,
-  fontFamily: font.system,
+  minHeight: "100%",
+  background: "var(--bg)",
+  color: "var(--text)",
   padding:
-    "max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))",
+    "max(12px, env(safe-area-inset-top)) 12px calc(80px + env(safe-area-inset-bottom))",
+  overflowY: "auto",
+  WebkitOverflowScrolling: "touch",
 };
 
 const shell: CSS = {
@@ -23,23 +23,19 @@ function pressHandlers() {
   return {
     onPointerDown: (e: React.PointerEvent<HTMLElement>) => {
       const el = e.currentTarget as HTMLElement;
-      el.style.transform = "scale(0.985)";
-      el.style.filter = "brightness(0.98)";
+      el.style.transform = "translate(1px, 1px)";
     },
     onPointerUp: (e: React.PointerEvent<HTMLElement>) => {
       const el = e.currentTarget as HTMLElement;
-      el.style.transform = "scale(1)";
-      el.style.filter = "brightness(1)";
+      el.style.transform = "translate(0, 0)";
     },
     onPointerCancel: (e: React.PointerEvent<HTMLElement>) => {
       const el = e.currentTarget as HTMLElement;
-      el.style.transform = "scale(1)";
-      el.style.filter = "brightness(1)";
+      el.style.transform = "translate(0, 0)";
     },
     onPointerLeave: (e: React.PointerEvent<HTMLElement>) => {
       const el = e.currentTarget as HTMLElement;
-      el.style.transform = "scale(1)";
-      el.style.filter = "brightness(1)";
+      el.style.transform = "translate(0, 0)";
     },
   };
 }
@@ -63,15 +59,16 @@ export function Screen({
               justifyContent: "space-between",
               alignItems: "baseline",
               gap: 12,
-              marginBottom: 2,
+              marginBottom: 4,
             }}
           >
             <div
               style={{
-                fontSize: 18,
-                fontWeight: 850,
-                letterSpacing: "-0.01em",
-                lineHeight: 1.2,
+                fontSize: 22,
+                fontWeight: 950,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.1,
+                textTransform: "uppercase",
               }}
             >
               {title ?? ""}
@@ -90,28 +87,34 @@ export function Screen({
 
 export function Card({
   children,
+  title,
   style,
 }: {
   children: React.ReactNode;
+  title?: string;
   style?: React.CSSProperties;
 }) {
   return (
     <div
       style={{
         background: "var(--card)",
-        border: "1px solid var(--border)",
-        borderRadius: 18,
-        padding: 14,
-        boxShadow: "none",
+        border: "var(--bw) solid var(--border)",
+        borderRadius: "var(--radius)",
+        padding: 16,
         ...style,
       }}
     >
+      {title && (
+        <div style={{ fontSize: 13, fontWeight: 900, textTransform: "uppercase", marginBottom: 12, opacity: 0.8 }}>
+          {title}
+        </div>
+      )}
       {children}
     </div>
   );
 }
 
-type ButtonVariant = "primary" | "ghost";
+type ButtonVariant = "primary" | "ghost" | "danger";
 
 export function Button({
   children,
@@ -132,38 +135,39 @@ export function Button({
 }) {
   const base: CSS = {
     width: "100%",
-    borderRadius: 14,
-    padding: "12px 12px",
-    border: "1px solid var(--border)",
-    background: "var(--card2)",
-    color: "var(--text)",
+    borderRadius: "var(--radius)",
+    padding: "16px 12px",
+    border: "var(--bw) solid var(--border)",
     fontSize: 15,
-    fontWeight: 850,
-    letterSpacing: "-0.01em",
+    fontWeight: 950,
+    textTransform: "uppercase",
+    letterSpacing: "0.02em",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     gap: 10,
     cursor: disabled ? "not-allowed" : "pointer",
-    opacity: disabled ? 0.55 : 1,
+    opacity: disabled ? 0.5 : 1,
     userSelect: "none",
     WebkitTapHighlightColor: "transparent",
-    transition:
-      "transform 120ms ease, filter 120ms ease, background 120ms ease, border-color 120ms ease, opacity 120ms ease",
+    transition: "transform 60ms ease",
     transform: "translateZ(0)",
   };
 
   const v: CSS =
     variant === "primary"
       ? {
-          background: "var(--accent)",
-          color: "#FFFFFF", // <- key: white text
-          border: "1px solid rgba(255,255,255,0.10)",
+        background: "var(--accent)",
+        color: "var(--accent-text)",
+      }
+      : variant === "danger"
+        ? {
+          background: "var(--bad)",
+          color: "#FFFFFF",
         }
-      : {
+        : {
           background: "transparent",
           color: "var(--text)",
-          border: "1px solid var(--border)",
         };
 
   const handlers = disabled ? {} : pressHandlers();
@@ -197,19 +201,17 @@ export function TinyIconButton({
       onClick={onClick}
       title={title}
       style={{
-        borderRadius: 12,
-        border: "1px solid var(--border)",
+        borderRadius: "var(--radius)",
+        border: "var(--bw) solid var(--border)",
         background: "var(--card2)",
         color: "var(--text)",
         padding: "10px 10px",
         fontSize: 14,
-        fontWeight: 850,
+        fontWeight: 950,
         cursor: "pointer",
         lineHeight: 1,
         WebkitTapHighlightColor: "transparent",
-        transition:
-          "transform 120ms ease, filter 120ms ease, background 120ms ease, border-color 120ms ease",
-        transform: "translateZ(0)",
+        transition: "transform 60ms ease",
       }}
       {...handlers}
     >
@@ -218,6 +220,64 @@ export function TinyIconButton({
   );
 }
 
+export function BottomNav({
+  active,
+  onTabChange,
+}: {
+  active: "workout" | "calendar" | "settings";
+  onTabChange: (tab: "workout" | "calendar" | "settings") => void;
+}) {
+  const tabs = [
+    { id: "workout", label: "Workout", icon: "🏋️" },
+    { id: "calendar", label: "History", icon: "📅" },
+    { id: "settings", label: "Settings", icon: "⚙️" },
+  ] as const;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: "var(--bg)",
+        borderTop: "var(--bw) solid var(--border)",
+        height: "calc(64px + env(safe-area-inset-bottom))",
+        paddingBottom: "env(safe-area-inset-bottom)",
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        zIndex: 100,
+      }}
+    >
+      {tabs.map((tab) => {
+        const isActive = active === tab.id;
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            style={{
+              border: "none",
+              background: isActive ? "var(--card2)" : "transparent",
+              color: "var(--text)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
+              fontSize: 11,
+              fontWeight: isActive ? 950 : 600,
+              textTransform: "uppercase",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            <span style={{ fontSize: 20 }}>{tab.icon}</span>
+            <span>{tab.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export function Segmented<T extends string>({
   value,
@@ -226,7 +286,6 @@ export function Segmented<T extends string>({
 }: {
   value: T;
   options: Array<{
-    // Accept both "value" (new) and legacy "key" (old)
     value?: T;
     key?: T;
     label?: string;
@@ -246,7 +305,9 @@ export function Segmented<T extends string>({
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${options.length}, 1fr)`,
-        gap: 8,
+        gap: 0,
+        border: "var(--bw) solid var(--border)",
+        background: "var(--border)",
       }}
     >
       {options.map((opt, idx) => {
@@ -259,44 +320,107 @@ export function Segmented<T extends string>({
             key={`${optValue}-${idx}`}
             onClick={() => onChange(optValue)}
             style={{
-              borderRadius: 14,
-              padding: "10px 10px",
-              border: active ? "1px solid rgba(124,92,255,0.70)" : "1px solid var(--border)",
-              background: active ? "var(--card2)" : "transparent",
-              color: active ? "#FFFFFF" : toneColor(opt.tone),
-              fontWeight: 900,
-              fontSize: 14,
+              border: "none",
+              borderRadius: 0,
+              padding: "14px 10px",
+              background: active ? "var(--accent)" : "var(--bg)",
+              color: active ? "var(--accent-text)" : toneColor(opt.tone),
+              fontWeight: 950,
+              fontSize: 13,
+              textTransform: "uppercase",
               cursor: "pointer",
               WebkitTapHighlightColor: "transparent",
-              transition:
-                "transform 120ms ease, filter 120ms ease, background 120ms ease, border-color 120ms ease",
-              transform: "translateZ(0)",
-            }}
-            onPointerDown={(e) => {
-              const el = e.currentTarget as HTMLButtonElement;
-              el.style.transform = "scale(0.985)";
-              el.style.filter = "brightness(0.98)";
-            }}
-            onPointerUp={(e) => {
-              const el = e.currentTarget as HTMLButtonElement;
-              el.style.transform = "scale(1)";
-              el.style.filter = "brightness(1)";
-            }}
-            onPointerCancel={(e) => {
-              const el = e.currentTarget as HTMLButtonElement;
-              el.style.transform = "scale(1)";
-              el.style.filter = "brightness(1)";
-            }}
-            onPointerLeave={(e) => {
-              const el = e.currentTarget as HTMLButtonElement;
-              el.style.transform = "scale(1)";
-              el.style.filter = "brightness(1)";
+              transition: "background 100ms ease",
             }}
           >
             {opt.label ?? ""}
           </button>
         );
       })}
+    </div>
+  );
+}
+export function Modal({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.6)",
+        display: "grid",
+        alignItems: "end",
+        padding: "12px",
+        zIndex: 200,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "var(--card)",
+          border: "var(--bw) solid var(--border)",
+          width: "100%",
+          maxWidth: 560,
+          margin: "0 auto",
+          maxHeight: "min(85vh, 720px)",
+          overflow: "hidden",
+          boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div
+          style={{
+            background: "var(--bg)",
+            borderBottom: "var(--bw) solid var(--border)",
+            padding: "16px",
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            alignItems: "center",
+          }}
+        >
+          <div style={{ fontSize: 16, fontWeight: 950, textTransform: "uppercase" }}>{title}</div>
+          <button
+            onClick={onClose}
+            style={{
+              border: "var(--bw) solid var(--border)",
+              background: "var(--card2)",
+              color: "var(--text)",
+              padding: "6px 12px",
+              fontSize: 12,
+              fontWeight: 950,
+              textTransform: "uppercase",
+              cursor: "pointer",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            Close
+          </button>
+        </div>
+
+        <div
+          style={{
+            padding: 16,
+            paddingBottom: "max(16px, env(safe-area-inset-bottom))",
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
+            color: "var(--text)",
+          }}
+        >
+          {children}
+        </div>
+      </div>
     </div>
   );
 }
