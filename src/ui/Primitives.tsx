@@ -92,7 +92,7 @@ export function Card({
   style,
 }: {
   children: React.ReactNode;
-  title?: string;
+  title?: React.ReactNode;
   style?: React.CSSProperties;
 }) {
   return (

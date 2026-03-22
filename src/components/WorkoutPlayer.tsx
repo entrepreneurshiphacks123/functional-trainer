@@ -263,13 +263,13 @@ export default function WorkoutPlayer({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* SESSION TIMER + EQUIPMENT */}
+        {/* SESSION TIMER */}
         <Card
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            padding: "24px 20px",
+            padding: "32px 20px",
             textAlign: "center",
           }}
         >
@@ -278,7 +278,7 @@ export default function WorkoutPlayer({
           </div>
           <div
             style={{
-              fontSize: 56,
+              fontSize: 72,
               fontWeight: 950,
               letterSpacing: "-0.04em",
               lineHeight: 1,
@@ -291,40 +291,47 @@ export default function WorkoutPlayer({
             <button
               onClick={() => { haptic(); startSessionIfNeeded(); }}
               style={{
-                marginTop: 16,
+                marginTop: 20,
                 background: "var(--accent)",
                 color: "var(--accent-text)",
                 border: "var(--bw) solid var(--border)",
-                padding: "10px 24px",
+                padding: "12px 28px",
                 fontWeight: 950,
                 textTransform: "uppercase",
+                fontSize: 16,
               }}
             >
               Start Workout
             </button>
           )}
-          {equipment.length > 0 && (
-            <button
-              onClick={() => setShowEquipment(true)}
-              style={{
-                marginTop: 12,
-                background: "none",
-                border: "none",
-                color: "var(--accent, #7c5cff)",
-                fontWeight: 800,
-                fontSize: 13,
-                cursor: "pointer",
-                textTransform: "uppercase",
-                letterSpacing: "0.03em",
-              }}
-            >
-              Equipment List
-            </button>
-          )}
         </Card>
 
         {/* CURRENT SCREEN */}
-        <Card title={screen.label}>
+        <Card title={
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span>{screen.label}</span>
+            {equipment.length > 0 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowEquipment(true); }}
+                style={{
+                  background: "none",
+                  border: "1px solid var(--border-light, rgba(0,0,0,0.15))",
+                  color: "var(--text)",
+                  fontWeight: 900,
+                  fontSize: 12,
+                  padding: "4px 8px",
+                  cursor: "pointer",
+                  borderRadius: "var(--radius, 0)",
+                  opacity: 0.6,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.03em",
+                }}
+              >
+                Equipment
+              </button>
+            )}
+          </div>
+        }>
           <div style={{ display: "grid", gap: 0 }}>
             {screen.items.map((item, idx) => {
               const posColor = screen.type === "fc_block" && item.fcPosition
