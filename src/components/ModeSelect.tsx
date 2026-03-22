@@ -20,7 +20,9 @@ export default function ModeSelect({ onSelect }: { onSelect: (m: Mode) => void }
         </div>
 
         <div style={{ fontSize: 13, opacity: 0.75, lineHeight: 1.35 }}>
-          Base = smoother pace. High Performance = more intensity.
+          Base = 30 min, no warmup, 2 contrast blocks + 2 exercises.
+          <br />
+          High Performance = 60 min with warmup, 3 full French Contrast blocks + finisher.
         </div>
       </div>
     </Card>
