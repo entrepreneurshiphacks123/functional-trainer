@@ -10,8 +10,8 @@ export const dayLabels: Record<DayType, string> = {
 };
 
 export const dayIntent: Record<DayType, string> = {
-  A: "Accel + Rotation",
-  B: "Decel + Single-leg",
-  C: "Shoulders + Control",
-  D: "Elastic + Footwork",
+  A: "Hip Hinge + Linear Power",
+  B: "Squat + Lateral Power",
+  C: "Upper Body + Rotation",
+  D: "Elastic + Conditioning",
 };
