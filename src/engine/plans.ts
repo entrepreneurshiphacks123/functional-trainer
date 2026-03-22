@@ -1,6 +1,7 @@
 import { generateWorkoutV1 } from "./generateWorkout";
 import { Mode, SorenessMap } from "./storage";
 import { BUILTIN_PLANS } from "./builtinPlans";
+import { WorkoutItem } from "../../types/WorkoutItem";
 export { BUILTIN_PLANS };
 
 export type GeneratedPlan = {
@@ -13,7 +14,7 @@ export type GeneratedPlan = {
 
 export type StaticPlanDay = {
   title: string;
-  items: any[];
+  items: WorkoutItem[];
 };
 
 export type StaticPlan = {

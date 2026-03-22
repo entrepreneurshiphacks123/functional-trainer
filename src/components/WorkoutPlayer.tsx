@@ -2,28 +2,15 @@ import React from "react";
 import { Card, Screen, Button, TinyIconButton, Modal } from "../ui/Primitives";
 import { getLoadFor, setLoadFor } from "../engine/loadLog";
 import { toLocalDateKey } from "../utils/date";
-
-export type WorkoutItem = {
-  id: string;
-  slot: "prep" | "strength" | "athletic" | "finish";
-  name: string;
-  dose: string;
-
-  equipment?: string;
-  description?: string;
-  hint?: string;
-};
-
-export type WorkoutData = {
-  day: string; // "A","B","C","D" etc
-  items: WorkoutItem[];
-};
+import { WorkoutItem, WorkoutData } from "../../types/WorkoutItem";
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
   prep: "Warm-up",
-  strength: "Strength",
-  athletic: "Athletic",
-  finish: "Finish",
+  fc_block: "French Contrast",
+  individual: "Individual",
+  accessory: "Accessory",
+  finisher: "Finisher",
+  cooldown: "Cooldown",
 };
 
 function isoDate() {
