@@ -50,3 +50,10 @@ export function setLoadFor(itemId: string, load: string) {
   all[itemId] = load;
   writeAll(all);
 }
+
+/**
+ * Get all saved loads as a map of itemId -> load string.
+ */
+export function getAllLoads(): LoadLog {
+  return readAll();
+}

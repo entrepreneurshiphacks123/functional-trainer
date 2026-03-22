@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, Screen, Button, TinyIconButton, Modal } from "../ui/Primitives";
-import { getLoadFor, setLoadFor } from "../engine/loadLog";
+import { getLoadFor, setLoadFor, getAllLoads } from "../engine/loadLog";
 import { pad2, toLocalDateKey } from "../utils/date";
 import { WorkoutItem, WorkoutData } from "../../types/WorkoutItem";
 
@@ -86,6 +86,36 @@ function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
   while (idx < items.length) {
     const item = items[idx];
 
+    // Group warmup items together
+    if (item.slot === "prep") {
+      const prepItems: WorkoutItem[] = [];
+      while (idx < items.length && items[idx].slot === "prep") {
+        prepItems.push(items[idx]);
+        idx++;
+      }
+      screens.push({
+        type: "single",
+        label: "Warm-up",
+        items: prepItems,
+      });
+      continue;
+    }
+
+    // Group accessory items together
+    if (item.slot === "accessory") {
+      const accItems: WorkoutItem[] = [];
+      while (idx < items.length && items[idx].slot === "accessory") {
+        accItems.push(items[idx]);
+        idx++;
+      }
+      screens.push({
+        type: "single",
+        label: "Accessory",
+        items: accItems,
+      });
+      continue;
+    }
+
     // Group FC block items together
     if (item.slot === "fc_block" && item.fcBlock) {
       const blockNum = item.fcBlock;
@@ -101,7 +131,7 @@ function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
       const totalBlocks = [...new Set(items.filter((x) => x.fcBlock).map((x) => x.fcBlock!))].length;
       screens.push({
         type: "fc_block",
-        label: `FC Block ${blockNum} of ${totalBlocks}`,
+        label: `French Contrast ${blockNum} of ${totalBlocks}`,
         items: blockItems,
         restNote,
       });
@@ -138,22 +168,28 @@ function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
   return screens;
 }
 
-// Collect unique equipment for the day
-function collectEquipment(items: WorkoutItem[]): string[] {
-  const set = new Set<string>();
+// Collect unique equipment with saved weights
+function collectEquipmentWithLoads(items: WorkoutItem[]): { name: string; weights: string[] }[] {
+  const loads = getAllLoads();
+  const equipMap = new Map<string, Set<string>>();
+
   for (const item of items) {
     if (item.equipment) {
-      // Split on " + " or ", " to get individual pieces
       const parts = item.equipment.split(/\s*[+,]\s*/);
       for (const p of parts) {
         const trimmed = p.trim();
         if (trimmed && trimmed.toLowerCase() !== "none") {
-          set.add(trimmed);
+          if (!equipMap.has(trimmed)) equipMap.set(trimmed, new Set());
+          const savedLoad = loads[item.id];
+          if (savedLoad) equipMap.get(trimmed)!.add(savedLoad);
         }
       }
     }
   }
-  return [...set].sort();
+
+  return [...equipMap.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([name, weights]) => ({ name, weights: [...weights].sort() }));
 }
 
 
@@ -178,7 +214,7 @@ export default function WorkoutPlayer({
 }) {
   const items = workout.items;
   const screens = React.useMemo(() => buildScreens(items), [items]);
-  const equipment = React.useMemo(() => collectEquipment(items), [items]);
+  const equipment = React.useMemo(() => collectEquipmentWithLoads(items), [items]);
 
   const [screenIdx, setScreenIdx] = React.useState(0);
   const [selected, setSelected] = React.useState<WorkoutItem | null>(null);
@@ -247,12 +283,55 @@ export default function WorkoutPlayer({
     const diff = e.changedTouches[0].clientX - touchStartX.current;
     touchStartX.current = null;
     if (Math.abs(diff) < 60) return; // min swipe distance
-    if (diff < 0 && screenIdx < screens.length - 1) goNext();
-    if (diff > 0 && screenIdx > 0) goBack();
+    if (diff < 0 && screenIdx < screens.length - 1) animatedGoNext();
+    if (diff > 0 && screenIdx > 0) animatedGoBack();
+  };
+
+  // Swipe animation
+  const [slideDir, setSlideDir] = React.useState<"left" | "right" | null>(null);
+  const [animating, setAnimating] = React.useState(false);
+
+  const animatedGoNext = () => {
+    if (animating || screenIdx >= screens.length - 1) return;
+    haptic();
+    startSessionIfNeeded();
+    setSlideDir("left");
+    setAnimating(true);
+    setTimeout(() => {
+      setScreenIdx((x) => Math.min(screens.length - 1, x + 1));
+      setSlideDir(null);
+      setAnimating(false);
+    }, 200);
+  };
+
+  const animatedGoBack = () => {
+    if (animating || screenIdx <= 0) return;
+    haptic();
+    setSlideDir("right");
+    setAnimating(true);
+    setTimeout(() => {
+      setScreenIdx((x) => Math.max(0, x - 1));
+      setSlideDir(null);
+      setAnimating(false);
+    }, 200);
   };
 
   const screen = screens[screenIdx];
-  const screenTitle = workoutLabel ? `${workoutLabel} ${modeLabel}` : modeLabel || "Workout";
+  const screenTitle = workoutLabel
+    ? `Day ${plannedDay} — ${workoutLabel} ${modeLabel}`
+    : modeLabel || "Workout";
+
+  const slideStyle: React.CSSProperties = slideDir
+    ? {
+        transform: slideDir === "left" ? "translateX(-30px)" : "translateX(30px)",
+        opacity: 0.3,
+        transition: "transform 0.2s ease, opacity 0.2s ease",
+      }
+    : {
+        transform: "translateX(0)",
+        opacity: 1,
+        transition: "transform 0.2s ease, opacity 0.2s ease",
+      };
 
   return (
     <Screen
@@ -310,31 +389,7 @@ export default function WorkoutPlayer({
         </Card>
 
         {/* CURRENT SCREEN */}
-        <Card title={
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span>{screen.label}</span>
-            {equipment.length > 0 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); setShowEquipment(true); }}
-                style={{
-                  background: "none",
-                  border: "1px solid var(--border-light, rgba(0,0,0,0.15))",
-                  color: "var(--text)",
-                  fontWeight: 900,
-                  fontSize: 12,
-                  padding: "4px 8px",
-                  cursor: "pointer",
-                  borderRadius: "var(--radius, 0)",
-                  opacity: 0.6,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.03em",
-                }}
-              >
-                Equipment
-              </button>
-            )}
-          </div>
-        }>
+        <Card title={screen.label} style={slideStyle}>
           <div style={{ display: "grid", gap: 0 }}>
             {screen.items.map((item, idx) => {
               const posColor = screen.type === "fc_block" && item.fcPosition
@@ -373,28 +428,6 @@ export default function WorkoutPlayer({
                           }}>
                             {posLabel}
                           </span>
-                        )}
-                        {item.howTo && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); haptic(); setSelected(item); }}
-                            style={{
-                              background: "none",
-                              border: "1px solid var(--border-light, rgba(255,255,255,0.2))",
-                              color: "var(--accent, #7c5cff)",
-                              fontWeight: 900,
-                              fontSize: 11,
-                              width: 20,
-                              height: 20,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              cursor: "pointer",
-                              flexShrink: 0,
-                              borderRadius: 999,
-                            }}
-                          >
-                            ?
-                          </button>
                         )}
                       </div>
                       <div style={{ fontSize: 13, fontWeight: 700, opacity: 0.6, marginTop: 2 }}>
@@ -473,11 +506,11 @@ export default function WorkoutPlayer({
 
           {/* Navigation */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
-            <Button icon="←" variant="ghost" onClick={goBack} disabled={screenIdx === 0}>
+            <Button icon="←" variant="ghost" onClick={animatedGoBack} disabled={screenIdx === 0}>
               Prev
             </Button>
             {screenIdx < screens.length - 1 ? (
-              <Button icon="➡️" onClick={goNext}>
+              <Button icon="➡️" onClick={animatedGoNext}>
                 Next
               </Button>
             ) : (
@@ -522,7 +555,12 @@ export default function WorkoutPlayer({
               })}
             </div>
             <div style={{ height: 12 }} />
-            <Button icon="⏱️" onClick={resetSession}>
+            {equipment.length > 0 && (
+              <Button icon="🎒" variant="ghost" onClick={() => { setShowOptions(false); setShowEquipment(true); }}>
+                Equipment List
+              </Button>
+            )}
+            <Button icon="⏱️" variant="ghost" onClick={resetSession}>
               Reset Session Timer
             </Button>
             <Button icon="←" variant="ghost" onClick={() => { haptic(); setShowOptions(false); onBack(); }}>
@@ -568,16 +606,19 @@ export default function WorkoutPlayer({
           <div style={{ display: "grid", gap: 8 }}>
             {equipment.map((e) => (
               <div
-                key={e}
+                key={e.name}
                 style={{
                   padding: "10px 14px",
                   background: "var(--card2)",
                   border: "1px solid var(--border-light)",
-                  fontWeight: 800,
-                  fontSize: 15,
                 }}
               >
-                {e}
+                <div style={{ fontWeight: 900, fontSize: 15 }}>{e.name}</div>
+                {e.weights.length > 0 && (
+                  <div style={{ fontSize: 13, fontWeight: 700, opacity: 0.6, marginTop: 2 }}>
+                    {e.weights.join(", ")}
+                  </div>
+                )}
               </div>
             ))}
           </div>
