@@ -2,8 +2,7 @@ import { useMemo, useState } from "react";
 import { MovementPattern } from "../../types/MovementPattern";
 import { Button, Card, Screen } from "../ui/Primitives";
 import { toLocalDateKey } from "../utils/date";
-
-type Soreness = "green" | "yellow" | "red";
+import type { Soreness } from "../engine/storage";
 
 const pretty: Record<MovementPattern, string> = {
   acceleration: "Acceleration",

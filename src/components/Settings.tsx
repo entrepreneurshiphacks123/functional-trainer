@@ -31,7 +31,7 @@ export default function Settings({
 }) {
   const [refresh, setRefresh] = useState(0);
   const plans = useMemo(() => getAllPlans(), [refresh]);
-  const userPlans = useMemo(() => loadUserPlans(), [refresh]);
+  const userPlanIds = useMemo(() => new Set(loadUserPlans().map((p: any) => p.id)), [refresh]);
 
   const onUpload = async (file: File) => {
     const text = await file.text();
@@ -149,7 +149,7 @@ export default function Settings({
                 }}>
                   <div style={{ fontWeight: 800 }}>{p.icon} {p.name}</div>
                   <div style={{ fontSize: 11, opacity: 0.6, textTransform: "uppercase" }}>
-                    {userPlans.some((u: any) => u.id === p.id) ? "Custom" : "System"}
+                    {userPlanIds.has(p.id) ? "Custom" : "System"}
                   </div>
                 </div>
               ))}

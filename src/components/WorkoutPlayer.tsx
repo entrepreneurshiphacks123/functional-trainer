@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Screen, Button, TinyIconButton, Modal } from "../ui/Primitives";
 import { getLoadFor, setLoadFor } from "../engine/loadLog";
-import { toLocalDateKey } from "../utils/date";
+import { pad2, toLocalDateKey } from "../utils/date";
 import { WorkoutItem, WorkoutData } from "../../types/WorkoutItem";
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
@@ -15,10 +15,6 @@ const slotLabel: Record<WorkoutItem["slot"], string> = {
 
 function isoDate() {
   return toLocalDateKey(new Date());
-}
-
-function pad2(n: number) {
-  return n.toString().padStart(2, "0");
 }
 
 function formatHMMSS(totalSec: number) {
@@ -54,6 +50,21 @@ function haptic() {
     if (navigator.vibrate) navigator.vibrate(10);
   } catch { }
 }
+
+// FC position colors — visual scan at a glance
+const FC_POSITION_COLORS: Record<number, string> = {
+  1: "#e74c3c", // heavy compound — red
+  2: "#e67e22", // force plyo — orange
+  3: "#f1c40f", // speed-strength — yellow
+  4: "#2ecc71", // speed plyo — green
+};
+
+const FC_POSITION_LABELS: Record<number, string> = {
+  1: "Heavy",
+  2: "Plyo",
+  3: "Speed",
+  4: "Reactive",
+};
 
 // ------- Group items into "screens" -------
 // Each screen is either a single item or a group of FC block items
@@ -387,7 +398,7 @@ export default function WorkoutPlayer({
                 Next
               </Button>
             ) : (
-              <Button icon="✅" onClick={() => { haptic(); onFinish(); }}>
+              <Button icon="✅" onClick={() => { haptic(); try { localStorage.removeItem("wp_state_v3"); } catch {} onFinish(); }}>
                 Done
               </Button>
             )}
@@ -407,7 +418,7 @@ export default function WorkoutPlayer({
             <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>
               Switch Day
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${dayKeys.length}, 1fr)`, gap: 8 }}>
               {dayKeys.map((k) => {
                 const active = k === plannedDay;
                 return (

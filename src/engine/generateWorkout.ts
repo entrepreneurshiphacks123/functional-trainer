@@ -1,7 +1,7 @@
 import { MovementPattern } from "../../types/MovementPattern";
 import { Mode, Soreness } from "./storage";
 import { DayType } from "./library";
-import { WorkoutItem } from "../components/WorkoutPlayer";
+import { WorkoutItem } from "../../types/WorkoutItem";
 
 const dayOrder: DayType[] = ["A", "B", "C", "D"];
 
@@ -24,7 +24,7 @@ function addHighPerformanceExtraHard(items: WorkoutItem[], day: DayType): Workou
     // Day A: rotational power bias
     A: {
       id: "a_hp_extra",
-      slot: "athletic",
+      slot: "fc_block",
       name: "DB clean → push press (alternating)",
       dose: "4×6/side",
       equipment: "Dumbbells",
@@ -36,7 +36,7 @@ function addHighPerformanceExtraHard(items: WorkoutItem[], day: DayType): Workou
     // Day B: decel / single-leg bias
     B: {
       id: "b_hp_extra",
-      slot: "strength",
+      slot: "fc_block",
       name: "DB reverse lunge → push press (alternating)",
       dose: "4×5/side",
       equipment: "Dumbbells",
@@ -48,7 +48,7 @@ function addHighPerformanceExtraHard(items: WorkoutItem[], day: DayType): Workou
     // Day C: shoulders + control (but still full-body)
     C: {
       id: "c_hp_extra",
-      slot: "strength",
+      slot: "fc_block",
       name: "DB thruster",
       dose: "5×4",
       equipment: "Dumbbells",
@@ -60,7 +60,7 @@ function addHighPerformanceExtraHard(items: WorkoutItem[], day: DayType): Workou
     // Day D: elastic / conditioning bias
     D: {
       id: "d_hp_extra",
-      slot: "athletic",
+      slot: "fc_block",
       name: "DB snatch (alternating)",
       dose: "6×4/side",
       equipment: "Dumbbells",
@@ -72,8 +72,8 @@ function addHighPerformanceExtraHard(items: WorkoutItem[], day: DayType): Workou
 
   const extra = EXTRA_BY_DAY[day];
 
-  // Put it before the finisher if a finish slot exists
-  const idxFinish = items.map((x) => x.slot).lastIndexOf("finish");
+  // Put it before the cooldown if a cooldown slot exists
+  const idxFinish = items.map((x) => x.slot).lastIndexOf("cooldown");
   if (idxFinish >= 0) {
     return [...items.slice(0, idxFinish), extra, ...items.slice(idxFinish)];
   }
@@ -116,7 +116,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "a3",
-        slot: "strength",
+        slot: "fc_block",
         name: "KB swings",
         dose: spicy ? "5×10" : "3×10",
         equipment: "Kettlebell",
@@ -126,7 +126,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "a4",
-        slot: "strength",
+        slot: "fc_block",
         name: "Half-kneeling Pallof press",
         dose: spicy ? "4 sets" : "3 sets",
         equipment: "Cable or band",
@@ -136,7 +136,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "a5",
-        slot: "athletic",
+        slot: "fc_block",
         name: "Med-ball rotational throw",
         dose: spicy ? "8×2/side" : "6×2/side",
         equipment: "Med ball + wall",
@@ -146,7 +146,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "a6",
-        slot: "finish",
+        slot: "cooldown",
         name: "Offset suitcase carry",
         dose: "3–5 carries",
         equipment: "Dumbbell or kettlebell",
@@ -168,7 +168,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "b2",
-        slot: "strength",
+        slot: "fc_block",
         name: "Front-foot elevated split squat",
         dose: spicy ? "4 sets" : "3 sets",
         equipment: "DBs + small plate/step",
@@ -178,7 +178,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "b3",
-        slot: "strength",
+        slot: "fc_block",
         name: "Step-downs",
         dose: spicy ? "4×6/side" : "3×6/side",
         equipment: "Box/step",
@@ -188,7 +188,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "b4",
-        slot: "athletic",
+        slot: "fc_block",
         name: "Lateral bound → stick",
         dose: spicy ? "8/side" : "6/side",
         equipment: "None",
@@ -198,7 +198,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "b5",
-        slot: "athletic",
+        slot: "fc_block",
         name: "Shuffle → decel (3-step stop)",
         dose: spicy ? "6 runs" : "4 runs",
         equipment: "Floor line/cones",
@@ -208,7 +208,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "b6",
-        slot: "finish",
+        slot: "cooldown",
         name: "Breathing reset",
         dose: "2 min",
         equipment: "None",
@@ -230,7 +230,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "c2",
-        slot: "strength",
+        slot: "fc_block",
         name: "Bottoms-up carry",
         dose: spicy ? "4 carries" : "3 carries",
         equipment: "Kettlebell",
@@ -240,7 +240,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "c3",
-        slot: "strength",
+        slot: "fc_block",
         name: "Tall-kneeling DB press",
         dose: spicy ? "4×6" : "3×6",
         equipment: "Dumbbells",
@@ -250,7 +250,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "c4",
-        slot: "strength",
+        slot: "fc_block",
         name: "1-arm cable row (pause)",
         dose: spicy ? "4×8/side" : "3×8/side",
         equipment: "Cable or band",
@@ -259,7 +259,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "c5",
-        slot: "athletic",
+        slot: "fc_block",
         name: "Med-ball catch (athletic stance)",
         dose: spicy ? "6×3" : "5×3",
         equipment: "Med ball + partner/wall",
@@ -269,7 +269,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "c6",
-        slot: "finish",
+        slot: "cooldown",
         name: "Alphabet (Shoulders)",
         dose: "2–3 sets",
         equipment: "DB",
@@ -291,7 +291,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "d2",
-        slot: "strength",
+        slot: "fc_block",
         name: "Pogo jumps",
         dose: spicy ? "6×15" : "4×15",
         equipment: "None",
@@ -301,7 +301,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "d3",
-        slot: "athletic",
+        slot: "fc_block",
         name: "Ladder footwork (lateral)",
         dose: spicy ? "8 runs" : "6 runs",
         equipment: "Agility ladder or tape",
@@ -311,7 +311,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "d4",
-        slot: "athletic",
+        slot: "fc_block",
         name: "Line hops (front/back)",
         dose: spicy ? "6×20s" : "5×20s",
         equipment: "Floor line/tape",
@@ -320,7 +320,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "d5",
-        slot: "athletic",
+        slot: "fc_block",
         name: "Single-leg 180 (control)",
         dose: spicy ? "5/side" : "4/side",
         equipment: "None",
@@ -330,7 +330,7 @@ export function generateWorkoutV1(args: {
       },
       {
         id: "d6",
-        slot: "finish",
+        slot: "cooldown",
         name: "Easy walk + breathe",
         dose: "3 min",
         equipment: "None",

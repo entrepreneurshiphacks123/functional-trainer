@@ -280,67 +280,6 @@ export function BottomNav({
   );
 }
 
-export function Segmented<T extends string>({
-  value,
-  options,
-  onChange,
-}: {
-  value: T;
-  options: Array<{
-    value?: T;
-    key?: T;
-    label?: string;
-    tone?: "neutral" | "good" | "warn" | "bad";
-  }>;
-  onChange: (v: T) => void;
-}) {
-  const toneColor = (tone?: "neutral" | "good" | "warn" | "bad") => {
-    if (tone === "good") return "var(--good)";
-    if (tone === "warn") return "var(--warn)";
-    if (tone === "bad") return "var(--bad)";
-    return "var(--text)";
-  };
-
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(${options.length}, 1fr)`,
-        gap: 0,
-        border: "var(--bw) solid var(--border)",
-        background: "var(--border)",
-      }}
-    >
-      {options.map((opt, idx) => {
-        const optValue = (opt.value ?? opt.key) as T | undefined;
-        if (!optValue) return null;
-        const active = optValue === value;
-
-        return (
-          <button
-            key={`${optValue}-${idx}`}
-            onClick={() => onChange(optValue)}
-            style={{
-              border: "none",
-              borderRadius: 0,
-              padding: "14px 10px",
-              background: active ? "var(--accent)" : "var(--bg)",
-              color: active ? "var(--accent-text)" : toneColor(opt.tone),
-              fontWeight: 950,
-              fontSize: 13,
-              textTransform: "uppercase",
-              cursor: "pointer",
-              WebkitTapHighlightColor: "transparent",
-              transition: "background 100ms ease",
-            }}
-          >
-            {opt.label ?? ""}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 export function Modal({
   title,
   onClose,

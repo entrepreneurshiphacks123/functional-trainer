@@ -6,8 +6,7 @@ import CalendarView from "./components/CalendarView";
 import PlanControls from "./components/PlanControls";
 import Settings from "./components/Settings";
 import { loadState, saveState, Mode, Soreness, AppState } from "./engine/storage";
-import { findPlan, getWorkoutForPlan } from "./engine/plans";
-import { dayIntent, dayLabels } from "./engine/library";
+import { findPlan, getWorkoutForPlan, getDayTitleForPlan } from "./engine/plans";
 import { MovementPattern } from "../types/MovementPattern";
 import { applyTheme, loadTheme, saveTheme, Theme } from "./ui/theme";
 import { BottomNav } from "./ui/Primitives";
@@ -34,7 +33,7 @@ export default function App() {
   const [workoutLog, setWorkoutLog] = useState(persisted.workoutLog ?? []);
 
   const [activePlanId, setActivePlanId] = useState<string | undefined>(
-    persisted.activePlanId ?? "functional-fitness-45"
+    persisted.activePlanId ?? "french-contrast-tennis"
   );
   const [dayOverride, setDayOverride] = useState<string | null>(persisted.dayOverride ?? null);
   const [trainingDaysPerWeek, setTrainingDaysPerWeek] = useState<3 | 4>(
@@ -67,7 +66,7 @@ export default function App() {
   }, [lastDay, mode, soreness, plan, plannedDay]);
 
   const dayLabel = workout
-    ? `${(dayLabels as any)[workout.day] ?? `Day ${workout.day}`} — ${(dayIntent as any)[workout.day] ?? ""}`
+    ? getDayTitleForPlan(plan, workout.day)
     : "";
 
   const modeLabel = mode === "high_performance" ? "🔥" : "🌱";
@@ -171,7 +170,7 @@ export default function App() {
 
             {step === "workout" && workout && mode && (
               <WorkoutPlayer
-                workout={workout as any}
+                workout={workout!}
                 workoutLabel={dayLabel}
                 modeLabel={modeLabel}
                 plannedDay={plannedDay}

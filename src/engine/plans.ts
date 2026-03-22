@@ -120,7 +120,7 @@ export function upsertUserPlan(plan: WorkoutPlan) {
 }
 
 function insertBeforeFinish(items: any[], extra: any) {
-  const idxFinish = items.map((x) => x.slot).lastIndexOf("finish");
+  const idxFinish = items.map((x) => x.slot).lastIndexOf("cooldown");
   if (idxFinish >= 0) return [...items.slice(0, idxFinish), extra, ...items.slice(idxFinish)];
   return [...items, extra];
 }

@@ -81,7 +81,7 @@ export default function CalendarView({
 
         <div style={{ display: "grid", gap: 10 }}>
           <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>Recent Activity</div>
-          {logs.slice(0, 5).map(log => (
+          {[...logs].sort((a, b) => (a.dateISO < b.dateISO ? 1 : -1)).slice(0, 5).map(log => (
             <div key={log.dateISO} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", border: "1px solid var(--border-light)", background: "var(--card)" }}>
               <div style={{ fontWeight: 900 }}>{log.title}</div>
               <div style={{ fontSize: 12, opacity: 0.7 }}>{log.dateISO}</div>
@@ -111,7 +111,7 @@ function DayCell({
     <>
       <button
         type="button"
-        onPointerDown={() => entry && setOpen(true)}
+        onClick={() => entry && setOpen(true)}
         style={{
           ...cell,
           opacity: inMonth ? 1 : 0.2,

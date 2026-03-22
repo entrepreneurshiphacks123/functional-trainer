@@ -1,7 +1,7 @@
 // src/engine/loadLog.ts
 //
 // Stores per-exercise load notes (e.g., "50s", "135x5", etc) in localStorage.
-// Keyed by workout item name so it works across plans.
+// Keyed by workout item ID so it works across plans.
 
 const KEY = "training_os_loadlog_v1";
 
@@ -35,19 +35,19 @@ function writeAll(next: LoadLog) {
 }
 
 /**
- * Get the saved load for a given movement/exercise name.
+ * Get the saved load for a given workout item ID.
  */
-export function getLoadFor(exerciseName: string): string {
+export function getLoadFor(itemId: string): string {
   const all = readAll();
-  return all[exerciseName] ?? "";
+  return all[itemId] ?? "";
 }
 
 /**
- * Save the load for a given movement/exercise name.
+ * Save the load for a given workout item ID.
  */
-export function setLoadFor(exerciseName: string, load: string) {
+export function setLoadFor(itemId: string, load: string) {
   const all = readAll();
-  all[exerciseName] = load;
+  all[itemId] = load;
   writeAll(all);
 }
 
