@@ -60,7 +60,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "185 lb (bar + 45+25/side)",
+          suggestedLoad: "185 lb (two 45s + two 25s)",
         },
         {
           id: "a_fc1_2",
@@ -109,7 +109,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "155 lb (bar + 45+10/side)",
+          suggestedLoad: "155 lb (two 45s + two 10s)",
         },
         {
           id: "a_fc2_2",
@@ -161,7 +161,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "155 lb (bar + 45+10/side)",
+          suggestedLoad: "155 lb (two 45s + two 10s)",
         },
         {
           id: "a_fc3_2",
@@ -339,7 +339,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "185 lb (bar + 45+25/side)",
+          suggestedLoad: "185 lb (two 45s + two 25s)",
         },
         {
           id: "b_fc1_2",
@@ -617,7 +617,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "155 lb (bar + 45+10/side)",
+          suggestedLoad: "155 lb (two 45s + two 10s)",
         },
         {
           id: "c_fc1_2",
@@ -721,7 +721,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "135 lb (bar + 45/side)",
+          suggestedLoad: "135 lb (two 45s)",
         },
         {
           id: "c_fc3_2",
@@ -899,7 +899,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "155 lb (bar + 45+10/side)",
+          suggestedLoad: "155 lb (two 45s + two 10s)",
         },
         {
           id: "d_fc1_2",
