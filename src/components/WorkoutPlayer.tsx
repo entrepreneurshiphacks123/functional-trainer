@@ -3,8 +3,6 @@ import { Card, Screen, Button, TinyIconButton, Modal } from "../ui/Primitives";
 import { getLoadFor, setLoadFor } from "../engine/loadLog";
 import { toLocalDateKey } from "../utils/date";
 import { WorkoutItem, WorkoutData } from "../../types/WorkoutItem";
-import RestTimer from "./RestTimer";
-import HowTo from "./HowTo";
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
   prep: "Warm-up",
@@ -16,7 +14,7 @@ const slotLabel: Record<WorkoutItem["slot"], string> = {
 };
 
 function isoDate() {
-  return toLocalDateKey(new Date()); // LOCAL YYYY-MM-DD
+  return toLocalDateKey(new Date());
 }
 
 function pad2(n: number) {
@@ -51,48 +49,97 @@ function saveWP(data: any) {
   } catch { }
 }
 
-// iOS haptic (when supported)
 function haptic() {
   try {
     if (navigator.vibrate) navigator.vibrate(10);
   } catch { }
 }
 
-function useIsNarrow(breakpointPx = 680) {
-  const [isNarrow, setIsNarrow] = React.useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia(`(max-width: ${breakpointPx}px)`).matches;
-  });
+// ------- Group items into "screens" -------
+// Each screen is either a single item or a group of FC block items
+type WorkoutScreen = {
+  type: "single" | "fc_block" | "finisher";
+  label: string;
+  items: WorkoutItem[];
+  restNote?: string; // e.g. "Rest 2-3 min"
+  roundCount?: number; // for finisher
+};
 
-  React.useEffect(() => {
-    const mq = window.matchMedia(`(max-width: ${breakpointPx}px)`);
-    const handler = () => setIsNarrow(mq.matches);
+function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
+  const screens: WorkoutScreen[] = [];
+  let idx = 0;
 
-    if ((mq as any).addEventListener) (mq as any).addEventListener("change", handler);
-    else (mq as any).addListener(handler);
+  while (idx < items.length) {
+    const item = items[idx];
 
-    handler();
+    // Group FC block items together
+    if (item.slot === "fc_block" && item.fcBlock) {
+      const blockNum = item.fcBlock;
+      const blockItems: WorkoutItem[] = [];
+      while (idx < items.length && items[idx].slot === "fc_block" && items[idx].fcBlock === blockNum) {
+        blockItems.push(items[idx]);
+        idx++;
+      }
+      // Check if next screen is also an FC block (meaning we need rest between)
+      const nextItem = idx < items.length ? items[idx] : null;
+      const restNote = nextItem?.slot === "fc_block" ? "Rest 2-3 min before next block" : undefined;
 
-    return () => {
-      if ((mq as any).removeEventListener) (mq as any).removeEventListener("change", handler);
-      else (mq as any).removeListener(handler);
-    };
-  }, [breakpointPx]);
+      const totalBlocks = [...new Set(items.filter((x) => x.fcBlock).map((x) => x.fcBlock!))].length;
+      screens.push({
+        type: "fc_block",
+        label: `FC Block ${blockNum} of ${totalBlocks}`,
+        items: blockItems,
+        restNote,
+      });
+      continue;
+    }
 
-  return isNarrow;
+    // Group finisher items together
+    if (item.slot === "finisher") {
+      const finisherItems: WorkoutItem[] = [];
+      while (idx < items.length && items[idx].slot === "finisher") {
+        finisherItems.push(items[idx]);
+        idx++;
+      }
+      const rounds = finisherItems[0]?.finisherRounds ?? 3;
+      screens.push({
+        type: "finisher",
+        label: `Finisher — ${rounds} rounds`,
+        items: finisherItems,
+        restNote: "30s rest between rounds",
+        roundCount: rounds,
+      });
+      continue;
+    }
+
+    // Single item screen
+    screens.push({
+      type: "single",
+      label: slotLabel[item.slot] ?? item.slot,
+      items: [item],
+    });
+    idx++;
+  }
+
+  return screens;
 }
 
-// ------- FC block helpers -------
-function getFcBlockLabel(item: WorkoutItem, items: WorkoutItem[]): string | undefined {
-  if (item.slot !== "fc_block" || !item.fcBlock) return undefined;
-  const blockNums = [...new Set(items.filter((x) => x.fcBlock).map((x) => x.fcBlock!))];
-  return `Block ${item.fcBlock} of ${blockNums.length}`;
-}
-
-function getFcPositionLabel(item: WorkoutItem): string | undefined {
-  if (!item.fcPosition) return undefined;
-  const labels: Record<number, string> = { 1: "Heavy Compound", 2: "Force Plyo", 3: "Speed-Strength", 4: "Speed Plyo" };
-  return labels[item.fcPosition];
+// Collect unique equipment for the day
+function collectEquipment(items: WorkoutItem[]): string[] {
+  const set = new Set<string>();
+  for (const item of items) {
+    if (item.equipment) {
+      // Split on " + " or ", " to get individual pieces
+      const parts = item.equipment.split(/\s*[+,]\s*/);
+      for (const p of parts) {
+        const trimmed = p.trim();
+        if (trimmed && trimmed.toLowerCase() !== "none") {
+          set.add(trimmed);
+        }
+      }
+    }
+  }
+  return [...set].sort();
 }
 
 
@@ -115,66 +162,42 @@ export default function WorkoutPlayer({
   onFinish: () => void;
   onBack: () => void;
 }) {
-  const isNarrow = useIsNarrow(680);
   const items = workout.items;
+  const screens = React.useMemo(() => buildScreens(items), [items]);
+  const equipment = React.useMemo(() => collectEquipment(items), [items]);
 
-  const [i, setI] = React.useState(0);
+  const [screenIdx, setScreenIdx] = React.useState(0);
   const [selected, setSelected] = React.useState<WorkoutItem | null>(null);
   const [showOptions, setShowOptions] = React.useState(false);
   const [showOverview, setShowOverview] = React.useState(false);
-
-  // Rest timer state
-  const [showRestTimer, setShowRestTimer] = React.useState(false);
-  const [restSeconds, setRestSeconds] = React.useState(0);
-  const [finisherRound, setFinisherRound] = React.useState(1);
-  const [pendingIdx, setPendingIdx] = React.useState<number | null>(null);
+  const [showEquipment, setShowEquipment] = React.useState(false);
 
   // Session timer
   const [startedAt, setStartedAt] = React.useState<number | null>(null);
   const [elapsedSec, setElapsedSec] = React.useState(0);
 
-  const activeRef = React.useRef<HTMLButtonElement | null>(null);
-  React.useEffect(() => {
-    activeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [i, showOverview]);
-
   React.useEffect(() => {
     const saved = loadWP();
     if (!saved) return;
     if (saved.sig !== itemsSig(items)) return;
-
-    if (typeof saved.i === "number") {
-      const safe = Math.max(0, Math.min(items.length - 1, saved.i));
-      setI(safe);
+    if (typeof saved.screenIdx === "number") {
+      setScreenIdx(Math.max(0, Math.min(screens.length - 1, saved.screenIdx)));
     }
     if (typeof saved.startedAt === "number") setStartedAt(saved.startedAt);
     if (typeof saved.elapsedSec === "number") setElapsedSec(saved.elapsedSec);
-  }, [items]);
+  }, [items, screens.length]);
 
   React.useEffect(() => {
     if (!startedAt) return;
     const t = window.setInterval(() => {
-      const now = Date.now();
-      const sec = Math.max(0, Math.floor((now - startedAt) / 1000));
-      setElapsedSec(sec);
+      setElapsedSec(Math.max(0, Math.floor((Date.now() - startedAt) / 1000)));
     }, 500);
     return () => window.clearInterval(t);
   }, [startedAt]);
 
   React.useEffect(() => {
-    saveWP({
-      sig: itemsSig(items),
-      i,
-      startedAt,
-      elapsedSec,
-      ts: Date.now(),
-    });
-  }, [items, i, startedAt, elapsedSec]);
-
-  // Reset finisher round when workout changes
-  React.useEffect(() => {
-    setFinisherRound(1);
-  }, [workout]);
+    saveWP({ sig: itemsSig(items), screenIdx, startedAt, elapsedSec, ts: Date.now() });
+  }, [items, screenIdx, startedAt, elapsedSec]);
 
   const startSessionIfNeeded = React.useCallback(() => {
     if (startedAt) return;
@@ -192,59 +215,15 @@ export default function WorkoutPlayer({
   const goNext = () => {
     haptic();
     startSessionIfNeeded();
-
-    const currentItem = items[i];
-    const nextIdx = Math.min(items.length - 1, i + 1);
-    const nextItem = items[nextIdx];
-
-    // Finisher round looping
-    if (currentItem?.slot === "finisher" && currentItem?.finisherRounds) {
-      const isLastFinisher = !nextItem || nextItem.slot !== "finisher" || nextIdx === i;
-      if (isLastFinisher && finisherRound < currentItem.finisherRounds) {
-        // Find first finisher item
-        const firstFinisherIdx = items.findIndex((x) => x.slot === "finisher");
-        setFinisherRound((r) => r + 1);
-        setPendingIdx(firstFinisherIdx);
-        setRestSeconds(30);
-        setShowRestTimer(true);
-        return;
-      }
-    }
-
-    // FC block rest timer
-    if (currentItem?.slot === "fc_block" && currentItem?.restAfter && currentItem.restAfter > 0) {
-      setPendingIdx(nextIdx);
-      setRestSeconds(currentItem.restAfter);
-      setShowRestTimer(true);
-      return;
-    }
-
-    // Normal advance
-    setI(nextIdx);
+    setScreenIdx((x) => Math.min(screens.length - 1, x + 1));
   };
 
-  const onRestComplete = () => {
-    setShowRestTimer(false);
-    if (pendingIdx !== null) {
-      setI(pendingIdx);
-      setPendingIdx(null);
-    }
-  };
-
-  const onRestSkip = () => {
-    setShowRestTimer(false);
-    if (pendingIdx !== null) {
-      setI(pendingIdx);
-      setPendingIdx(null);
-    }
-  };
-
-  const goBackIdx = () => {
+  const goBack = () => {
     haptic();
-    setI((x) => Math.max(0, x - 1));
+    setScreenIdx((x) => Math.max(0, x - 1));
   };
 
-  const activeItem = items[i];
+  const screen = screens[screenIdx];
   const screenTitle = workoutLabel ? `${workoutLabel} ${modeLabel}` : modeLabel || "Workout";
 
   return (
@@ -255,13 +234,13 @@ export default function WorkoutPlayer({
       }
     >
       <div style={{ display: "grid", gap: 16 }}>
-        {/* TIMER BLOCK */}
+        {/* SESSION TIMER + EQUIPMENT */}
         <Card
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            padding: "40px 20px",
+            padding: "24px 20px",
             textAlign: "center",
           }}
         >
@@ -270,7 +249,7 @@ export default function WorkoutPlayer({
           </div>
           <div
             style={{
-              fontSize: 64,
+              fontSize: 56,
               fontWeight: 950,
               letterSpacing: "-0.04em",
               lineHeight: 1,
@@ -283,7 +262,7 @@ export default function WorkoutPlayer({
             <button
               onClick={() => { haptic(); startSessionIfNeeded(); }}
               style={{
-                marginTop: 20,
+                marginTop: 16,
                 background: "var(--accent)",
                 color: "var(--accent-text)",
                 border: "var(--bw) solid var(--border)",
@@ -295,67 +274,127 @@ export default function WorkoutPlayer({
               Start Workout
             </button>
           )}
+          {equipment.length > 0 && (
+            <button
+              onClick={() => setShowEquipment(true)}
+              style={{
+                marginTop: 12,
+                background: "none",
+                border: "none",
+                color: "var(--accent, #7c5cff)",
+                fontWeight: 800,
+                fontSize: 13,
+                cursor: "pointer",
+                textTransform: "uppercase",
+                letterSpacing: "0.03em",
+              }}
+            >
+              Equipment List
+            </button>
+          )}
         </Card>
 
-        {/* ACTIVE EXERCISE BLOCK */}
-        <Card title={`Exercise ${i + 1} of ${items.length}`}>
-          <div style={{ display: "grid", gap: 12 }}>
-            <div
-              onClick={() => { haptic(); setSelected(activeItem); }}
-              style={{ cursor: "pointer" }}
-            >
-              {/* FC block context labels */}
-              {activeItem?.slot === "fc_block" && (
-                <div style={{ fontSize: 12, fontWeight: 900, opacity: 0.5, textTransform: "uppercase", marginBottom: 4 }}>
-                  {getFcBlockLabel(activeItem, items)} • {getFcPositionLabel(activeItem)}
+        {/* CURRENT SCREEN */}
+        <Card title={`${screenIdx + 1} of ${screens.length} — ${screen.label}`}>
+          <div style={{ display: "grid", gap: 0 }}>
+            {screen.items.map((item, idx) => (
+              <div
+                key={item.id}
+                style={{
+                  padding: "10px 0",
+                  borderTop: idx > 0 ? "1px solid var(--border-light, rgba(255,255,255,0.1))" : "none",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      {screen.type === "fc_block" && (
+                        <span style={{ fontSize: 12, fontWeight: 900, opacity: 0.4, minWidth: 18 }}>
+                          {item.fcPosition}.
+                        </span>
+                      )}
+                      <span
+                        style={{ fontSize: 17, fontWeight: 950, lineHeight: 1.2, cursor: "pointer" }}
+                        onClick={() => { haptic(); setSelected(item); }}
+                      >
+                        {item.name}
+                      </span>
+                      {item.howTo && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); haptic(); setSelected(item); }}
+                          style={{
+                            background: "none",
+                            border: "1px solid var(--border-light, rgba(255,255,255,0.2))",
+                            color: "var(--accent, #7c5cff)",
+                            fontWeight: 900,
+                            fontSize: 11,
+                            width: 20,
+                            height: 20,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            flexShrink: 0,
+                            borderRadius: 999,
+                          }}
+                        >
+                          ?
+                        </button>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 700, opacity: 0.6, marginTop: 2 }}>
+                      {item.dose}
+                      {item.equipment && item.equipment.toLowerCase() !== "none" && (
+                        <span> · {item.equipment}</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              )}
-              {activeItem?.slot === "finisher" && activeItem?.finisherRounds && (
-                <div style={{ fontSize: 12, fontWeight: 900, opacity: 0.5, textTransform: "uppercase", marginBottom: 4 }}>
-                  Round {finisherRound} of {activeItem.finisherRounds}
-                </div>
-              )}
-
-              <div style={{ fontSize: 24, fontWeight: 950, lineHeight: 1.1, marginBottom: 4 }}>
-                {activeItem?.name ?? "—"}
               </div>
-              <div style={{ fontSize: 16, fontWeight: 800, opacity: 0.7 }}>
-                {activeItem?.dose ?? ""} • {activeItem ? slotLabel[activeItem.slot] : "—"}
-              </div>
-              {activeItem?.hint && (
-                <div style={{ fontSize: 14, marginTop: 8, opacity: 0.6 }}>
-                  💡 {activeItem.hint}
-                </div>
-              )}
-              {activeItem?.howTo && (
-                <HowTo text={activeItem.howTo} image={activeItem.howToImage} />
-              )}
-            </div>
+            ))}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
-              <Button icon="←" variant="ghost" onClick={goBackIdx} disabled={i === 0}>
-                Prev
+            {/* Rest note between blocks */}
+            {screen.restNote && (
+              <div style={{
+                marginTop: 8,
+                padding: "8px 12px",
+                background: "var(--card2, rgba(255,255,255,0.05))",
+                border: "1px solid var(--border-light, rgba(255,255,255,0.1))",
+                fontSize: 13,
+                fontWeight: 800,
+                opacity: 0.7,
+                textAlign: "center",
+              }}>
+                {screen.restNote}
+              </div>
+            )}
+
+            {/* FC block rest between exercises note */}
+            {screen.type === "fc_block" && (
+              <div style={{ fontSize: 12, opacity: 0.5, marginTop: 8, textAlign: "center" }}>
+                ~20s rest between exercises within block
+              </div>
+            )}
+          </div>
+
+          {/* Navigation */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
+            <Button icon="←" variant="ghost" onClick={goBack} disabled={screenIdx === 0}>
+              Prev
+            </Button>
+            {screenIdx < screens.length - 1 ? (
+              <Button icon="➡️" onClick={goNext}>
+                Next
               </Button>
-              {i < items.length - 1 ? (
-                (activeItem?.slot === "fc_block" && activeItem?.restAfter) ? (
-                  <Button icon="✓" onClick={goNext}>
-                    Done
-                  </Button>
-                ) : (
-                  <Button icon="➡️" onClick={goNext}>
-                    Next
-                  </Button>
-                )
-              ) : (
-                <Button icon="✅" onClick={() => { haptic(); onFinish(); }}>
-                  Done
-                </Button>
-              )}
-            </div>
+            ) : (
+              <Button icon="✅" onClick={() => { haptic(); onFinish(); }}>
+                Done
+              </Button>
+            )}
           </div>
         </Card>
 
-        {/* OVERVIEW / LOG BUTTON */}
+        {/* OVERVIEW BUTTON */}
         <Button variant="ghost" onClick={() => setShowOverview(true)}>
           View Workout Overview
         </Button>
@@ -388,13 +427,10 @@ export default function WorkoutPlayer({
                 );
               })}
             </div>
-
             <div style={{ height: 12 }} />
-
             <Button icon="⏱️" onClick={resetSession}>
               Reset Session Timer
             </Button>
-
             <Button icon="←" variant="ghost" onClick={() => { haptic(); setShowOptions(false); onBack(); }}>
               Exit Workout
             </Button>
@@ -405,59 +441,58 @@ export default function WorkoutPlayer({
       {/* OVERVIEW MODAL */}
       {showOverview && (
         <Modal title="Workout Overview" onClose={() => setShowOverview(false)}>
-          <div style={{ display: "grid", gap: 10 }}>
-            {items.map((it, idx) => {
-              const active = idx === i;
-              const prevItem = idx > 0 ? items[idx - 1] : null;
-              const showBlockHeader = it.fcBlock && (!prevItem || prevItem.fcBlock !== it.fcBlock);
-
+          <div style={{ display: "grid", gap: 6 }}>
+            {screens.map((s, idx) => {
+              const active = idx === screenIdx;
               return (
-                <React.Fragment key={it.id}>
-                  {showBlockHeader && (
-                    <div style={{
-                      fontSize: 11,
-                      fontWeight: 900,
-                      opacity: 0.4,
-                      textTransform: "uppercase",
-                      padding: "8px 12px 4px",
-                      marginTop: idx > 0 ? 8 : 0,
-                    }}>
-                      FC Block {it.fcBlock}
-                    </div>
-                  )}
-                  <button
-                    ref={active ? activeRef : undefined}
-                    onClick={() => { setI(idx); setShowOverview(false); }}
-                    style={{
-                      textAlign: "left",
-                      padding: 12,
-                      background: active ? "var(--card2)" : "transparent",
-                      border: active ? "var(--bw) solid var(--border)" : "1px solid var(--border-light)",
-                      borderRadius: 0,
-                      color: "var(--text)",
-                    }}
-                  >
-                    <div style={{ fontWeight: 900 }}>{idx + 1}. {it.name}</div>
-                    <div style={{ fontSize: 13, opacity: 0.7 }}>{it.dose} • {slotLabel[it.slot]}</div>
-                  </button>
-                </React.Fragment>
+                <button
+                  key={idx}
+                  onClick={() => { setScreenIdx(idx); setShowOverview(false); }}
+                  style={{
+                    textAlign: "left",
+                    padding: 12,
+                    background: active ? "var(--card2)" : "transparent",
+                    border: active ? "var(--bw) solid var(--border)" : "1px solid var(--border-light)",
+                    borderRadius: 0,
+                    color: "var(--text)",
+                  }}
+                >
+                  <div style={{ fontWeight: 900, fontSize: 14 }}>{idx + 1}. {s.label}</div>
+                  <div style={{ fontSize: 12, opacity: 0.6, marginTop: 2 }}>
+                    {s.items.map((it) => it.name).join(" → ")}
+                  </div>
+                </button>
               );
             })}
           </div>
         </Modal>
       )}
 
-      {selected ? <ExerciseDetails item={selected} todayISO={isoDate()} onClose={() => setSelected(null)} /> : null}
+      {/* EQUIPMENT LIST MODAL */}
+      {showEquipment && (
+        <Modal title="Equipment Needed" onClose={() => setShowEquipment(false)}>
+          <div style={{ display: "grid", gap: 8 }}>
+            {equipment.map((e) => (
+              <div
+                key={e}
+                style={{
+                  padding: "10px 14px",
+                  background: "var(--card2)",
+                  border: "1px solid var(--border-light)",
+                  fontWeight: 800,
+                  fontSize: 15,
+                }}
+              >
+                {e}
+              </div>
+            ))}
+          </div>
+        </Modal>
+      )}
 
-      {/* REST TIMER OVERLAY */}
-      {showRestTimer && (
-        <RestTimer
-          seconds={restSeconds}
-          nextExerciseName={pendingIdx !== null ? items[pendingIdx]?.name : items[i + 1]?.name}
-          blockLabel={activeItem ? getFcBlockLabel(activeItem, items) : undefined}
-          onSkip={onRestSkip}
-          onComplete={onRestComplete}
-        />
+      {/* EXERCISE DETAIL MODAL */}
+      {selected && (
+        <ExerciseDetails item={selected} todayISO={isoDate()} onClose={() => setSelected(null)} />
       )}
     </Screen>
   );
@@ -488,11 +523,9 @@ function ExerciseDetails({
       <div style={{ display: "grid", gap: 12, color: "var(--text)" }}>
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>Load Tracking</div>
-
           <div style={{ fontSize: 14, fontWeight: 950 }}>
             {lastLoad ? `Previously: ${lastLoad}` : "No previous load"}
           </div>
-
           <input
             value={load}
             onChange={(e) => setLoad(e.target.value)}
@@ -511,7 +544,6 @@ function ExerciseDetails({
               boxSizing: "border-box",
             }}
           />
-
           <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
             <Button onClick={save}>Save Load</Button>
             <Button variant="ghost" onClick={onClose}>Cancel</Button>
@@ -520,17 +552,21 @@ function ExerciseDetails({
 
         <div style={{ borderTop: "var(--bw) solid var(--border)", margin: "8px 0" }} />
 
-        <div style={{ display: "grid", gap: 4 }}>
-          <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>Equipment</div>
-          <div style={{ fontSize: 15, fontWeight: 900 }}>{item.equipment ?? "No equipment listed"}</div>
-        </div>
-
-        <div style={{ display: "grid", gap: 4 }}>
-          <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>Instructions</div>
-          <div style={{ fontSize: 15, lineHeight: 1.5, fontWeight: 700, whiteSpace: "pre-wrap" }}>
-            {item.description ?? "No description available."}
+        {item.equipment && (
+          <div style={{ display: "grid", gap: 4 }}>
+            <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>Equipment</div>
+            <div style={{ fontSize: 15, fontWeight: 900 }}>{item.equipment}</div>
           </div>
-        </div>
+        )}
+
+        {item.description && (
+          <div style={{ display: "grid", gap: 4 }}>
+            <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>Instructions</div>
+            <div style={{ fontSize: 15, lineHeight: 1.5, fontWeight: 700, whiteSpace: "pre-wrap" }}>
+              {item.description}
+            </div>
+          </div>
+        )}
 
         {item.howTo && (
           <div style={{ display: "grid", gap: 4 }}>
