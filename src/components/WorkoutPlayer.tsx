@@ -3,6 +3,8 @@ import { Card, Screen, Button, TinyIconButton, Modal } from "../ui/Primitives";
 import { getLoadFor, setLoadFor } from "../engine/loadLog";
 import { toLocalDateKey } from "../utils/date";
 import { WorkoutItem, WorkoutData } from "../../types/WorkoutItem";
+import RestTimer from "./RestTimer";
+import HowTo from "./HowTo";
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
   prep: "Warm-up",
@@ -80,6 +82,19 @@ function useIsNarrow(breakpointPx = 680) {
   return isNarrow;
 }
 
+// ------- FC block helpers -------
+function getFcBlockLabel(item: WorkoutItem, items: WorkoutItem[]): string | undefined {
+  if (item.slot !== "fc_block" || !item.fcBlock) return undefined;
+  const blockNums = [...new Set(items.filter((x) => x.fcBlock).map((x) => x.fcBlock!))];
+  return `Block ${item.fcBlock} of ${blockNums.length}`;
+}
+
+function getFcPositionLabel(item: WorkoutItem): string | undefined {
+  if (!item.fcPosition) return undefined;
+  const labels: Record<number, string> = { 1: "Heavy Compound", 2: "Force Plyo", 3: "Speed-Strength", 4: "Speed Plyo" };
+  return labels[item.fcPosition];
+}
+
 
 export default function WorkoutPlayer({
   workout,
@@ -107,6 +122,12 @@ export default function WorkoutPlayer({
   const [selected, setSelected] = React.useState<WorkoutItem | null>(null);
   const [showOptions, setShowOptions] = React.useState(false);
   const [showOverview, setShowOverview] = React.useState(false);
+
+  // Rest timer state
+  const [showRestTimer, setShowRestTimer] = React.useState(false);
+  const [restSeconds, setRestSeconds] = React.useState(0);
+  const [finisherRound, setFinisherRound] = React.useState(1);
+  const [pendingIdx, setPendingIdx] = React.useState<number | null>(null);
 
   // Session timer
   const [startedAt, setStartedAt] = React.useState<number | null>(null);
@@ -150,6 +171,11 @@ export default function WorkoutPlayer({
     });
   }, [items, i, startedAt, elapsedSec]);
 
+  // Reset finisher round when workout changes
+  React.useEffect(() => {
+    setFinisherRound(1);
+  }, [workout]);
+
   const startSessionIfNeeded = React.useCallback(() => {
     if (startedAt) return;
     setStartedAt(Date.now());
@@ -166,7 +192,51 @@ export default function WorkoutPlayer({
   const goNext = () => {
     haptic();
     startSessionIfNeeded();
-    setI((x) => Math.min(items.length - 1, x + 1));
+
+    const currentItem = items[i];
+    const nextIdx = Math.min(items.length - 1, i + 1);
+    const nextItem = items[nextIdx];
+
+    // Finisher round looping
+    if (currentItem?.slot === "finisher" && currentItem?.finisherRounds) {
+      const isLastFinisher = !nextItem || nextItem.slot !== "finisher" || nextIdx === i;
+      if (isLastFinisher && finisherRound < currentItem.finisherRounds) {
+        // Find first finisher item
+        const firstFinisherIdx = items.findIndex((x) => x.slot === "finisher");
+        setFinisherRound((r) => r + 1);
+        setPendingIdx(firstFinisherIdx);
+        setRestSeconds(30);
+        setShowRestTimer(true);
+        return;
+      }
+    }
+
+    // FC block rest timer
+    if (currentItem?.slot === "fc_block" && currentItem?.restAfter && currentItem.restAfter > 0) {
+      setPendingIdx(nextIdx);
+      setRestSeconds(currentItem.restAfter);
+      setShowRestTimer(true);
+      return;
+    }
+
+    // Normal advance
+    setI(nextIdx);
+  };
+
+  const onRestComplete = () => {
+    setShowRestTimer(false);
+    if (pendingIdx !== null) {
+      setI(pendingIdx);
+      setPendingIdx(null);
+    }
+  };
+
+  const onRestSkip = () => {
+    setShowRestTimer(false);
+    if (pendingIdx !== null) {
+      setI(pendingIdx);
+      setPendingIdx(null);
+    }
   };
 
   const goBackIdx = () => {
@@ -234,6 +304,18 @@ export default function WorkoutPlayer({
               onClick={() => { haptic(); setSelected(activeItem); }}
               style={{ cursor: "pointer" }}
             >
+              {/* FC block context labels */}
+              {activeItem?.slot === "fc_block" && (
+                <div style={{ fontSize: 12, fontWeight: 900, opacity: 0.5, textTransform: "uppercase", marginBottom: 4 }}>
+                  {getFcBlockLabel(activeItem, items)} • {getFcPositionLabel(activeItem)}
+                </div>
+              )}
+              {activeItem?.slot === "finisher" && activeItem?.finisherRounds && (
+                <div style={{ fontSize: 12, fontWeight: 900, opacity: 0.5, textTransform: "uppercase", marginBottom: 4 }}>
+                  Round {finisherRound} of {activeItem.finisherRounds}
+                </div>
+              )}
+
               <div style={{ fontSize: 24, fontWeight: 950, lineHeight: 1.1, marginBottom: 4 }}>
                 {activeItem?.name ?? "—"}
               </div>
@@ -245,6 +327,9 @@ export default function WorkoutPlayer({
                   💡 {activeItem.hint}
                 </div>
               )}
+              {activeItem?.howTo && (
+                <HowTo text={activeItem.howTo} image={activeItem.howToImage} />
+              )}
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
@@ -252,9 +337,15 @@ export default function WorkoutPlayer({
                 Prev
               </Button>
               {i < items.length - 1 ? (
-                <Button icon="➡️" onClick={goNext}>
-                  Next
-                </Button>
+                (activeItem?.slot === "fc_block" && activeItem?.restAfter) ? (
+                  <Button icon="✓" onClick={goNext}>
+                    Done
+                  </Button>
+                ) : (
+                  <Button icon="➡️" onClick={goNext}>
+                    Next
+                  </Button>
+                )
               ) : (
                 <Button icon="✅" onClick={() => { haptic(); onFinish(); }}>
                   Done
@@ -317,22 +408,39 @@ export default function WorkoutPlayer({
           <div style={{ display: "grid", gap: 10 }}>
             {items.map((it, idx) => {
               const active = idx === i;
+              const prevItem = idx > 0 ? items[idx - 1] : null;
+              const showBlockHeader = it.fcBlock && (!prevItem || prevItem.fcBlock !== it.fcBlock);
+
               return (
-                <button
-                  key={it.id}
-                  onClick={() => { setI(idx); setShowOverview(false); }}
-                  style={{
-                    textAlign: "left",
-                    padding: 12,
-                    background: active ? "var(--card2)" : "transparent",
-                    border: active ? "var(--bw) solid var(--border)" : "1px solid var(--border-light)",
-                    borderRadius: 0,
-                    color: "var(--text)",
-                  }}
-                >
-                  <div style={{ fontWeight: 900 }}>{idx + 1}. {it.name}</div>
-                  <div style={{ fontSize: 13, opacity: 0.7 }}>{it.dose} • {slotLabel[it.slot]}</div>
-                </button>
+                <React.Fragment key={it.id}>
+                  {showBlockHeader && (
+                    <div style={{
+                      fontSize: 11,
+                      fontWeight: 900,
+                      opacity: 0.4,
+                      textTransform: "uppercase",
+                      padding: "8px 12px 4px",
+                      marginTop: idx > 0 ? 8 : 0,
+                    }}>
+                      FC Block {it.fcBlock}
+                    </div>
+                  )}
+                  <button
+                    ref={active ? activeRef : undefined}
+                    onClick={() => { setI(idx); setShowOverview(false); }}
+                    style={{
+                      textAlign: "left",
+                      padding: 12,
+                      background: active ? "var(--card2)" : "transparent",
+                      border: active ? "var(--bw) solid var(--border)" : "1px solid var(--border-light)",
+                      borderRadius: 0,
+                      color: "var(--text)",
+                    }}
+                  >
+                    <div style={{ fontWeight: 900 }}>{idx + 1}. {it.name}</div>
+                    <div style={{ fontSize: 13, opacity: 0.7 }}>{it.dose} • {slotLabel[it.slot]}</div>
+                  </button>
+                </React.Fragment>
               );
             })}
           </div>
@@ -340,6 +448,17 @@ export default function WorkoutPlayer({
       )}
 
       {selected ? <ExerciseDetails item={selected} todayISO={isoDate()} onClose={() => setSelected(null)} /> : null}
+
+      {/* REST TIMER OVERLAY */}
+      {showRestTimer && (
+        <RestTimer
+          seconds={restSeconds}
+          nextExerciseName={pendingIdx !== null ? items[pendingIdx]?.name : items[i + 1]?.name}
+          blockLabel={activeItem ? getFcBlockLabel(activeItem, items) : undefined}
+          onSkip={onRestSkip}
+          onComplete={onRestComplete}
+        />
+      )}
     </Screen>
   );
 }
@@ -412,6 +531,18 @@ function ExerciseDetails({
             {item.description ?? "No description available."}
           </div>
         </div>
+
+        {item.howTo && (
+          <div style={{ display: "grid", gap: 4 }}>
+            <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>How To</div>
+            <div style={{ fontSize: 15, lineHeight: 1.6, fontWeight: 600, whiteSpace: "pre-wrap" }}>
+              {item.howTo}
+            </div>
+            {item.howToImage && (
+              <img src={item.howToImage} alt="Exercise demo" style={{ width: "100%", marginTop: 8 }} />
+            )}
+          </div>
+        )}
       </div>
     </Modal>
   );
