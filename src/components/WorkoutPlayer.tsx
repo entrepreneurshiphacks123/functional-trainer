@@ -319,7 +319,7 @@ export default function WorkoutPlayer({
 
   const screen = screens[screenIdx];
   const screenTitle = workoutLabel
-    ? `Day ${plannedDay} — ${workoutLabel} ${modeLabel}`
+    ? `Day ${plannedDay} — ${workoutLabel}`
     : modeLabel || "Workout";
 
   const slideStyle: React.CSSProperties = slideDir
