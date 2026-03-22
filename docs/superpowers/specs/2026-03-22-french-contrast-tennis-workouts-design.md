@@ -15,27 +15,18 @@ Redesign the Functional Trainer PWA workout system around French Contrast (FC) t
 
 ## Data Model Changes
 
-### Exercise Type Updates
+### Type Location: Move WorkoutItem to `/types/`
 
-```typescript
-export interface Exercise {
-  id: string;
-  name: string;
-  primaryPattern: MovementPattern;
-  secondaryPattern?: MovementPattern;
-  shoulderSubTag?: ShoulderSubTag;
-  allowedDays: Array<"A" | "B" | "C" | "D">;
-  coordinationLevel: 1 | 2 | 3;
-  loadTypes: Array<"bodyweight" | "db" | "kb" | "band" | "medball" | "barbell" | "trapbar" | "cable" | "box">;
-  isOverhead: boolean;
-  howTo?: string;        // Expandable instructions, collapsed by default
-  howToImage?: string;   // Optional image URL for the how-to
-}
-```
+Currently `WorkoutItem` lives inside `src/components/WorkoutPlayer.tsx`. Move it to `/types/WorkoutItem.ts` as a shared type — both the plan files and the UI components need to import it.
+
+### Exercise Type — No Changes Needed
+
+The `Exercise` interface in `/types/Exercise.ts` is not used by the plan system (plans use `WorkoutItem[]` directly). Leave it as-is. The `howTo` and `howToImage` fields live on `WorkoutItem`, not `Exercise`.
 
 ### WorkoutItem Updates
 
 ```typescript
+// /types/WorkoutItem.ts (moved from WorkoutPlayer.tsx)
 export interface WorkoutItem {
   id: string;
   slot: "prep" | "fc_block" | "individual" | "accessory" | "finisher" | "cooldown";
@@ -44,20 +35,68 @@ export interface WorkoutItem {
   equipment: string;
   description: string;
   hint?: string;
-  howTo?: string;
-  howToImage?: string;
+  howTo?: string;         // Expandable instructions, collapsed by default
+  howToImage?: string;    // Optional image URL for the how-to
   fcBlock?: number;       // Which FC block this belongs to (1, 2, 3)
   fcPosition?: 1 | 2 | 3 | 4;  // Position within the FC block
   restAfter?: number;     // Seconds of rest after this exercise
   hpOnly?: boolean;       // Only shown in High Performance mode
   kneeFlag?: boolean;     // Flag for knee-sensitive exercises
+  finisherRounds?: number; // For finisher exercises: how many rounds to repeat
 }
 ```
+
+### WorkoutPlayer.tsx — slotLabel Map Update
+
+The existing `slotLabel` map must be updated to include the new slot values:
+
+```typescript
+const slotLabel: Record<WorkoutItem["slot"], string> = {
+  prep: "Warm-up",
+  fc_block: "French Contrast",
+  individual: "Individual",
+  accessory: "Accessory",
+  finisher: "Finisher",
+  cooldown: "Cooldown",
+};
+```
+
+The old slot values (`"strength"`, `"athletic"`, `"finish"`) are removed. Existing plans that use them will need to be updated or removed.
+
+### AppState Updates
+
+```typescript
+// Add to AppState in storage.ts
+export type AppState = {
+  lastDay?: string;
+  soreness: SorenessMap;
+  sorenessLog?: SorenessLogEntry[];
+  workoutLog?: WorkoutLogEntry[];
+  activePlanId?: string;
+  dayOverride?: string | null;
+  trainingDaysPerWeek?: 3 | 4;  // NEW: controls day rotation
+};
+```
+
+Default: `trainingDaysPerWeek: 4`. Settings component needs a toggle (3 or 4 days).
+
+### Mode Type — Already Correct
+
+`Mode` in `storage.ts` is `"base" | "high_performance"` — matches the spec. Note: `WorkoutSession.ts` still references `"walk_out_better"` — update that to `"base"` for consistency.
+
+### Soreness Routing — Knee Mapping
+
+There is no `"knee"` key in `MovementPattern`. Knee soreness maps to the existing `"single_leg"` and `"deceleration"` patterns:
+
+- If `single_leg === "red"` OR `deceleration === "red"` → treat as knee issue → skip Day B, offer Day D instead
+- `kneeFlag` on individual exercises allows finer-grained filtering: if either pattern is red, hide/warn on kneeFlag exercises across ALL days
+
+This extends the existing shoulder routing logic (`shoulder_stability === "red"` → skip Day C).
 
 ### New Timing Constants
 
 ```typescript
-const FC_INTRA_REST = 20;     // seconds between exercises within an FC block
+const FC_INTRA_REST = 20;     // seconds between exercises within an FC block (fixed at 20s)
 const FC_INTER_REST = 150;    // seconds (2.5 min) between FC blocks
 const FINISHER_EXERCISE_REST = 0;   // minimal rest within finisher
 const FINISHER_ROUND_REST = 30;     // seconds between finisher rounds
@@ -318,12 +357,37 @@ Each FC block follows this sequence:
 
 ## Rest Timer Enforcement
 
-The app MUST show countdown timers:
-- **Within FC blocks:** 20-30s countdown between exercises. Timer auto-starts when user marks exercise complete.
-- **Between FC blocks:** 2-3 min countdown. Prominent display. User can skip but timer is shown by default.
-- **Finisher rounds:** 30s countdown between rounds.
+The app MUST show countdown timers. Steve tends to under-rest when training alone, which undermines the potentiation effect of French Contrast.
 
-This is critical — Steve tends to under-rest when training alone, which undermines the potentiation effect of French Contrast.
+### UX Flow
+
+The current WorkoutPlayer has Prev/Next navigation showing one exercise at a time. The rest timer integrates as follows:
+
+1. **"Done" button replaces "Next"** within FC blocks. Tapping "Done" marks the exercise complete and immediately shows a **rest timer overlay** on top of the current screen.
+2. **Rest timer overlay:** Full-screen countdown (large numbers), shows the upcoming exercise name below. Has a "Skip Rest" button for impatient moments. Timer auto-advances to the next exercise when it hits 0.
+3. **Between FC blocks:** Same overlay but longer timer (2.5 min). Shows "Block 2 of 3" context.
+4. **Outside FC blocks** (individual, accessory, finisher): "Next" button works as before — no enforced rest timer.
+5. **Timer state:** Local component state only. No localStorage persistence. If the user backgrounds the app, the timer keeps running (browser timer behavior).
+
+### Timer Values (fixed, not ranges)
+
+- **Within FC blocks:** 20s countdown (FC_INTRA_REST)
+- **Between FC blocks:** 2.5 min countdown (FC_INTER_REST)
+- **Finisher rounds:** 30s countdown (FINISHER_ROUND_REST)
+
+## FC Block Visual Grouping
+
+### Overview Screen
+FC blocks appear as grouped sections with a header: "FC Block 1 — Hinge Power". The 4 exercises within are listed as sub-items. Each block is visually distinct (card/border grouping).
+
+### Player Screen
+Still shows one exercise at a time (current UX). Added context:
+- Block-level progress indicator: "Block 1 • Exercise 2 of 4"
+- FC block name shown as subtitle above exercise name
+- Rest timer overlay between exercises (see above)
+
+### Base Mode Display
+In Base mode, FC blocks show only positions 2-3-4 (items with `hpOnly: true` are hidden). The block header still shows but the heavy compound is absent.
 
 ## 3-Day vs 4-Day Week
 
@@ -355,14 +419,37 @@ Full gym assumed:
 - Landmine attachment
 - Bench
 
+## Finisher Structure
+
+Finishers are multi-exercise circuits repeated for rounds. Expressed in WorkoutItem[] as:
+
+- Each exercise in the finisher has `slot: "finisher"` and `finisherRounds: N`
+- The player groups all consecutive `finisher` items and repeats the group N times
+- Between exercises within a round: no rest (FINISHER_EXERCISE_REST = 0)
+- Between rounds: 30s rest timer (FINISHER_ROUND_REST)
+
+Example: Day A finisher = 3 items with `finisherRounds: 3` → player loops through all 3 exercises, then 30s rest, repeat 2 more times.
+
+## Cooldown
+
+All days in HP mode end with a 2 min cooldown (walk it off, nose breathing, long exhales). This is a single WorkoutItem with `slot: "cooldown"`. Base mode has no cooldown.
+
+## Plan Migration
+
+- New plan ID: `french-contrast-tennis`
+- `functional-fitness-45` remains in BUILTIN_PLANS for backward compatibility but is no longer the default
+- `defaultState.activePlanId` updates to `"french-contrast-tennis"`
+- On app load, if `activePlanId` is `"functional-fitness-45"`, show a one-time prompt suggesting the new plan
+- Other existing builtin plans (athletic, hotel, etc.) remain available
+
 ## Plan Structure in Code
 
-This replaces the existing `functionalFitness45` plan. New plan ID: `french-contrast-tennis`.
-
 The existing `StaticPlan` type and `generateWorkoutV1` function will need updates to support:
-1. FC block grouping (visual grouping of 4 exercises)
-2. Mode-based exercise filtering (hpOnly flag)
-3. Rest timer metadata
-4. How-to expandable content
-5. 3-day vs 4-day rotation logic
-6. Knee/shoulder soreness routing with kneeFlag support
+1. FC block grouping (visual grouping of 4 exercises via `fcBlock` + `fcPosition`)
+2. Mode-based exercise filtering (`hpOnly` flag → filter items when mode is `"base"`)
+3. Rest timer metadata (`restAfter` on each item, consumed by WorkoutPlayer)
+4. How-to expandable content (`howTo` field rendered as collapsible section)
+5. 3-day vs 4-day rotation logic (`trainingDaysPerWeek` in AppState → skip Day D when 3)
+6. Knee/shoulder soreness routing (`kneeFlag` + `single_leg`/`deceleration` red check)
+7. Finisher round looping (`finisherRounds` + player logic to repeat the group)
+8. `howTo` strings from the Notes column in the workout tables go into the `howTo` field on WorkoutItem (NOT into `description` — description stays as the short coaching cue)
