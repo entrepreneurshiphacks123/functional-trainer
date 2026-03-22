@@ -28,6 +28,7 @@ export type AppState = {
   workoutLog?: WorkoutLogEntry[];
   activePlanId?: string;
   dayOverride?: string | null;
+  trainingDaysPerWeek?: 3 | 4;
 };
 
 const STORAGE_KEY = "training_os_state_v1";
@@ -37,8 +38,9 @@ const defaultState: AppState = {
   soreness: {},
   sorenessLog: [],
   workoutLog: [],
-  activePlanId: "functional-fitness-45",
+  activePlanId: "french-contrast-tennis",
   dayOverride: null,
+  trainingDaysPerWeek: 4,
 };
 
 function isObject(x: unknown): x is Record<string, any> {
@@ -112,6 +114,7 @@ export function loadState(): AppState {
       workoutLog: sanitizeWorkoutLog(parsed.workoutLog),
       activePlanId: safeString(parsed.activePlanId) ?? defaultState.activePlanId,
       dayOverride: parsed.dayOverride === null ? null : safeString(parsed.dayOverride) ?? null,
+      trainingDaysPerWeek: parsed.trainingDaysPerWeek === 3 ? 3 : 4,
     };
   } catch {
     return { ...defaultState };

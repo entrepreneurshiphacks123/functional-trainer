@@ -37,6 +37,9 @@ export default function App() {
     persisted.activePlanId ?? "functional-fitness-45"
   );
   const [dayOverride, setDayOverride] = useState<string | null>(persisted.dayOverride ?? null);
+  const [trainingDaysPerWeek, setTrainingDaysPerWeek] = useState<3 | 4>(
+    persisted.trainingDaysPerWeek ?? 4
+  );
 
   const [theme, setTheme] = useState<Theme>(() => loadTheme());
 
@@ -46,12 +49,17 @@ export default function App() {
   }, [theme]);
 
   const plan = useMemo(() => findPlan(activePlanId), [activePlanId]);
-  const dayKeys = Array.isArray(plan.dayKeys) && plan.dayKeys.length ? plan.dayKeys : ["A", "B", "C", "D"];
+  const allDayKeys = Array.isArray(plan.dayKeys) && plan.dayKeys.length ? plan.dayKeys : ["A", "B", "C", "D"];
+  const dayKeys = trainingDaysPerWeek === 3 ? allDayKeys.filter((k) => k !== "D") : allDayKeys;
 
   const computedPlannedDay = dayOverride ?? nextDayKey(dayKeys, lastDay);
 
-  const plannedDay =
-    soreness?.shoulder_stability === "red" && computedPlannedDay === "C" ? "D" : computedPlannedDay;
+  const kneeRed = soreness?.single_leg === "red" || soreness?.deceleration === "red";
+  const shoulderRed = soreness?.shoulder_stability === "red";
+
+  let plannedDay = computedPlannedDay;
+  if (shoulderRed && plannedDay === "C") plannedDay = nextDayKey(dayKeys, "C");
+  if (kneeRed && plannedDay === "B") plannedDay = nextDayKey(dayKeys, "B");
 
   const workout = useMemo(() => {
     if (!mode) return null;
@@ -137,6 +145,11 @@ export default function App() {
             theme={theme}
             onThemeToggle={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
             onBack={() => setActiveTab("workout")}
+            trainingDaysPerWeek={trainingDaysPerWeek}
+            onTrainingDaysChange={(d) => {
+              setTrainingDaysPerWeek(d);
+              persist({ trainingDaysPerWeek: d });
+            }}
           />
         )}
 

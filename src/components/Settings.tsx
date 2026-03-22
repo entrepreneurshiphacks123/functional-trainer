@@ -19,11 +19,15 @@ function downloadJson(filename: string, obj: any) {
 export default function Settings({
   theme,
   onThemeToggle,
-  onBack
+  onBack,
+  trainingDaysPerWeek,
+  onTrainingDaysChange,
 }: {
-  theme: Theme,
-  onThemeToggle: () => void,
-  onBack: () => void
+  theme: Theme;
+  onThemeToggle: () => void;
+  onBack: () => void;
+  trainingDaysPerWeek: 3 | 4;
+  onTrainingDaysChange: (days: 3 | 4) => void;
 }) {
   const [refresh, setRefresh] = useState(0);
   const plans = useMemo(() => getAllPlans(), [refresh]);
@@ -80,6 +84,35 @@ export default function Settings({
           <Button onClick={onThemeToggle}>
             Switch to {theme === "dark" ? "Light" : "Dark"} Mode
           </Button>
+        </Card>
+
+        <Card title="Training Schedule">
+          <div style={{ display: "grid", gap: 12 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, opacity: 0.8 }}>
+              Training days per week
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {([3, 4] as const).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => onTrainingDaysChange(d)}
+                  style={{
+                    padding: "14px",
+                    background: trainingDaysPerWeek === d ? "var(--accent)" : "var(--bg)",
+                    color: trainingDaysPerWeek === d ? "var(--accent-text)" : "var(--text)",
+                    border: "var(--bw) solid var(--border)",
+                    fontWeight: 950,
+                    fontSize: 16,
+                  }}
+                >
+                  {d} days
+                </button>
+              ))}
+            </div>
+            <div style={{ fontSize: 12, opacity: 0.6 }}>
+              3 days = A→B→C (drops conditioning day). 4 days = full A→B→C→D rotation.
+            </div>
+          </div>
         </Card>
 
         <Card title="Workout Plans">
