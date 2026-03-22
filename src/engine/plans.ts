@@ -138,10 +138,16 @@ export function getWorkoutForPlan(args: {
     const fallbackKey = plan.dayKeys?.[0] ?? Object.keys(plan.days)[0] ?? dayKey;
     const d = plan.days[dayKey] ?? plan.days[fallbackKey];
 
-    let items = d.items;
+    let items = [...d.items];
 
-    // ✅ Add plan-specific extra only in high_performance
-    if (mode === "high_performance") {
+    if (mode === "base") {
+      // Base mode: remove hpOnly items, keep individuals
+      items = items.filter((it: any) => !it.hpOnly);
+    } else {
+      // HP mode: remove individual-slot items (they're base-only), keep hpOnly items
+      items = items.filter((it: any) => it.slot !== "individual");
+
+      // Legacy: insert highPerformanceExtraByDay if defined
       const extra = plan.highPerformanceExtraByDay?.[dayKey];
       if (extra) items = insertBeforeFinish(items, extra);
     }
