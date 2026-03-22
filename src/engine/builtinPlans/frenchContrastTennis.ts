@@ -60,7 +60,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "185 lb (70/side)",
+          suggestedLoad: "185 lb (bar + 70/side)",
         },
         {
           id: "a_fc1_2",
@@ -109,7 +109,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "155 lb (55/side)",
+          suggestedLoad: "155 lb (bar + 55/side)",
         },
         {
           id: "a_fc2_2",
@@ -161,7 +161,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "155 lb (55/side)",
+          suggestedLoad: "155 lb (bar + 55/side)",
         },
         {
           id: "a_fc3_2",
@@ -339,7 +339,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "185 lb (70/side)",
+          suggestedLoad: "185 lb (bar + 70/side)",
         },
         {
           id: "b_fc1_2",
@@ -617,7 +617,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "155 lb (55/side)",
+          suggestedLoad: "155 lb (bar + 55/side)",
         },
         {
           id: "c_fc1_2",
@@ -669,7 +669,7 @@ export const frenchContrastTennis: StaticPlan = {
           hpOnly: true,
           howTo:
             "Barbell in landmine attachment. Hold end with both hands at chest. Drive from hips to rotate the bar from one hip to the other. Keep arms relatively straight — power comes from hips and trunk, not shoulders.",
-          suggestedLoad: "70 lb (25 plate)",
+          suggestedLoad: "70 lb (bar + 25)",
         },
         {
           id: "c_fc2_2",
@@ -721,7 +721,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "135 lb (45/side)",
+          suggestedLoad: "135 lb (bar + 45/side)",
         },
         {
           id: "c_fc3_2",
@@ -899,7 +899,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "155 lb (55/side)",
+          suggestedLoad: "155 lb (bar + 55/side)",
         },
         {
           id: "d_fc1_2",
