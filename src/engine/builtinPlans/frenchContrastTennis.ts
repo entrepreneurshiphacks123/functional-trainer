@@ -669,7 +669,7 @@ export const frenchContrastTennis: StaticPlan = {
           hpOnly: true,
           howTo:
             "Barbell in landmine attachment. Hold end with both hands at chest. Drive from hips to rotate the bar from one hip to the other. Keep arms relatively straight — power comes from hips and trunk, not shoulders.",
-          suggestedLoad: "45 lb (bar only)",
+          suggestedLoad: "70 lb (bar + 25)",
         },
         {
           id: "c_fc2_2",
