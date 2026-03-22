@@ -18,7 +18,7 @@ export default function PlanControls({
           Workout Plans
         </div>
 
-        <div style={{ display: "grid", gap: 12 }}>
+        <div style={{ display: "grid", gap: 8 }}>
           {plans.map((p) => {
             const active = p.id === activePlanId;
             const icon = (p as any).icon || "🏋️";
@@ -30,43 +30,26 @@ export default function PlanControls({
                 onClick={() => onPlanChange(p.id)}
                 style={{
                   textAlign: "left",
-                  padding: 16,
-                  borderRadius: 18,
-                  border: active ? "1px solid rgba(124,92,255,0.85)" : "1px solid var(--border)",
-                  background: active ? "rgba(124,92,255,0.10)" : "var(--card)",
-                  boxShadow: active ? "0 0 0 3px rgba(124,92,255,0.12)" : "none",
+                  padding: "14px 16px",
+                  borderRadius: "var(--radius, 0)",
+                  border: active
+                    ? "var(--bw, 2px) solid var(--accent)"
+                    : "var(--bw, 2px) solid var(--border)",
+                  background: active ? "var(--accent)" : "var(--bg)",
+                  color: active ? "var(--accent-text)" : "var(--text)",
                   display: "flex",
                   alignItems: "center",
-                  gap: 14,
+                  gap: 12,
                   cursor: "pointer",
                   WebkitTapHighlightColor: "transparent",
+                  fontWeight: 950,
+                  fontSize: 15,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.02em",
                 }}
               >
-                <div
-                  aria-hidden
-                  style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: 18,
-                    display: "grid",
-                    placeItems: "center",
-                    fontSize: 26,
-                    background: "var(--card2)",
-                    border: "1px solid var(--border)",
-                    flex: "0 0 auto",
-                  }}
-                >
-                  {icon}
-                </div>
-
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 950, fontSize: 16, lineHeight: 1.15, marginBottom: 4 }}>
-                    {p.name}
-                  </div>
-                  <div style={{ opacity: 0.75, fontSize: 12 }}>
-                    {active ? "Selected" : "Tap to select"}
-                  </div>
-                </div>
+                <span style={{ fontSize: 22 }}>{icon}</span>
+                <span>{p.name}</span>
               </button>
             );
           })}
