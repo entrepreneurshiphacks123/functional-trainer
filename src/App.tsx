@@ -71,6 +71,24 @@ export default function App() {
 
   const modeLabel = mode === "high_performance" ? "🔥" : "🌱";
 
+  // Equipment for the planned day (shown before mode selection)
+  const plannedDayEquipment = useMemo(() => {
+    if (plan.kind !== "static") return [];
+    const d = plan.days[plannedDay];
+    if (!d?.items) return [];
+    const set = new Set<string>();
+    for (const item of d.items) {
+      if (item.equipment) {
+        const parts = (item.equipment as string).split(/\s*[+,]\s*/);
+        for (const p of parts) {
+          const t = p.trim();
+          if (t && t.toLowerCase() !== "none") set.add(t);
+        }
+      }
+    }
+    return [...set].sort();
+  }, [plan, plannedDay]);
+
   const persist = (patch: Partial<AppState>) => {
     const prev = loadState();
     saveState({ ...prev, ...patch });
@@ -156,7 +174,7 @@ export default function App() {
           <>
             {step === "mode" && (
               <div style={{ display: "grid", gap: 12 }}>
-                <ModeSelect onSelect={start} />
+                <ModeSelect onSelect={start} equipment={plannedDayEquipment} />
                 <PlanControls
                   activePlanId={plan.id}
                   onPlanChange={(id) => {

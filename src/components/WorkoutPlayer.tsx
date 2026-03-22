@@ -234,6 +234,20 @@ export default function WorkoutPlayer({
     setScreenIdx((x) => Math.max(0, x - 1));
   };
 
+  // Swipe navigation
+  const touchStartX = React.useRef<number | null>(null);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(diff) < 60) return; // min swipe distance
+    if (diff < 0 && screenIdx < screens.length - 1) goNext();
+    if (diff > 0 && screenIdx > 0) goBack();
+  };
+
   const screen = screens[screenIdx];
   const screenTitle = workoutLabel ? `${workoutLabel} ${modeLabel}` : modeLabel || "Workout";
 
@@ -244,7 +258,11 @@ export default function WorkoutPlayer({
         <TinyIconButton label="•••" onClick={() => setShowOptions(true)} />
       }
     >
-      <div style={{ display: "grid", gap: 16 }}>
+      <div
+        style={{ display: "grid", gap: 16 }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         {/* SESSION TIMER + EQUIPMENT */}
         <Card
           style={{
@@ -306,63 +324,80 @@ export default function WorkoutPlayer({
         </Card>
 
         {/* CURRENT SCREEN */}
-        <Card title={`${screenIdx + 1} of ${screens.length} — ${screen.label}`}>
+        <Card title={screen.label}>
           <div style={{ display: "grid", gap: 0 }}>
-            {screen.items.map((item, idx) => (
-              <div
-                key={item.id}
-                style={{
-                  padding: "10px 0",
-                  borderTop: idx > 0 ? "1px solid var(--border-light, rgba(255,255,255,0.1))" : "none",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      {screen.type === "fc_block" && (
-                        <span style={{ fontSize: 12, fontWeight: 900, opacity: 0.4, minWidth: 18 }}>
-                          {item.fcPosition}.
-                        </span>
-                      )}
-                      <span
-                        style={{ fontSize: 17, fontWeight: 950, lineHeight: 1.2, cursor: "pointer" }}
-                        onClick={() => { haptic(); setSelected(item); }}
-                      >
-                        {item.name}
-                      </span>
-                      {item.howTo && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); haptic(); setSelected(item); }}
-                          style={{
-                            background: "none",
-                            border: "1px solid var(--border-light, rgba(255,255,255,0.2))",
-                            color: "var(--accent, #7c5cff)",
-                            fontWeight: 900,
-                            fontSize: 11,
-                            width: 20,
-                            height: 20,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            flexShrink: 0,
-                            borderRadius: 999,
-                          }}
+            {screen.items.map((item, idx) => {
+              const posColor = screen.type === "fc_block" && item.fcPosition
+                ? FC_POSITION_COLORS[item.fcPosition]
+                : undefined;
+              const posLabel = screen.type === "fc_block" && item.fcPosition
+                ? FC_POSITION_LABELS[item.fcPosition]
+                : undefined;
+
+              return (
+                <div
+                  key={item.id}
+                  style={{
+                    padding: "10px 0 10px 12px",
+                    borderTop: idx > 0 ? "1px solid var(--border-light, rgba(255,255,255,0.1))" : "none",
+                    borderLeft: posColor ? `3px solid ${posColor}` : "3px solid transparent",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span
+                          style={{ fontSize: 17, fontWeight: 950, lineHeight: 1.2, cursor: "pointer" }}
+                          onClick={() => { haptic(); setSelected(item); }}
                         >
-                          ?
-                        </button>
-                      )}
-                    </div>
-                    <div style={{ fontSize: 13, fontWeight: 700, opacity: 0.6, marginTop: 2 }}>
-                      {item.dose}
-                      {item.equipment && item.equipment.toLowerCase() !== "none" && (
-                        <span> · {item.equipment}</span>
-                      )}
+                          {item.name}
+                        </span>
+                        {posLabel && (
+                          <span style={{
+                            fontSize: 10,
+                            fontWeight: 900,
+                            textTransform: "uppercase",
+                            color: posColor,
+                            opacity: 0.8,
+                            letterSpacing: "0.03em",
+                          }}>
+                            {posLabel}
+                          </span>
+                        )}
+                        {item.howTo && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); haptic(); setSelected(item); }}
+                            style={{
+                              background: "none",
+                              border: "1px solid var(--border-light, rgba(255,255,255,0.2))",
+                              color: "var(--accent, #7c5cff)",
+                              fontWeight: 900,
+                              fontSize: 11,
+                              width: 20,
+                              height: 20,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              cursor: "pointer",
+                              flexShrink: 0,
+                              borderRadius: 999,
+                            }}
+                          >
+                            ?
+                          </button>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 700, opacity: 0.6, marginTop: 2 }}>
+                        {item.dose}
+                        {item.equipment && item.equipment.toLowerCase() !== "none" && (
+                          <span> · {item.equipment}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {/* Rest note between blocks */}
             {screen.restNote && (
@@ -388,8 +423,46 @@ export default function WorkoutPlayer({
             )}
           </div>
 
+          {/* Progress bar */}
+          <div style={{ marginTop: 12 }}>
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              fontSize: 11,
+              fontWeight: 800,
+              opacity: 0.5,
+              marginBottom: 4,
+              textTransform: "uppercase",
+            }}>
+              <span>{screenIdx + 1} of {screens.length}</span>
+              <span>{Math.round(((screenIdx + 1) / screens.length) * 100)}%</span>
+            </div>
+            <div style={{ width: "100%", height: 3, background: "var(--border-light, rgba(0,0,0,0.1))", borderRadius: 2 }}>
+              <div style={{
+                width: `${((screenIdx + 1) / screens.length) * 100}%`,
+                height: "100%",
+                background: "var(--accent, #7c5cff)",
+                borderRadius: 2,
+                transition: "width 0.3s ease",
+              }} />
+            </div>
+          </div>
+
+          {/* What's next preview */}
+          {screenIdx < screens.length - 1 && (
+            <div style={{
+              marginTop: 8,
+              fontSize: 12,
+              fontWeight: 700,
+              opacity: 0.5,
+              textAlign: "center",
+            }}>
+              Next: {screens[screenIdx + 1].label}
+            </div>
+          )}
+
           {/* Navigation */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
             <Button icon="←" variant="ghost" onClick={goBack} disabled={screenIdx === 0}>
               Prev
             </Button>
