@@ -121,7 +121,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 2,
           restAfter: 20,
-          suggestedLoad: "12 lb",
+          suggestedLoad: "10 lb",
         },
         {
           id: "a_fc2_3",
@@ -250,7 +250,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 0,
           hpOnly: true,
           finisherRounds: 3,
-          suggestedLoad: "12 lb",
+          suggestedLoad: "10 lb",
         },
         {
           id: "a_fin2",
@@ -681,7 +681,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 2,
           restAfter: 20,
-          suggestedLoad: "12 lb",
+          suggestedLoad: "10 lb",
         },
         {
           id: "c_fc2_3",
@@ -734,7 +734,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 2,
           restAfter: 20,
           hpOnly: true,
-          suggestedLoad: "15 lb",
+          suggestedLoad: "12 lb",
         },
         {
           id: "c_fc3_3",
@@ -811,7 +811,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 0,
           hpOnly: true,
           finisherRounds: 3,
-          suggestedLoad: "12 lb",
+          suggestedLoad: "10 lb",
         },
         {
           id: "c_fin2",
@@ -822,7 +822,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 0,
           hpOnly: true,
           finisherRounds: 3,
-          suggestedLoad: "15 lb",
+          suggestedLoad: "12 lb",
         },
         {
           id: "c_fin3",
@@ -1116,7 +1116,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 30,
           hpOnly: true,
           finisherRounds: 4,
-          suggestedLoad: "12 lb",
+          suggestedLoad: "10 lb",
         },
 
         // Cooldown
