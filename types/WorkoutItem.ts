@@ -16,6 +16,7 @@ export type WorkoutItem = {
   hpOnly?: boolean;
   kneeFlag?: boolean;
   finisherRounds?: number;
+  suggestedLoad?: string;
 };
 
 export type WorkoutData = {

@@ -11,7 +11,7 @@ export const frenchContrastTennis: StaticPlan = {
     // DAY A: Hip Hinge + Linear Power
     // ─────────────────────────────────────────────
     A: {
-      title: "Hip Hinge + Linear Power",
+      title: "Hinge + Linear",
       items: [
         // Warmup
         {
@@ -60,6 +60,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "185 lb",
         },
         {
           id: "a_fc1_2",
@@ -82,6 +83,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 1,
           fcPosition: 3,
           restAfter: 20,
+          suggestedLoad: "44 lb KB",
         },
         {
           id: "a_fc1_4",
@@ -107,6 +109,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "155 lb",
         },
         {
           id: "a_fc2_2",
@@ -118,6 +121,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 2,
           restAfter: 20,
+          suggestedLoad: "12 lb",
         },
         {
           id: "a_fc2_3",
@@ -130,6 +134,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 20,
           howTo:
             "Cable anchored low on the side you rotate FROM. Step up with the leg closest to the box. Rotate torso from cable side as you drive up. Mimics open-stance forehand loading pattern.",
+          suggestedLoad: "20 lb cable",
         },
         {
           id: "a_fc2_4",
@@ -141,6 +146,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 4,
           restAfter: 150,
+          suggestedLoad: "10 lb",
         },
 
         // FC Block 3 — Linear Acceleration (ALL hpOnly)
@@ -155,6 +161,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "155 lb",
         },
         {
           id: "a_fc3_2",
@@ -179,6 +186,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 3,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "20 lb DBs",
         },
         {
           id: "a_fc3_4",
@@ -201,6 +209,7 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "3×6/side",
           equipment: "DBs",
           description: "Balance + posterior chain",
+          suggestedLoad: "30 lb DB",
         },
         {
           id: "a_ind2",
@@ -209,6 +218,7 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "3×8/side",
           equipment: "Cable or band",
           description: "Anti-rotation core",
+          suggestedLoad: "15 lb cable",
         },
 
         // HP Accessory
@@ -219,6 +229,7 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "3×12",
           equipment: "Band or cable",
           hpOnly: true,
+          suggestedLoad: "20 lb cable",
         },
         {
           id: "a_acc2",
@@ -239,6 +250,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 0,
           hpOnly: true,
           finisherRounds: 3,
+          suggestedLoad: "12 lb",
         },
         {
           id: "a_fin2",
@@ -259,6 +271,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 30,
           hpOnly: true,
           finisherRounds: 3,
+          suggestedLoad: "35 lb KB",
         },
 
         // Cooldown
@@ -277,7 +290,7 @@ export const frenchContrastTennis: StaticPlan = {
     // DAY B: Squat + Lateral Power
     // ─────────────────────────────────────────────
     B: {
-      title: "Squat + Lateral Power",
+      title: "Squat + Lateral",
       items: [
         // Warmup
         {
@@ -326,6 +339,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "185 lb",
         },
         {
           id: "b_fc1_2",
@@ -348,6 +362,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 1,
           fcPosition: 3,
           restAfter: 20,
+          suggestedLoad: "25 lb DB",
         },
         {
           id: "b_fc1_4",
@@ -373,6 +388,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "35 lb DBs",
         },
         {
           id: "b_fc2_2",
@@ -395,6 +411,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 3,
           restAfter: 20,
+          suggestedLoad: "25 lb DB",
         },
         {
           id: "b_fc2_4",
@@ -421,6 +438,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 20,
           hpOnly: true,
           kneeFlag: true,
+          suggestedLoad: "30 lb DBs",
         },
         {
           id: "b_fc3_2",
@@ -446,6 +464,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 3,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "25 lb DBs",
         },
         {
           id: "b_fc3_4",
@@ -468,6 +487,7 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "3×6/side",
           equipment: "Box/step",
           description: "Knee control + decel strength",
+          suggestedLoad: "BW or 15 lb DBs",
         },
         {
           id: "b_ind2",
@@ -486,6 +506,7 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "3×12",
           equipment: "None or DBs",
           hpOnly: true,
+          suggestedLoad: "30 lb DBs",
         },
         {
           id: "b_acc2",
@@ -528,6 +549,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 30,
           hpOnly: true,
           finisherRounds: 3,
+          suggestedLoad: "25 lb DB",
         },
 
         // Cooldown
@@ -546,7 +568,7 @@ export const frenchContrastTennis: StaticPlan = {
     // DAY C: Upper Body + Rotation
     // ─────────────────────────────────────────────
     C: {
-      title: "Upper Body + Rotation",
+      title: "Upper + Rotation",
       items: [
         // Warmup
         {
@@ -595,6 +617,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "155 lb",
         },
         {
           id: "c_fc1_2",
@@ -606,6 +629,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 1,
           fcPosition: 2,
           restAfter: 20,
+          suggestedLoad: "12 lb",
         },
         {
           id: "c_fc1_3",
@@ -617,6 +641,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 1,
           fcPosition: 3,
           restAfter: 20,
+          suggestedLoad: "35 lb DBs",
         },
         {
           id: "c_fc1_4",
@@ -644,6 +669,7 @@ export const frenchContrastTennis: StaticPlan = {
           hpOnly: true,
           howTo:
             "Barbell in landmine attachment. Hold end with both hands at chest. Drive from hips to rotate the bar from one hip to the other. Keep arms relatively straight — power comes from hips and trunk, not shoulders.",
+          suggestedLoad: "45 lb (bar only)",
         },
         {
           id: "c_fc2_2",
@@ -655,6 +681,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 2,
           restAfter: 20,
+          suggestedLoad: "12 lb",
         },
         {
           id: "c_fc2_3",
@@ -667,6 +694,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 20,
           howTo:
             "Cable anchored low. Split stance with inside foot forward. Pull from low to high across body, rotating trunk. Drive from back hip.",
+          suggestedLoad: "20 lb cable",
         },
         {
           id: "c_fc2_4",
@@ -693,6 +721,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "135 lb",
         },
         {
           id: "c_fc3_2",
@@ -705,6 +734,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 2,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "15 lb",
         },
         {
           id: "c_fc3_3",
@@ -717,6 +747,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 3,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "30 lb cable",
         },
         {
           id: "c_fc3_4",
@@ -739,6 +770,7 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "3×8/side",
           equipment: "Cable",
           description: "Rotational core, no leg compensation",
+          suggestedLoad: "20 lb cable",
         },
         {
           id: "c_ind2",
@@ -747,6 +779,7 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "3 carries/side",
           equipment: "KB",
           description: "Shoulder stability under chaos",
+          suggestedLoad: "20 lb KB",
         },
 
         // HP Accessory
@@ -757,6 +790,7 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "3×12",
           equipment: "Cable",
           hpOnly: true,
+          suggestedLoad: "20 lb cable",
         },
         {
           id: "c_acc2",
@@ -777,6 +811,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 0,
           hpOnly: true,
           finisherRounds: 3,
+          suggestedLoad: "12 lb",
         },
         {
           id: "c_fin2",
@@ -787,6 +822,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 0,
           hpOnly: true,
           finisherRounds: 3,
+          suggestedLoad: "15 lb",
         },
         {
           id: "c_fin3",
@@ -863,6 +899,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "155 lb",
         },
         {
           id: "d_fc1_2",
@@ -886,6 +923,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 1,
           fcPosition: 3,
           restAfter: 20,
+          suggestedLoad: "20 lb DBs",
         },
         {
           id: "d_fc1_4",
@@ -911,6 +949,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "40 lb DBs",
         },
         {
           id: "d_fc2_2",
@@ -959,6 +998,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           hpOnly: true,
+          suggestedLoad: "44 lb KB",
         },
         {
           id: "d_fc3_2",
@@ -1033,6 +1073,7 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "3×10/side",
           equipment: "None or DBs",
           hpOnly: true,
+          suggestedLoad: "25 lb DB",
         },
 
         // HP Finisher — 4 rounds
@@ -1075,6 +1116,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 30,
           hpOnly: true,
           finisherRounds: 4,
+          suggestedLoad: "12 lb",
         },
 
         // Cooldown

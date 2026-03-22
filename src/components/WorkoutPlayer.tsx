@@ -215,6 +215,7 @@ export default function WorkoutPlayer({
   const items = workout.items;
   const screens = React.useMemo(() => buildScreens(items), [items]);
   const equipment = React.useMemo(() => collectEquipmentWithLoads(items), [items]);
+  const loads = React.useMemo(() => getAllLoads(), [items]);
 
   const [screenIdx, setScreenIdx] = React.useState(0);
   const [selected, setSelected] = React.useState<WorkoutItem | null>(null);
@@ -435,6 +436,13 @@ export default function WorkoutPlayer({
                         {item.equipment && item.equipment.toLowerCase() !== "none" && (
                           <span> · {item.equipment}</span>
                         )}
+                        {(() => {
+                          const saved = loads[item.id];
+                          const suggested = item.suggestedLoad;
+                          if (saved) return <span style={{ color: "var(--accent, #7c5cff)", opacity: 1 }}> · {saved}</span>;
+                          if (suggested) return <span style={{ fontStyle: "italic" }}> · ~{suggested}</span>;
+                          return null;
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -659,7 +667,7 @@ function ExerciseDetails({
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, textTransform: "uppercase" }}>Load Tracking</div>
           <div style={{ fontSize: 14, fontWeight: 950 }}>
-            {lastLoad ? `Previously: ${lastLoad}` : "No previous load"}
+            {lastLoad ? `Previously: ${lastLoad}` : item.suggestedLoad ? `Suggested: ~${item.suggestedLoad}` : "No previous load"}
           </div>
           <input
             value={load}
