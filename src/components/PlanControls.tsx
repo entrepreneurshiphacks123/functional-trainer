@@ -21,7 +21,7 @@ export default function PlanControls({
         <div style={{ display: "grid", gap: 8 }}>
           {plans.map((p) => {
             const active = p.id === activePlanId;
-            const icon = (p as any).icon || "🏋️";
+            const icon = p.icon ?? "🏋️";
 
             return (
               <button

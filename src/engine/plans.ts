@@ -2,6 +2,7 @@ import { generateWorkoutV1 } from "./generateWorkout";
 import { Mode, SorenessMap } from "./storage";
 import { BUILTIN_PLANS } from "./builtinPlans";
 import { WorkoutItem } from "../../types/WorkoutItem";
+import { DayType } from "./library";
 export { BUILTIN_PLANS };
 
 export type GeneratedPlan = {
@@ -159,7 +160,7 @@ export function getWorkoutForPlan(args: {
   const keys = plan.dayKeys;
   const idx = keys.indexOf(dayKey);
   const prevKey = idx <= 0 ? keys[keys.length - 1] : keys[idx - 1];
-  const w = generateWorkoutV1({ lastDay: (prevKey as any) ?? lastDay, mode, soreness });
+  const w = generateWorkoutV1({ lastDay: (prevKey as DayType) ?? lastDay, mode, soreness });
   return w;
 }
 

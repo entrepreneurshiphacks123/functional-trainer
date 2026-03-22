@@ -11,6 +11,9 @@ const slotLabel: Record<WorkoutItem["slot"], string> = {
   accessory: "Accessory",
   finisher: "Finisher",
   cooldown: "Cooldown",
+  strength: "Strength",
+  athletic: "Athletic",
+  finish: "Finish",
 };
 
 function isoDate() {

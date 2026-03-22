@@ -1,4 +1,4 @@
-export type WorkoutItemSlot = "prep" | "fc_block" | "individual" | "accessory" | "finisher" | "cooldown";
+export type WorkoutItemSlot = "prep" | "fc_block" | "individual" | "accessory" | "finisher" | "cooldown" | "strength" | "athletic" | "finish";
 
 export type WorkoutItem = {
   id: string;

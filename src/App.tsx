@@ -188,7 +188,7 @@ export default function App() {
 
             {step === "workout" && workout && mode && (
               <WorkoutPlayer
-                workout={workout!}
+                workout={workout}
                 workoutLabel={dayLabel}
                 modeLabel={modeLabel}
                 plannedDay={plannedDay}

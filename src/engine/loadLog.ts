@@ -50,14 +50,3 @@ export function setLoadFor(itemId: string, load: string) {
   all[itemId] = load;
   writeAll(all);
 }
-
-/**
- * Optional: clear all saved loads.
- */
-export function resetLoadLog() {
-  try {
-    localStorage.removeItem(KEY);
-  } catch {
-    // ignore
-  }
-}
