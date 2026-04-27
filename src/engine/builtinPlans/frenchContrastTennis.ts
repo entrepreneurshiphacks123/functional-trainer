@@ -13,14 +13,13 @@ export const frenchContrastTennis: StaticPlan = {
     A: {
       title: "Hinge + Linear",
       items: [
-        // Warmup
+        // ── Warmup ──
         {
           id: "a_w1",
           slot: "prep",
           name: "Ankle circles + calf raises",
           dose: "2 min",
           equipment: "None",
-          hpOnly: true,
         },
         {
           id: "a_w2",
@@ -28,7 +27,6 @@ export const frenchContrastTennis: StaticPlan = {
           name: "World's greatest stretch + hip airplanes",
           dose: "3 min",
           equipment: "None",
-          hpOnly: true,
         },
         {
           id: "a_w3",
@@ -36,19 +34,42 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Band walks + glute activation",
           dose: "2 min",
           equipment: "Mini band",
-          hpOnly: true,
-        },
-        {
-          id: "a_w4",
-          slot: "prep",
-          name: "Broad jumps at 70% effort",
-          dose: "3–5 reps",
-          equipment: "None",
-          description: "CNS primer",
-          hpOnly: true,
         },
 
-        // FC Block 1 — Hinge Power
+        // ── Core Activation ──
+        {
+          id: "a_ca1",
+          slot: "core_activation",
+          name: "Dead bug (slow, exhale on extend)",
+          dose: "8 reps",
+          equipment: "None",
+          description: "Anti-extension",
+          howTo:
+            "Flatten lower back to floor. Extend opposite arm and leg on exhale. 3-second extend, 2-second return. Feel your deep core brace, not your hip flexors.",
+        },
+        {
+          id: "a_ca2",
+          slot: "core_activation",
+          name: "Half-kneeling Pallof press",
+          dose: "8/side",
+          equipment: "Band or cable",
+          description: "Anti-rotation",
+          suggestedLoad: "15 lb",
+          howTo:
+            "Kneel on inside knee facing perpendicular to band/cable. Press out from chest. Hold 2 seconds at full extension — resist the pull. Don't let your trunk rotate.",
+        },
+        {
+          id: "a_ca3",
+          slot: "core_activation",
+          name: "Bird dog (3-sec hold)",
+          dose: "6/side",
+          equipment: "None",
+          description: "Anti-extension + anti-rotation",
+          howTo:
+            "Extend opposite arm and leg simultaneously. Hold 3 seconds at the top. Keep hips square — don't let the hip of the extended leg open up.",
+        },
+
+        // ── FC Block 1 — Hinge Power (single pass) ──
         {
           id: "a_fc1_1",
           slot: "fc_block",
@@ -59,19 +80,20 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 1,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "185 lb (bar + 70/side)",
+          suggestedLoad: "205 lb (bar + 80/side)",
         },
         {
           id: "a_fc1_2",
           slot: "fc_block",
-          name: "Broad jump (stick landing)",
+          name: "Broad jump → stick in split step",
           dose: "3 reps",
           equipment: "None",
           description: "Express hip extension force",
           fcBlock: 1,
           fcPosition: 2,
           restAfter: 20,
+          howTo:
+            "Land in split step stance — feet shoulder-width, knees bent, weight on balls of feet. Hold 2 seconds. You should look like you're about to return a serve. If you land upright, you're doing it wrong.",
         },
         {
           id: "a_fc1_3",
@@ -83,7 +105,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 1,
           fcPosition: 3,
           restAfter: 20,
-          suggestedLoad: "44 lb KB",
+          suggestedLoad: "53 lb KB",
         },
         {
           id: "a_fc1_4",
@@ -97,7 +119,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 150,
         },
 
-        // FC Block 2 — Rotational Power
+        // ── FC Block 2 — Rotational Power (single pass) ──
         {
           id: "a_fc2_1",
           slot: "fc_block",
@@ -108,8 +130,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "155 lb (bar + 55/side)",
+          suggestedLoad: "175 lb (bar + 65/side)",
         },
         {
           id: "a_fc2_2",
@@ -126,15 +147,16 @@ export const frenchContrastTennis: StaticPlan = {
         {
           id: "a_fc2_3",
           slot: "fc_block",
-          name: "Cable step-up with rotation",
+          name: "Landmine SL RDL + hip twist",
           dose: "4/side",
-          equipment: "Cable + box",
+          equipment: "Barbell",
+          description: "Rotational control under single-leg balance",
           fcBlock: 2,
           fcPosition: 3,
           restAfter: 20,
+          suggestedLoad: "~70 lb",
           howTo:
-            "Cable anchored low on the side you rotate FROM. Step up with the leg closest to the box. Rotate torso from cable side as you drive up. Mimics open-stance forehand loading pattern.",
-          suggestedLoad: "20 lb cable",
+            "Hold the barbell end in one hand. Stand on the opposite leg. Hinge at the hip, lowering the barbell toward the ground while the free leg extends behind you. At the bottom, rotate your trunk toward the standing leg, then rotate back as you stand. Mimics loading position on open-stance shots.",
         },
         {
           id: "a_fc2_4",
@@ -149,87 +171,135 @@ export const frenchContrastTennis: StaticPlan = {
           suggestedLoad: "10 lb",
         },
 
-        // FC Block 3 — Linear Acceleration (ALL hpOnly)
+        // ── FC Block 3 — Posterior Pull (single pass) ──
         {
           id: "a_fc3_1",
           slot: "fc_block",
-          name: "RDL (barbell)",
+          name: "Barbell bent-over row",
           dose: "3 reps @ 80%",
           equipment: "Barbell",
-          description: "Potentiate hamstrings",
+          description: "Potentiate pull chain",
           fcBlock: 3,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "155 lb (bar + 55/side)",
+          suggestedLoad: "135 lb",
         },
         {
           id: "a_fc3_2",
           slot: "fc_block",
-          name: "Box jump (step down)",
-          dose: "3 reps",
-          equipment: "Box",
-          description: "High-force vertical",
+          name: "Med-ball overhead slam",
+          dose: "4 reps",
+          equipment: "Med ball",
+          description: "Express pull-down force",
           fcBlock: 3,
           fcPosition: 2,
           restAfter: 20,
-          hpOnly: true,
+          suggestedLoad: "12 lb",
         },
         {
           id: "a_fc3_3",
           slot: "fc_block",
-          name: "DB split squat jump",
+          name: "Single-arm DB row (explosive)",
           dose: "4/side",
-          equipment: "DBs",
-          description: "Speed-strength single-leg",
+          equipment: "DB",
+          description: "Speed-strength pull",
           fcBlock: 3,
           fcPosition: 3,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "20 lb DBs",
+          suggestedLoad: "45 lb DB",
+          howTo:
+            "Explosive concentric — rip the weight to your hip. Control the eccentric. Think: fast up, slow down. Same force pattern as the racquet arm pulling through contact.",
         },
         {
           id: "a_fc3_4",
           slot: "fc_block",
-          name: "10m sprint (or shuttle)",
-          dose: "2 reps",
-          equipment: "None",
-          description: "Max velocity expression",
+          name: "Band straight-arm pulldown (speed)",
+          dose: "6 reps",
+          equipment: "Long band",
+          description: "Overspeed lat activation",
           fcBlock: 3,
           fcPosition: 4,
           restAfter: 150,
-          hpOnly: true,
+          howTo:
+            "Band anchored high. Straight arms, pull from overhead to hips as fast as possible. Snap the band down. Pure speed — the band assist lets you move faster than bodyweight allows.",
         },
 
-        // Individual Exercises
+        // ── Tennis Movement ──
         {
-          id: "a_ind1",
-          slot: "individual",
-          name: "Single-leg RDL (DB)",
-          dose: "3×6/side",
-          equipment: "DBs",
-          description: "Balance + posterior chain",
-          suggestedLoad: "30 lb DB",
+          id: "a_tm1",
+          slot: "tennis_movement",
+          name: "Sandbag decel (pitcher throw, hold on)",
+          dose: "4/side",
+          equipment: "Sandbag",
+          suggestedLoad: "~30 lb",
+          howTo:
+            "Hold sandbag at chest. Wind up like a pitcher — load rear hip, rotate trunk back. Explosively rotate forward as if throwing, but DO NOT release. Decelerate hard through the trunk. The braking is the exercise.",
         },
         {
-          id: "a_ind2",
-          slot: "individual",
-          name: "Half-kneeling Pallof press",
-          dose: "3×8/side",
-          equipment: "Cable or band",
-          description: "Anti-rotation core",
-          suggestedLoad: "15 lb cable",
+          id: "a_tm2",
+          slot: "tennis_movement",
+          name: "Ladder: Icky shuffle",
+          dose: "2 passes",
+          equipment: "Agility ladder",
+          howTo:
+            "In-in-out pattern — step in with one foot, step in with the other, step out with the lead foot. Quick lateral weight transfers through the ladder. Mirrors the quick weight shift of split-step recovery on court.",
+        },
+        {
+          id: "a_tm3",
+          slot: "tennis_movement",
+          name: "Ladder: Devonte 2.0",
+          dose: "2 passes",
+          equipment: "Agility ladder",
+          howTo:
+            "Salsa pattern, switch lead foot mid-ladder, drop into a lunge every 3rd rep. Coordination + decel loading in one drill.",
+        },
+        {
+          id: "a_tm4",
+          slot: "tennis_movement",
+          name: "Lateral hurdle hops",
+          dose: "3 passes/direction",
+          equipment: "6\" hurdles (4 in a row)",
+          howTo:
+            "Set 4 hurdles in a line, 2 feet apart. Hop laterally over each on both feet. Land in split step stance after the last hurdle — feet wide, knees bent, ready position. Quick ground contacts between hurdles.",
+        },
+        {
+          id: "a_tm5",
+          slot: "tennis_movement",
+          name: "Split step → explosive first step 3m → stick",
+          dose: "4/direction",
+          equipment: "None",
+          howTo:
+            "Ready position. Split step, then explode forward 3 meters — just 2-3 steps of maximum acceleration. Stick the landing in athletic stance for 2 seconds. The first step is the exercise — that's what wins points on court.",
+        },
+        {
+          id: "a_tm6",
+          slot: "tennis_movement",
+          name: "Lateral bound → stick → crossover recovery",
+          dose: "3/side",
+          equipment: "None",
+          howTo:
+            "Bound wide laterally, stick landing on outside leg for 2 seconds. Then crossover step to recover back to start. Mimics wide ball → recovery on court.",
+        },
+        {
+          id: "a_fin1",
+          slot: "finisher",
+          name: "KB clean + squat + press (complex)",
+          dose: "3/side",
+          equipment: "KB",
+          finisherRounds: 3,
+          suggestedLoad: "35 lb KB",
+          howTo:
+            "Single-arm KB clean to rack position. Squat. Press overhead at the top. That's one rep. Full-body power chain: pull → squat → push. Builds the ground-up force production tennis demands.",
         },
 
-        // HP Accessory
+        // ── Accessories ──
         {
           id: "a_acc1",
           slot: "accessory",
-          name: "Face pulls (band or cable)",
+          name: "Face pulls",
           dose: "3×12",
           equipment: "Band or cable",
-          hpOnly: true,
-          suggestedLoad: "20 lb cable",
+          suggestedLoad: "20 lb",
         },
         {
           id: "a_acc2",
@@ -237,51 +307,15 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Banded lateral walks",
           dose: "3×10/side",
           equipment: "Mini band",
-          hpOnly: true,
         },
 
-        // HP Finisher — 3 rounds
-        {
-          id: "a_fin1",
-          slot: "finisher",
-          name: "Med-ball rotational slams",
-          dose: "6 reps",
-          equipment: "Med ball",
-          restAfter: 0,
-          hpOnly: true,
-          finisherRounds: 3,
-          suggestedLoad: "10 lb",
-        },
-        {
-          id: "a_fin2",
-          slot: "finisher",
-          name: "10m shuttle run",
-          dose: "1 rep",
-          equipment: "None",
-          restAfter: 0,
-          hpOnly: true,
-          finisherRounds: 3,
-        },
-        {
-          id: "a_fin3",
-          slot: "finisher",
-          name: "KB swings",
-          dose: "8 reps",
-          equipment: "KB",
-          restAfter: 30,
-          hpOnly: true,
-          finisherRounds: 3,
-          suggestedLoad: "35 lb KB",
-        },
-
-        // Cooldown
+        // ── Cooldown ──
         {
           id: "a_cd1",
           slot: "cooldown",
           name: "Walk it off + nose breathing",
           dose: "2 min",
           equipment: "None",
-          hpOnly: true,
         },
       ],
     },
@@ -292,14 +326,13 @@ export const frenchContrastTennis: StaticPlan = {
     B: {
       title: "Squat + Lateral",
       items: [
-        // Warmup
+        // ── Warmup ──
         {
           id: "b_w1",
           slot: "prep",
           name: "Ankle rocks + toe raises",
           dose: "2 min",
           equipment: "None",
-          hpOnly: true,
         },
         {
           id: "b_w2",
@@ -307,7 +340,6 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Lunge stretch + hip 90/90 switches",
           dose: "3 min",
           equipment: "None",
-          hpOnly: true,
         },
         {
           id: "b_w3",
@@ -315,42 +347,68 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Mini-band lateral walks + clamshells",
           dose: "2 min",
           equipment: "Mini band",
-          hpOnly: true,
-        },
-        {
-          id: "b_w4",
-          slot: "prep",
-          name: "Lateral bounds at 70% effort",
-          dose: "3–4 reps",
-          equipment: "None",
-          description: "CNS primer",
-          hpOnly: true,
         },
 
-        // FC Block 1 — Squat Power
+        // ── Core Activation ──
+        {
+          id: "b_ca1",
+          slot: "core_activation",
+          name: "Copenhagen plank",
+          dose: "20s/side",
+          equipment: "Bench",
+          description: "Anti-lateral flexion + adductor strength",
+          howTo:
+            "Side plank with top leg on bench, bottom leg free. Squeeze adductors to hold position. Prevents groin injuries and builds lateral trunk stability for court movement.",
+        },
+        {
+          id: "b_ca2",
+          slot: "core_activation",
+          name: "Side plank with reach-through",
+          dose: "8/side",
+          equipment: "None",
+          description: "Anti-lateral flexion + rotation",
+          howTo:
+            "Side plank on forearm. Reach top arm under your body (rotation), then open up to the ceiling. Control the rotation — don't collapse.",
+        },
+        {
+          id: "b_ca3",
+          slot: "core_activation",
+          name: "Pallof press iso hold",
+          dose: "15s/side",
+          equipment: "Band or cable",
+          description: "Anti-rotation",
+          suggestedLoad: "15 lb",
+          howTo:
+            "Standing athletic stance. Press band out from chest and hold at full extension for 15 seconds. Fight the rotation. Don't let your hips shift.",
+        },
+
+        // ── FC Block 1 — Squat Power (single pass) ──
         {
           id: "b_fc1_1",
           slot: "fc_block",
-          name: "Trap bar deadlift (high handles)",
+          name: "Heavy goblet squat",
           dose: "3 reps @ 80%",
-          equipment: "Trap bar",
-          description: "Potentiate quads + glutes. Sub: heavy goblet squat if no trap bar.",
+          equipment: "DB",
+          description: "Potentiate quads + glutes",
           fcBlock: 1,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "185 lb (bar + 70/side)",
+          suggestedLoad: "65 lb DB",
+          howTo:
+            "Hold DB at chest, elbows inside knees. Full depth, drive through the whole foot. Keep chest tall.",
         },
         {
           id: "b_fc1_2",
           slot: "fc_block",
-          name: "Hurdle hops (stick each landing)",
+          name: "Hurdle hops → stick landing",
           dose: "3 reps",
-          equipment: "Hurdles or cones",
+          equipment: "6\" hurdles (3 in a row)",
           description: "High-force vertical + landing mechanics",
           fcBlock: 1,
           fcPosition: 2,
           restAfter: 20,
+          howTo:
+            "3 hurdles in a line, 3 feet apart. Hop over each continuously. Stick final landing in split step stance for 2 seconds. Minimize ground contact between hurdles.",
         },
         {
           id: "b_fc1_3",
@@ -362,7 +420,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 1,
           fcPosition: 3,
           restAfter: 20,
-          suggestedLoad: "25 lb DB",
+          suggestedLoad: "30 lb DB",
         },
         {
           id: "b_fc1_4",
@@ -376,7 +434,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 150,
         },
 
-        // FC Block 2 — Lateral Power
+        // ── FC Block 2 — Lateral Power (single pass) ──
         {
           id: "b_fc2_1",
           slot: "fc_block",
@@ -387,8 +445,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "35 lb DBs",
+          suggestedLoad: "40 lb DBs",
         },
         {
           id: "b_fc2_2",
@@ -400,6 +457,8 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 2,
           restAfter: 20,
+          howTo:
+            "Bound laterally, stick the landing on one leg. Hold 2 seconds — full control. Landing position = wide ball recovery stance.",
         },
         {
           id: "b_fc2_3",
@@ -407,11 +466,11 @@ export const frenchContrastTennis: StaticPlan = {
           name: "DB lateral step-up",
           dose: "4/side",
           equipment: "DB + box",
-          description: "Speed-strength lateral drive, knee tracking",
+          description: "Speed-strength lateral drive",
           fcBlock: 2,
           fcPosition: 3,
           restAfter: 20,
-          suggestedLoad: "25 lb DB",
+          suggestedLoad: "30 lb DB",
         },
         {
           id: "b_fc2_4",
@@ -423,35 +482,35 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 4,
           restAfter: 150,
+          howTo:
+            "Shuffle 5m laterally as fast as possible. Decel in exactly 3 steps: wide base, low hips, chest over toes. End in split step ready position. This is how you stop on court.",
         },
 
-        // FC Block 3 — Single-Leg Power (ALL hpOnly)
+        // ── FC Block 3 — Single-Leg Reactive (single pass) ──
         {
           id: "b_fc3_1",
           slot: "fc_block",
-          name: "Bulgarian split squat (heavy)",
+          name: "Rear-foot elevated split squat",
           dose: "3/side",
           equipment: "DBs + bench",
-          description: "Potentiate single-leg",
+          description: "Potentiate single-leg drive",
           fcBlock: 3,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          kneeFlag: true,
-          suggestedLoad: "30 lb DBs",
+          suggestedLoad: "40 lb DBs",
         },
         {
           id: "b_fc3_2",
           slot: "fc_block",
-          name: "Single-leg box jump (step down)",
+          name: "Single-leg box jump → stick landing",
           dose: "3/side",
-          equipment: "Box",
-          description: "Single-leg force production",
+          equipment: "Box (12\")",
+          description: "Single-leg force expression",
           fcBlock: 3,
           fcPosition: 2,
           restAfter: 20,
-          hpOnly: true,
-          kneeFlag: true,
+          howTo:
+            "Standing on one leg, jump onto a 12\" box. Stick the landing on both feet in split step stance. 2-second hold. If unstable, lower the box. The single-leg takeoff is the point — it's how you push off on court.",
         },
         {
           id: "b_fc3_3",
@@ -459,54 +518,94 @@ export const frenchContrastTennis: StaticPlan = {
           name: "DB reverse lunge to knee drive",
           dose: "4/side",
           equipment: "DBs",
-          description: "Speed-strength + hip flexion",
+          description: "Speed-strength single-leg transition",
           fcBlock: 3,
           fcPosition: 3,
           restAfter: 20,
-          hpOnly: true,
           suggestedLoad: "25 lb DBs",
+          howTo:
+            "Step back into reverse lunge. Explode up, driving the back knee forward and up. Don't pause at the top — lunge, drive, lunge. Mimics recovery step mechanics.",
         },
         {
           id: "b_fc3_4",
           slot: "fc_block",
-          name: "Skater hops (continuous)",
-          dose: "6 total",
+          name: "Single-leg pogo hops",
+          dose: "5/side",
           equipment: "None",
-          description: "Reactive lateral elasticity",
+          description: "Overspeed single-leg elastic recoil",
           fcBlock: 3,
           fcPosition: 4,
           restAfter: 150,
-          hpOnly: true,
+          howTo:
+            "Stiff ankle, minimal knee bend. Quick ground contacts on one leg. Same cue as regular pogos — drumstick, not a thud. The single-leg version builds the ankle stiffness you need for hard cuts.",
         },
 
-        // Individual Exercises
+        // ── Tennis Movement ──
         {
-          id: "b_ind1",
-          slot: "individual",
-          name: "Step-downs (slow eccentric, 3 sec lower)",
-          dose: "3×6/side",
-          equipment: "Box/step",
-          description: "Knee control + decel strength",
-          suggestedLoad: "BW or 15 lb DBs",
+          id: "b_tm1",
+          slot: "tennis_movement",
+          name: "Lateral hurdle hops",
+          dose: "3 passes/direction",
+          equipment: "6\" hurdles (4 in a row)",
+          howTo:
+            "4 hurdles in a line, 2 feet apart. Hop laterally over each. Land in split step after the last one. Quick ground contacts — hot feet.",
         },
         {
-          id: "b_ind2",
-          slot: "individual",
-          name: "Copenhagen plank",
-          dose: "3×20s/side",
-          equipment: "Bench",
-          description: "Adductor strength, groin injury prevention",
+          id: "b_tm2",
+          slot: "tennis_movement",
+          name: "Lateral bound → stick → crossover recovery",
+          dose: "4/side",
+          equipment: "None",
+          howTo:
+            "Bound wide, stick landing 2 sec, then crossover step to recover back to start. Mimics wide ball → recovery on court.",
+        },
+        {
+          id: "b_tm3",
+          slot: "tennis_movement",
+          name: "Split step drop → explosive first step 3m",
+          dose: "4/direction",
+          equipment: "None",
+          howTo:
+            "Start in ready position. Small hop (split step), land, explode laterally 3 meters. Just 2-3 steps of max acceleration and stick. The split step timing is the exercise — read and react.",
+        },
+        {
+          id: "b_tm4",
+          slot: "tennis_movement",
+          name: "Ladder: Icky shuffle",
+          dose: "2 passes",
+          equipment: "Agility ladder",
+          howTo:
+            "In-in-out pattern — step in with one foot, step in with the other, step out with the lead foot. Quick lateral movement through the ladder.",
+        },
+        {
+          id: "b_tm5",
+          slot: "tennis_movement",
+          name: "Shuffle → decel → split step → first step forward",
+          dose: "4 reps",
+          equipment: "None",
+          howTo:
+            "Lateral shuffle 5m, decel, split step, explosive first step forward 3m and stick. Mimics baseline defense → approach shot transition. The transition from lateral to linear is the skill.",
+        },
+        {
+          id: "b_fin1",
+          slot: "finisher",
+          name: "Med-ball slam → lateral shuffle → slam",
+          dose: "1 round (slam → shuffle → slam → shuffle back)",
+          equipment: "Med ball",
+          finisherRounds: 3,
+          suggestedLoad: "10 lb",
+          howTo:
+            "Overhead slam, pick up ball, lateral shuffle 5m, slam again, shuffle back. That's one round. Combines vertical power with lateral movement — like transitioning between baseline shots.",
         },
 
-        // HP Accessory
+        // ── Accessories ──
         {
           id: "b_acc1",
           slot: "accessory",
           name: "Calf raises (slow, full ROM)",
           dose: "3×12",
-          equipment: "None or DBs",
-          hpOnly: true,
-          suggestedLoad: "30 lb DBs",
+          equipment: "DBs",
+          suggestedLoad: "35 lb DBs",
         },
         {
           id: "b_acc2",
@@ -514,52 +613,15 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Tibialis raises",
           dose: "3×15",
           equipment: "None or band",
-          hpOnly: true,
         },
 
-        // HP Finisher — 3 rounds
-        {
-          id: "b_fin1",
-          slot: "finisher",
-          name: "5-10-5 shuttle drill",
-          dose: "1 rep",
-          equipment: "Cones",
-          restAfter: 0,
-          hpOnly: true,
-          finisherRounds: 3,
-          howTo:
-            "Set two markers 5 yards apart. Start in the middle. Sprint 5 yards right, touch. Sprint 10 yards left, touch. Sprint 5 yards back to middle.",
-        },
-        {
-          id: "b_fin2",
-          slot: "finisher",
-          name: "Lateral bounds",
-          dose: "8 reps",
-          equipment: "None",
-          restAfter: 0,
-          hpOnly: true,
-          finisherRounds: 3,
-        },
-        {
-          id: "b_fin3",
-          slot: "finisher",
-          name: "Goblet squat jumps",
-          dose: "10 reps",
-          equipment: "DB",
-          restAfter: 30,
-          hpOnly: true,
-          finisherRounds: 3,
-          suggestedLoad: "25 lb DB",
-        },
-
-        // Cooldown
+        // ── Cooldown ──
         {
           id: "b_cd1",
           slot: "cooldown",
           name: "Walk it off + nose breathing",
           dose: "2 min",
           equipment: "None",
-          hpOnly: true,
         },
       ],
     },
@@ -570,14 +632,13 @@ export const frenchContrastTennis: StaticPlan = {
     C: {
       title: "Upper + Rotation",
       items: [
-        // Warmup
+        // ── Warmup ──
         {
           id: "c_w1",
           slot: "prep",
           name: "Scap push-ups + band pull-aparts",
           dose: "2 min",
-          equipment: "Band (optional)",
-          hpOnly: true,
+          equipment: "Band",
         },
         {
           id: "c_w2",
@@ -585,15 +646,13 @@ export const frenchContrastTennis: StaticPlan = {
           name: "T-spine rotations on foam roller",
           dose: "2 min",
           equipment: "Foam roller",
-          hpOnly: true,
         },
         {
           id: "c_w3",
           slot: "prep",
-          name: "Bottoms-up KB hold (standing, each side 30s)",
+          name: "Bottoms-up KB hold (standing, 30s/side)",
           dose: "2 min",
           equipment: "KB",
-          hpOnly: true,
         },
         {
           id: "c_w4",
@@ -602,10 +661,42 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "3–4 reps",
           equipment: "Med ball",
           description: "CNS primer",
-          hpOnly: true,
         },
 
-        // FC Block 1 — Pressing Power
+        // ── Core Activation ──
+        {
+          id: "c_ca1",
+          slot: "core_activation",
+          name: "Dead bug (slow exhale)",
+          dose: "8 reps",
+          equipment: "None",
+          description: "Anti-extension",
+          howTo:
+            "Flatten lower back to floor. Exhale as you extend opposite arm and leg. Primes trunk stability before pressing and rotation.",
+        },
+        {
+          id: "c_ca2",
+          slot: "core_activation",
+          name: "Tall-kneeling Pallof press",
+          dose: "8/side",
+          equipment: "Cable or band",
+          description: "Anti-rotation — no hip compensation",
+          suggestedLoad: "15 lb",
+          howTo:
+            "Tall kneeling position. Press out from chest, hold 2 seconds at full extension. No hip shift, no lean. Pure trunk control.",
+        },
+        {
+          id: "c_ca3",
+          slot: "core_activation",
+          name: "Bird dog with rotation",
+          dose: "6/side",
+          equipment: "None",
+          description: "Anti-extension + rotational control",
+          howTo:
+            "Extend opposite arm and leg. At the top, rotate trunk slightly toward the extended arm side, then return to neutral. Trains rotational control — prepares trunk for the rotational FC blocks.",
+        },
+
+        // ── FC Block 1 — Pressing Power (single pass) ──
         {
           id: "c_fc1_1",
           slot: "fc_block",
@@ -616,8 +707,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 1,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "155 lb (bar + 55/side)",
+          suggestedLoad: "175 lb (bar + 65/side)",
         },
         {
           id: "c_fc1_2",
@@ -634,14 +724,16 @@ export const frenchContrastTennis: StaticPlan = {
         {
           id: "c_fc1_3",
           slot: "fc_block",
-          name: "DB push press (standing)",
-          dose: "4 reps",
-          equipment: "DBs",
-          description: "Speed-strength, legs into press",
+          name: "Landmine press + knee drive",
+          dose: "4/side",
+          equipment: "Barbell",
+          description: "Ground → hip → trunk → press kinetic chain",
           fcBlock: 1,
           fcPosition: 3,
           restAfter: 20,
-          suggestedLoad: "35 lb DBs",
+          suggestedLoad: "~70 lb",
+          howTo:
+            "Stand facing away from the landmine anchor. Hold the barbell end at shoulder height with one hand. As you press up, drive the opposite knee up explosively. The force chain runs ground → hip → trunk → press — same kinetic sequence as a tennis serve. Alternate sides each rep.",
         },
         {
           id: "c_fc1_4",
@@ -655,7 +747,7 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 150,
         },
 
-        // FC Block 2 — Rotational Torque
+        // ── FC Block 2 — Rotational Torque (single pass) ──
         {
           id: "c_fc2_1",
           slot: "fc_block",
@@ -666,10 +758,9 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
+          suggestedLoad: "80 lb (bar + 35)",
           howTo:
             "Barbell in landmine attachment. Hold end with both hands at chest. Drive from hips to rotate the bar from one hip to the other. Keep arms relatively straight — power comes from hips and trunk, not shoulders.",
-          suggestedLoad: "70 lb (bar + 25)",
         },
         {
           id: "c_fc2_2",
@@ -686,15 +777,15 @@ export const frenchContrastTennis: StaticPlan = {
         {
           id: "c_fc2_3",
           slot: "fc_block",
-          name: "Cable low-to-high chop (split stance)",
+          name: "Band low-to-high chop (split stance)",
           dose: "4/side",
-          equipment: "Cable",
+          equipment: "Long band",
+          description: "Speed-strength rotation — no cable needed",
           fcBlock: 2,
           fcPosition: 3,
           restAfter: 20,
           howTo:
-            "Cable anchored low. Split stance with inside foot forward. Pull from low to high across body, rotating trunk. Drive from back hip.",
-          suggestedLoad: "20 lb cable",
+            "Band anchored low. Split stance with inside foot forward. Pull from low to high across body, rotating trunk. Drive from back hip. Same movement as a cable chop but the band stays at the landmine station.",
         },
         {
           id: "c_fc2_4",
@@ -702,6 +793,7 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Band-resisted open stance rotation",
           dose: "4/side",
           equipment: "Long band",
+          description: "Reactive forehand/backhand loading",
           fcBlock: 2,
           fcPosition: 4,
           restAfter: 150,
@@ -709,72 +801,132 @@ export const frenchContrastTennis: StaticPlan = {
             "Band anchored behind you at hip height. Stand in open stance (feet wide, slight knee bend). Rotate trunk against band resistance mimicking forehand/backhand loading. Snap back to start — feel the elastic recoil.",
         },
 
-        // FC Block 3 — Pulling Power (ALL hpOnly)
+        // ── FC Block 3 — Pull + Overhead (single pass) ──
         {
           id: "c_fc3_1",
           slot: "fc_block",
           name: "Barbell bent-over row",
           dose: "3 reps @ 80%",
           equipment: "Barbell",
-          description: "Potentiate pulling chain",
+          description: "Potentiate pull chain — serve decel muscle group",
           fcBlock: 3,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "135 lb (bar + 45/side)",
+          suggestedLoad: "135 lb",
         },
         {
           id: "c_fc3_2",
           slot: "fc_block",
-          name: "Med-ball overhead slam",
+          name: "Med-ball overhead forward throw",
           dose: "4 reps",
           equipment: "Med ball",
-          description: "High-force full-body pull-down",
+          description: "Express overhead power — serve pattern",
           fcBlock: 3,
           fcPosition: 2,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "12 lb",
+          suggestedLoad: "10 lb",
+          howTo:
+            "Stand facing wall, 8 feet back. Ball overhead with both hands. Step forward and throw ball into the wall at maximum velocity. Whole body — legs drive, trunk flexes, arms follow. Same kinetic chain as the serve.",
         },
         {
           id: "c_fc3_3",
           slot: "fc_block",
-          name: "1-arm cable row (explosive)",
+          name: "Half-kneeling single-arm band row (explosive)",
           dose: "4/side",
-          equipment: "Cable",
-          description: "Speed-strength pulling, anti-rotation",
+          equipment: "Long band",
+          description: "Speed-strength pull with rotary stability",
           fcBlock: 3,
           fcPosition: 3,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "30 lb cable",
+          howTo:
+            "Half-kneeling position, band anchored at chest height in front. Pull explosively to your hip with one arm. The kneeling position forces your trunk to stabilize — no leg compensation. Anti-rotation meets speed-strength.",
         },
         {
           id: "c_fc3_4",
           slot: "fc_block",
-          name: "Band face pull (fast, snap back)",
-          dose: "6 reps",
-          equipment: "Long band",
-          description: "Reactive shoulder external rotation",
+          name: "Band pull-apart (speed)",
+          dose: "8 reps",
+          equipment: "Band",
+          description: "Overspeed posterior chain activation",
           fcBlock: 3,
           fcPosition: 4,
           restAfter: 150,
-          hpOnly: true,
+          howTo:
+            "Light band, arms straight in front. Pull apart as fast as humanly possible. Snap to full stretch. Speed is the only variable that matters here — not range, not resistance.",
         },
 
-        // Individual Exercises
+        // ── Tennis Movement ──
         {
-          id: "c_ind1",
-          slot: "individual",
-          name: "Tall-kneeling cable chop (high-to-low)",
-          dose: "3×8/side",
-          equipment: "Cable",
-          description: "Rotational core, no leg compensation",
-          suggestedLoad: "20 lb cable",
+          id: "c_tm1",
+          slot: "tennis_movement",
+          name: "Sandbag decel (pitcher throw, hold on)",
+          dose: "4/side",
+          equipment: "Sandbag",
+          suggestedLoad: "~30 lb",
+          howTo:
+            "Rotational braking. Wind up like a pitcher — load rear hip, rotate trunk back. Explosively rotate forward as if throwing, but DO NOT release. Decelerate hard. The braking is the exercise — same force pattern as decelerating after a forehand follow-through.",
         },
         {
-          id: "c_ind2",
-          slot: "individual",
+          id: "c_tm2",
+          slot: "tennis_movement",
+          name: "Split step → explosive first step 3m → decel → recovery step",
+          dose: "4 reps",
+          equipment: "None",
+          howTo:
+            "Ready position. Split step, explode forward 3m, decel in 2 steps, crossover step left then right to recover. Full direction change chain — short space, maximum intent.",
+        },
+        {
+          id: "c_tm3",
+          slot: "tennis_movement",
+          name: "Ladder: Devonte",
+          dose: "2 passes",
+          equipment: "Agility ladder",
+          howTo:
+            "Salsa pattern but switch which foot leads mid-ladder. Forces lead-leg coordination changes — same as switching direction on court.",
+        },
+        {
+          id: "c_tm4",
+          slot: "tennis_movement",
+          name: "Lateral shuffle → split step → explosive first step",
+          dose: "4/direction",
+          equipment: "None",
+          howTo:
+            "Shuffle 5m, split step, explode forward 3m and stick. The split step is the trigger — read and react.",
+        },
+        {
+          id: "c_tm5",
+          slot: "tennis_movement",
+          name: "Rotational med-ball wall throw (fast)",
+          dose: "6/side",
+          equipment: "Med ball",
+          suggestedLoad: "8 lb",
+          howTo:
+            "Face wall at 45 degrees. Quick rotational throws — catch and immediately throw again. Speed > power. Reactive rotation at game speed.",
+        },
+        {
+          id: "c_fin1",
+          slot: "finisher",
+          name: "KB swing → goblet squat → press (complex)",
+          dose: "3 reps",
+          equipment: "KB",
+          finisherRounds: 3,
+          suggestedLoad: "35 lb KB",
+          howTo:
+            "KB swing, clean to rack, goblet squat, press overhead. That's one rep. Full kinetic chain: hinge → clean → squat → press. Builds the ground-up force production that powers every stroke.",
+        },
+
+        // ── Accessories ──
+        {
+          id: "c_acc1",
+          slot: "accessory",
+          name: "Face pulls",
+          dose: "3×12",
+          equipment: "Cable or band",
+          suggestedLoad: "20 lb",
+        },
+        {
+          id: "c_acc2",
+          slot: "accessory",
           name: "Bottoms-up KB carry",
           dose: "3 carries/side",
           equipment: "KB",
@@ -782,67 +934,13 @@ export const frenchContrastTennis: StaticPlan = {
           suggestedLoad: "20 lb KB",
         },
 
-        // HP Accessory
-        {
-          id: "c_acc1",
-          slot: "accessory",
-          name: "Face pulls (cable)",
-          dose: "3×12",
-          equipment: "Cable",
-          hpOnly: true,
-          suggestedLoad: "20 lb cable",
-        },
-        {
-          id: "c_acc2",
-          slot: "accessory",
-          name: "Alphabet (light DBs, arms extended, draw A–Z)",
-          dose: "2 rounds",
-          equipment: "Light DBs",
-          hpOnly: true,
-        },
-
-        // HP Finisher — 3 rounds
-        {
-          id: "c_fin1",
-          slot: "finisher",
-          name: "Med-ball rotational ground slams",
-          dose: "6 reps",
-          equipment: "Med ball",
-          restAfter: 0,
-          hpOnly: true,
-          finisherRounds: 3,
-          suggestedLoad: "10 lb",
-        },
-        {
-          id: "c_fin2",
-          slot: "finisher",
-          name: "Med-ball overhead slams",
-          dose: "8 reps",
-          equipment: "Med ball",
-          restAfter: 0,
-          hpOnly: true,
-          finisherRounds: 3,
-          suggestedLoad: "12 lb",
-        },
-        {
-          id: "c_fin3",
-          slot: "finisher",
-          name: "Band-resisted rotations",
-          dose: "10 reps",
-          equipment: "Long band",
-          restAfter: 30,
-          hpOnly: true,
-          finisherRounds: 3,
-        },
-
-        // Cooldown
+        // ── Cooldown ──
         {
           id: "c_cd1",
           slot: "cooldown",
           name: "Walk it off + nose breathing",
           dose: "2 min",
           equipment: "None",
-          hpOnly: true,
         },
       ],
     },
@@ -853,14 +951,13 @@ export const frenchContrastTennis: StaticPlan = {
     D: {
       title: "Elastic + Conditioning",
       items: [
-        // Warmup
+        // ── Warmup ──
         {
           id: "d_w1",
           slot: "prep",
           name: "Jump rope (easy rhythm)",
           dose: "2 min",
           equipment: "Jump rope (optional)",
-          hpOnly: true,
         },
         {
           id: "d_w2",
@@ -868,7 +965,6 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Ankle pogo hops + calf bounces",
           dose: "2 min",
           equipment: "None",
-          hpOnly: true,
         },
         {
           id: "d_w3",
@@ -876,30 +972,52 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Hip flexor stretch + leg swings",
           dose: "2 min",
           equipment: "None",
-          hpOnly: true,
-        },
-        {
-          id: "d_w4",
-          slot: "prep",
-          name: "Ladder footwork (2 patterns, easy pace)",
-          dose: "2 min",
-          equipment: "Agility ladder (optional)",
-          hpOnly: true,
         },
 
-        // FC Block 1 — Vertical Elasticity
+        // ── Core Activation ──
+        {
+          id: "d_ca1",
+          slot: "core_activation",
+          name: "Hollow body hold",
+          dose: "20s",
+          equipment: "None",
+          description: "Anti-extension under full-body tension",
+          howTo:
+            "Arms overhead, legs extended, lower back pressed to floor. If you can't hold 20s, bend knees slightly. This is the foundation of trunk stiffness for plyometrics.",
+        },
+        {
+          id: "d_ca2",
+          slot: "core_activation",
+          name: "Plank shoulder taps (slow)",
+          dose: "10 total",
+          equipment: "None",
+          description: "Anti-rotation under instability",
+          howTo:
+            "High plank, tap opposite shoulder with each hand. Slow — don't let hips rock side to side. Wider feet = easier. Narrow feet = harder.",
+        },
+        {
+          id: "d_ca3",
+          slot: "core_activation",
+          name: "Dead bug with contralateral reach",
+          dose: "8 reps",
+          equipment: "None",
+          description: "Anti-extension + coordination",
+          howTo:
+            "Opposite arm and leg extend. Reach PAST your normal range — fingertips and toes pushing away from center. 3-second extension.",
+        },
+
+        // ── FC Block 1 — Vertical Elasticity (single pass) ──
         {
           id: "d_fc1_1",
           slot: "fc_block",
           name: "Trap bar deadlift (lighter, 75%)",
           dose: "3 reps",
           equipment: "Trap bar",
-          description: "Potentiate without grinding",
+          description: "Potentiate without grinding — fast bar speed",
           fcBlock: 1,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "155 lb (bar + 55/side)",
+          suggestedLoad: "175 lb (bar + 65/side)",
         },
         {
           id: "d_fc1_2",
@@ -907,11 +1025,12 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Depth jump (off 18\" box, stick landing)",
           dose: "3 reps",
           equipment: "Box (18\")",
+          description: "Stretch-shortening cycle — minimize ground contact",
           fcBlock: 1,
           fcPosition: 2,
           restAfter: 20,
           howTo:
-            "Stand on box. Step off (don't jump off). The moment your feet hit the ground, immediately jump as high as possible. Minimize ground contact time. Stick the landing on the second jump.",
+            "Step off (don't jump off). The moment your feet hit the ground, immediately jump as high as possible. Minimize ground contact time. Stick the landing in split step stance.",
         },
         {
           id: "d_fc1_3",
@@ -923,7 +1042,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 1,
           fcPosition: 3,
           restAfter: 20,
-          suggestedLoad: "20 lb DBs",
+          suggestedLoad: "25 lb DBs",
         },
         {
           id: "d_fc1_4",
@@ -931,13 +1050,15 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Pogo hops (continuous)",
           dose: "15–20 reps",
           equipment: "None",
-          description: "Max speed ground contacts",
+          description: "Ankle stiffness + elastic recoil",
           fcBlock: 1,
           fcPosition: 4,
           restAfter: 150,
+          howTo:
+            "Stiff ankles, minimal knee bend. Quick ground contacts — pretend the floor is lava. Foot should sound like a drumstick, not a thud.",
         },
 
-        // FC Block 2 — Lateral Elasticity
+        // ── FC Block 2 — Lateral Elasticity (single pass) ──
         {
           id: "d_fc2_1",
           slot: "fc_block",
@@ -948,8 +1069,7 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "40 lb DBs",
+          suggestedLoad: "45 lb DBs",
         },
         {
           id: "d_fc2_2",
@@ -957,11 +1077,12 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Lateral depth jump (off 12\" box, stick)",
           dose: "3/side",
           equipment: "Box (12\")",
+          description: "Lateral stretch-shortening cycle",
           fcBlock: 2,
           fcPosition: 2,
           restAfter: 20,
           howTo:
-            "Stand on a low box. Step off sideways. The moment you land, immediately bound laterally away from the box. Stick the landing for 2 seconds.",
+            "Stand on a low box. Step off sideways. The moment you land, immediately bound laterally away from the box. Stick the landing for 2 seconds. Land in athletic ready position.",
         },
         {
           id: "d_fc2_3",
@@ -984,149 +1105,148 @@ export const frenchContrastTennis: StaticPlan = {
           fcBlock: 2,
           fcPosition: 4,
           restAfter: 150,
+          howTo:
+            "Continuous lateral hops. Arm swing like a speed skater. Quick ground contacts, soft landings. Cover distance — don't just hop in place.",
         },
 
-        // FC Block 3 — Multidirectional (ALL hpOnly)
+        // ── FC Block 3 — Multi-Directional Reactive (single pass) ──
         {
           id: "d_fc3_1",
           slot: "fc_block",
-          name: "KB swing (heavy)",
-          dose: "5 reps",
-          equipment: "KB",
-          description: "Potentiate hip snap",
+          name: "Heavy DB step-up",
+          dose: "3/side",
+          equipment: "DBs + box (16\")",
+          description: "Potentiate drive pattern",
           fcBlock: 3,
           fcPosition: 1,
           restAfter: 20,
-          hpOnly: true,
-          suggestedLoad: "44 lb KB",
+          suggestedLoad: "40 lb DBs",
         },
         {
           id: "d_fc3_2",
           slot: "fc_block",
-          name: "Lateral bound (alternating, continuous)",
-          dose: "4/side",
+          name: "180° squat jump → stick",
+          dose: "3 reps",
           equipment: "None",
-          description: "High-force lateral reactive",
+          description: "Rotational force expression",
           fcBlock: 3,
           fcPosition: 2,
           restAfter: 20,
-          hpOnly: true,
+          howTo:
+            "Squat, jump, rotate 180° in the air, stick the landing in athletic stance. Hold 2 seconds. Alternate rotation direction each rep. Trains rotational body control at speed.",
         },
         {
           id: "d_fc3_3",
           slot: "fc_block",
-          name: "Single-leg 180 rotation jump",
-          dose: "3/side",
-          equipment: "None",
+          name: "Med-ball rotational slam (fast)",
+          dose: "4/side",
+          equipment: "Med ball",
+          description: "Speed-strength rotation",
           fcBlock: 3,
           fcPosition: 3,
           restAfter: 20,
-          hpOnly: true,
+          suggestedLoad: "8 lb",
           howTo:
-            "Stand on one leg. Jump and rotate 180 degrees in the air. Land on the same leg, stabilize for 2 seconds. Rotate back. Control > height.",
+            "Light ball, maximum speed. Rotate and slam to the ground on your side. Catch the bounce and immediately go again. Speed > power — this is the speed position, not the force position.",
         },
         {
           id: "d_fc3_4",
           slot: "fc_block",
-          name: "10m sprint to decel (3-step stop)",
-          dose: "3 reps",
+          name: "Compass hops (N-S-E-W, continuous)",
+          dose: "2 rounds (8 hops per round)",
           equipment: "None",
-          description: "Max speed + braking",
+          description: "Overspeed multi-directional reactivity",
           fcBlock: 3,
           fcPosition: 4,
           restAfter: 150,
-          hpOnly: true,
+          howTo:
+            "Stand on one spot. Hop forward, back to center, right, back to center, backward, back to center, left, back to center. That's one round. Quick ground contacts, stiff ankles. Covers all 4 directions — the movement vocabulary of court coverage.",
         },
 
-        // Individual Exercises
+        // ── Tennis Movement ──
         {
-          id: "d_ind1",
-          slot: "individual",
-          name: "Line hops (front/back, 20s on/10s off)",
-          dose: "3 rounds",
-          equipment: "None",
-          description: "Ankle stiffness + elastic contacts",
+          id: "d_tm1",
+          slot: "tennis_movement",
+          name: "Ladder: Icky shuffle",
+          dose: "2 passes",
+          equipment: "Agility ladder",
+          howTo:
+            "In-in-out pattern — step in with one foot, step in with the other, step out with the lead foot. Quick lateral weight transfers through the ladder.",
         },
         {
-          id: "d_ind2",
-          slot: "individual",
-          name: "Lateral shuffle → split step → sprint",
+          id: "d_tm2",
+          slot: "tennis_movement",
+          name: "Line hops — front/back + side/side",
+          dose: "20s on / 10s off × 3 rounds",
+          equipment: "None",
+          howTo:
+            "Two patterns: hop forward and back over a line, then side to side. Quick ground contacts, ankle stiffness drill. Stay on balls of feet.",
+        },
+        {
+          id: "d_tm3",
+          slot: "tennis_movement",
+          name: "Split step → react → explosive first step 3m → stick",
           dose: "4 reps",
           equipment: "None",
           howTo:
-            "Shuffle laterally 3–4 steps, hit a split step (small hop landing in athletic stance), then sprint forward 5m. Mimics reading a shot, setting up, then closing on the ball.",
+            "Ready position. Visual cue (partner points or ball drop). Split step, read, explode to the target 3m away. Stick landing in athletic stance. Reaction is the exercise — not the distance.",
+        },
+        {
+          id: "d_tm4",
+          slot: "tennis_movement",
+          name: "Sprint superset (weekly — needs space)",
+          dose: "3 reps",
+          equipment: "None",
+          description: "Once-per-week sprint work — skip if no space",
+          howTo:
+            "Sprint 10m, 3-step decel, split step, backpedal to start. This is the one day per week you open it up to full speed. If you don't have 10m of straight line, replace with 5m shuttles (forward → back × 3).",
+        },
+        {
+          id: "d_fin1",
+          slot: "finisher",
+          name: "Burpee → broad jump → explosive start",
+          dose: "3 reps",
+          equipment: "None",
+          finisherRounds: 3,
+          howTo:
+            "Burpee (chest to floor), explode up into a broad jump, land and immediately take 2-3 explosive steps forward. Full-body power + transition to first-step speed.",
+        },
+        {
+          id: "d_fin2",
+          slot: "finisher",
+          name: "Med-ball complex: overhead slam + rotational throw L + rotational throw R",
+          dose: "3 throws (slam + throw L + throw R)",
+          equipment: "Med ball",
+          finisherRounds: 3,
+          suggestedLoad: "8 lb",
+          howTo:
+            "Three throws in sequence without rest: overhead slam, pick up, rotational throw left, pick up, rotational throw right. That's one round. Multi-planar power endurance.",
         },
 
-        // HP Accessory
+        // ── Accessories ──
         {
           id: "d_acc1",
           slot: "accessory",
           name: "Tibialis raises",
           dose: "3×15",
           equipment: "None or band",
-          hpOnly: true,
         },
         {
           id: "d_acc2",
           slot: "accessory",
           name: "Single-leg calf raise (slow)",
           dose: "3×10/side",
-          equipment: "None or DBs",
-          hpOnly: true,
-          suggestedLoad: "25 lb DB",
+          equipment: "DB",
+          suggestedLoad: "30 lb DB",
         },
 
-        // HP Finisher — 4 rounds
-        {
-          id: "d_fin1",
-          slot: "finisher",
-          name: "Lateral shuffle 10m",
-          dose: "1 rep",
-          equipment: "None",
-          restAfter: 0,
-          hpOnly: true,
-          finisherRounds: 4,
-        },
-        {
-          id: "d_fin2",
-          slot: "finisher",
-          name: "Sprint 10m",
-          dose: "1 rep",
-          equipment: "None",
-          restAfter: 0,
-          hpOnly: true,
-          finisherRounds: 4,
-        },
-        {
-          id: "d_fin3",
-          slot: "finisher",
-          name: "Backpedal 10m",
-          dose: "1 rep",
-          equipment: "None",
-          restAfter: 0,
-          hpOnly: true,
-          finisherRounds: 4,
-        },
-        {
-          id: "d_fin4",
-          slot: "finisher",
-          name: "Med-ball ground slams",
-          dose: "4 reps",
-          equipment: "Med ball",
-          restAfter: 30,
-          hpOnly: true,
-          finisherRounds: 4,
-          suggestedLoad: "10 lb",
-        },
-
-        // Cooldown
+        // ── Cooldown ──
         {
           id: "d_cd1",
           slot: "cooldown",
           name: "Walk it off + nose breathing",
           dose: "2 min",
           equipment: "None",
-          hpOnly: true,
         },
       ],
     },

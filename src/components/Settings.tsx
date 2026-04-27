@@ -180,6 +180,10 @@ export default function Settings({
           </div>
         </Card>
 
+        <Button variant="ghost" onClick={() => window.location.reload()}>
+          Refresh App
+        </Button>
+
         <div style={{ padding: "0 12px", opacity: 0.5, fontSize: 12, textAlign: "center", marginBottom: 40 }}>
           Functional Trainer v1.1 • Mobile-Only Block Design
         </div>
