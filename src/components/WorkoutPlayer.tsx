@@ -6,7 +6,9 @@ import { WorkoutItem, WorkoutData } from "../../types/WorkoutItem";
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
   prep: "Warm-up",
+  core_activation: "Core Activation",
   fc_block: "French Contrast",
+  tennis_movement: "Tennis Movement",
   individual: "Individual",
   accessory: "Accessory",
   finisher: "Finisher",
@@ -97,6 +99,36 @@ function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
         type: "single",
         label: "Warm-up",
         items: prepItems,
+      });
+      continue;
+    }
+
+    // Group core activation items together
+    if (item.slot === "core_activation") {
+      const caItems: WorkoutItem[] = [];
+      while (idx < items.length && items[idx].slot === "core_activation") {
+        caItems.push(items[idx]);
+        idx++;
+      }
+      screens.push({
+        type: "single",
+        label: "Core Activation",
+        items: caItems,
+      });
+      continue;
+    }
+
+    // Group tennis movement items together
+    if (item.slot === "tennis_movement") {
+      const tmItems: WorkoutItem[] = [];
+      while (idx < items.length && items[idx].slot === "tennis_movement") {
+        tmItems.push(items[idx]);
+        idx++;
+      }
+      screens.push({
+        type: "single",
+        label: "Tennis Movement",
+        items: tmItems,
       });
       continue;
     }

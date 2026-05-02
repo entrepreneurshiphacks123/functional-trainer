@@ -60,6 +60,7 @@ function isPlanShapeSafe(p: any): p is WorkoutPlan {
 }
 
 const PLANS_KEY = "training_os_plans_v1";
+const PLAN_ORDER_KEY = "training_os_plan_order_v1";
 
 export function loadUserPlans(): WorkoutPlan[] {
   try {
@@ -81,12 +82,49 @@ export function saveUserPlans(plans: WorkoutPlan[]) {
   }
 }
 
+export function loadPlanOrder(): string[] {
+  try {
+    const raw = localStorage.getItem(PLAN_ORDER_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((x) => typeof x === "string");
+  } catch {
+    return [];
+  }
+}
+
+export function savePlanOrder(orderedIds: string[]) {
+  try {
+    localStorage.setItem(PLAN_ORDER_KEY, JSON.stringify(orderedIds));
+  } catch {
+    // ignore
+  }
+}
+
 export function getAllPlans(): WorkoutPlan[] {
   const user = loadUserPlans();
   const byId = new Map<string, WorkoutPlan>();
   for (const p of BUILTIN_PLANS) byId.set(p.id, p);
   for (const p of user) byId.set(p.id, p);
-  return Array.from(byId.values());
+
+  const order = loadPlanOrder();
+  if (order.length === 0) return Array.from(byId.values());
+
+  // Apply saved order, append plans not in saved order at the end so new plans don't disappear.
+  const consumed = new Set<string>();
+  const ordered: WorkoutPlan[] = [];
+  for (const id of order) {
+    const p = byId.get(id);
+    if (p) {
+      ordered.push(p);
+      consumed.add(id);
+    }
+  }
+  for (const [id, p] of byId) {
+    if (!consumed.has(id)) ordered.push(p);
+  }
+  return ordered;
 }
 
 export function findPlan(planId?: string | null): WorkoutPlan {
