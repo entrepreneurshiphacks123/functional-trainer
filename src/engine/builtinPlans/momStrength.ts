@@ -5,12 +5,10 @@ import type { StaticPlan } from "../plans";
 //   - No spine flexion or extension (osteoporosis fracture protocol)
 //   - No hip internal rotation (posterior hip precaution)
 //   - No squat below 90° (the box stops her at safe depth)
-//   - Machines preferred over cables WHERE A MACHINE EXISTS for the pattern
-//   - One cable exception kept on Day B: the pull-through (hip hinge — no machine equivalent
-//     in most gyms, and the hinge is the highest-value bone-loading + life-skill pattern she
-//     can train safely)
-//   - Body-part grouping: BACK → CHEST → SHOULDERS → LEGS → ARMS → CORE
-//   - 3-phase structure: warmup → strength → cooldown (Pallof + carries cover core, no dedicated activation block)
+//   - Machines preferred (no hip abduction machine available; pull-through dropped — too complicated)
+//   - Body-part grouping; on leg-emphasis days legs go FIRST (when fresh)
+//   - 3-phase structure: warmup → strength → cooldown
+//   - Sessions sized to ~45 min: 6-8 exercises per day with biceps/triceps supersetted on Day A
 export const momStrength: StaticPlan = {
   id: "mom-strength",
   name: "Mom's Strength Plan",
@@ -19,10 +17,10 @@ export const momStrength: StaticPlan = {
   dayKeys: ["A", "B", "C"],
   days: {
     // ─────────────────────────────────────────────
-    // DAY A — Standard Full Body (her daily anchor — most balanced, hits everything)
+    // DAY A — Full Body (her anchor — covers everything if she does A-A-A)
     // ─────────────────────────────────────────────
     A: {
-      title: "Standard Full Body",
+      title: "Full Body",
       items: [
         // ── Warmup ──
         {
@@ -66,60 +64,9 @@ export const momStrength: StaticPlan = {
           description: "Just warming the hips. No max effort.",
         },
 
-        // ── Strength: BACK ──
+        // ── Strength: LEGS (first when fresh) ──
         {
           id: "mom_a_s1",
-          slot: "strength",
-          name: "Lat pulldown",
-          dose: "3×8",
-          equipment: "Lat pulldown machine",
-          group: "BACK",
-          howTo: "Pull bar to collarbone, elbows down. Don't lean back.",
-        },
-        {
-          id: "mom_a_s2",
-          slot: "strength",
-          name: "Seated row machine",
-          dose: "3×10",
-          equipment: "Seated row machine",
-          group: "BACK",
-          howTo: "Long spine, pull handles to belly, squeeze shoulder blades. Don't round forward at the bottom.",
-        },
-        {
-          id: "mom_a_s3",
-          slot: "strength",
-          name: "Rear delt fly machine",
-          dose: "3×12",
-          equipment: "Rear delt fly machine",
-          group: "BACK",
-          howTo: "Sit chest to pad. Lead with the elbows, pull handles wide and back. Squeeze rear delts.",
-        },
-
-        // ── Strength: CHEST ──
-        {
-          id: "mom_a_s4",
-          slot: "strength",
-          name: "Chest press machine",
-          dose: "3×10",
-          equipment: "Chest press machine",
-          group: "CHEST",
-          howTo: "Press straight forward, smooth tempo. Don't lock elbows at top. No back arching.",
-        },
-
-        // ── Strength: SHOULDERS ──
-        {
-          id: "mom_a_s5",
-          slot: "strength",
-          name: "DB lateral raise (seated)",
-          dose: "3×10",
-          equipment: "Dumbbells",
-          group: "SHOULDERS",
-          howTo: "Sit upright. Lead with the elbow, slight bend. Stop at shoulder height — not above.",
-        },
-
-        // ── Strength: LEGS ──
-        {
-          id: "mom_a_s6",
           slot: "strength",
           name: "Box squat (DB or cable goblet hold)",
           dose: "3×8",
@@ -130,49 +77,61 @@ export const momStrength: StaticPlan = {
           howTo: "Hold DB or cable handle at chest like a goblet. Sit back to the box, light touch, stand up. The box stops your depth — don't try to go below it.",
         },
         {
-          id: "mom_a_s7",
+          id: "mom_a_s2",
           slot: "strength",
-          name: "Glute-focus leg press (feet HIGH)",
+          name: "Leg press — feet HIGH (glute focus)",
           dose: "3×10",
           equipment: "Leg press machine",
           group: "LEGS",
           kneeFlag: true,
-          howTo: "Place feet HIGH on the platform, heels near top, toes pointed down. Drive through heels — feel glutes and hams. Don't lock knees at top.",
-        },
-        {
-          id: "mom_a_s8",
-          slot: "strength",
-          name: "Hip abduction machine",
-          dose: "3×12",
-          equipment: "Hip abduction machine",
-          group: "LEGS",
-          howTo: "Press knees out against pads. Smooth tempo. Trains glute med — critical for hip stability and falls prevention.",
-        },
-        {
-          id: "mom_a_s9",
-          slot: "strength",
-          name: "Leg curl machine",
-          dose: "3×10",
-          equipment: "Leg curl machine",
-          group: "LEGS",
-          kneeFlag: true,
-          howTo: "Smooth tempo, full range. Squeeze hamstrings at the top of the curl.",
+          howTo: "Place feet HIGH on the platform — heels near the top, toes pointed down. Drive through your heels — feel glutes and hams. This shifts the work from quads to glutes/hams. Don't lock knees at top.",
         },
 
-        // ── Strength: ARMS ──
+        // ── Strength: BACK ──
         {
-          id: "mom_a_s10",
+          id: "mom_a_s3",
           slot: "strength",
-          name: "Bicep curl (cable bar or DBs)",
+          name: "Lat pulldown",
+          dose: "3×8",
+          equipment: "Lat pulldown machine",
+          group: "BACK",
+          howTo: "Pull bar to collarbone, elbows down. Don't lean back.",
+        },
+        {
+          id: "mom_a_s4",
+          slot: "strength",
+          name: "Seated row machine",
+          dose: "3×10",
+          equipment: "Seated row machine",
+          group: "BACK",
+          howTo: "Long spine, pull handles to belly, squeeze shoulder blades. Don't round forward at the bottom.",
+        },
+
+        // ── Strength: CHEST ──
+        {
+          id: "mom_a_s5",
+          slot: "strength",
+          name: "Chest press machine",
+          dose: "3×10",
+          equipment: "Chest press machine",
+          group: "CHEST",
+          howTo: "Press straight forward, smooth tempo. Don't lock elbows at top. No back arching.",
+        },
+
+        // ── Strength: ARMS (supersetted to save time — alternate, no rest between) ──
+        {
+          id: "mom_a_s6",
+          slot: "strength",
+          name: "Bicep curl (cable bar or DBs) — superset with triceps",
           dose: "2×10",
           equipment: "Cable bar or dumbbells",
           group: "ARMS",
-          howTo: "Elbows pinned to sides. Smooth curl, controlled lower.",
+          howTo: "Elbows pinned to sides. Smooth curl, controlled lower. Alternate this with the triceps pressdown — no rest between, rest 60 sec after both are done.",
         },
         {
-          id: "mom_a_s11",
+          id: "mom_a_s7",
           slot: "strength",
-          name: "Triceps pressdown",
+          name: "Triceps pressdown — superset with biceps",
           dose: "2×10",
           equipment: "Cable + bar",
           group: "ARMS",
@@ -181,7 +140,7 @@ export const momStrength: StaticPlan = {
 
         // ── Strength: CORE ──
         {
-          id: "mom_a_s12",
+          id: "mom_a_s8",
           slot: "strength",
           name: "Standing Pallof press",
           dose: "2×10/side",
@@ -203,14 +162,6 @@ export const momStrength: StaticPlan = {
         {
           id: "mom_a_c2",
           slot: "cooldown",
-          name: "Single-leg balance",
-          dose: "3×20 sec/side",
-          equipment: "None",
-          howTo: "Stand on one leg, eyes open, hands free. Hold 20 seconds. Switch sides.",
-        },
-        {
-          id: "mom_a_c3",
-          slot: "cooldown",
           name: "Easy walk",
           dose: "3 min",
           equipment: "Treadmill or outside",
@@ -220,10 +171,10 @@ export const momStrength: StaticPlan = {
     },
 
     // ─────────────────────────────────────────────
-    // DAY B — Hinge & Back Focus (the pull-through day; back-heavy)
+    // DAY B — Back and Legs (legs first, posterior emphasis)
     // ─────────────────────────────────────────────
     B: {
-      title: "Hinge & Back Focus",
+      title: "Back and Legs",
       items: [
         // ── Warmup ──
         {
@@ -264,70 +215,19 @@ export const momStrength: StaticPlan = {
           howTo: "Side-lying, knees bent, feet stacked. Open top knee while keeping feet together. Don't roll the hip back.",
         },
 
-        // ── Strength: BACK ──
+        // ── Strength: LEGS (first — it's a leg day) ──
         {
           id: "mom_b_s1",
           slot: "strength",
-          name: "Lat pulldown",
-          dose: "3×8",
-          equipment: "Lat pulldown machine",
-          group: "BACK",
-          howTo: "Pull to collarbone, elbows down. Don't lean back.",
-        },
-        {
-          id: "mom_b_s2",
-          slot: "strength",
-          name: "Seated row machine",
-          dose: "3×10",
-          equipment: "Seated row machine",
-          group: "BACK",
-          howTo: "Long spine, pull to belly, squeeze blades.",
-        },
-        {
-          id: "mom_b_s3",
-          slot: "strength",
-          name: "Rear delt fly machine",
-          dose: "3×12",
-          equipment: "Rear delt fly machine",
-          group: "BACK",
-          howTo: "Sit chest to pad. Lead with the elbows, pull wide and back. Squeeze rear delts.",
-        },
-
-        // ── Strength: CHEST ──
-        {
-          id: "mom_b_s4",
-          slot: "strength",
-          name: "Chest press machine",
-          dose: "3×10",
-          equipment: "Chest press machine",
-          group: "CHEST",
-          howTo: "Press straight, smooth tempo. No arching.",
-        },
-
-        // ── Strength: LEGS ──
-        {
-          id: "mom_b_s5",
-          slot: "strength",
-          name: "Cable pull-through (hip hinge)",
-          dose: "3×10",
-          equipment: "Cable (low pulley)",
-          group: "LEGS",
-          suggestedLoad: "15-20 lb",
-          hint: "Cable exception",
-          howTo: "Face away from cable, handle between legs. Hinge at hips, soft knees, push hips back like closing a door with your butt. Stand tall — don't extend back at the top. This is the hip hinge pattern — most important bone-loading move she has.",
-        },
-        {
-          id: "mom_b_s6",
-          slot: "strength",
-          name: "Glute-focus leg press (feet HIGH)",
+          name: "Leg press — feet HIGH (glute focus)",
           dose: "3×10",
           equipment: "Leg press machine",
           group: "LEGS",
           kneeFlag: true,
-          howTo: "Feet HIGH on platform, drive through heels. Glutes and hams do the work.",
+          howTo: "Feet HIGH on platform — heels near top, toes pointed down. Drive through heels. Glutes and hams do the work.",
         },
         {
-          id: "mom_b_s7",
+          id: "mom_b_s2",
           slot: "strength",
           name: "Leg curl machine",
           dose: "3×10",
@@ -336,30 +236,39 @@ export const momStrength: StaticPlan = {
           kneeFlag: true,
           howTo: "Smooth tempo, full range. Squeeze hamstrings at the top of the curl.",
         },
-        {
-          id: "mom_b_s8",
-          slot: "strength",
-          name: "Hip abduction machine",
-          dose: "3×12",
-          equipment: "Hip abduction machine",
-          group: "LEGS",
-          howTo: "Press knees out against pads. Smooth tempo. Glute med — hip stability.",
-        },
 
-        // ── Strength: ARMS ──
+        // ── Strength: BACK ──
         {
-          id: "mom_b_s9",
+          id: "mom_b_s3",
           slot: "strength",
-          name: "Bicep curl (cable bar or DBs)",
-          dose: "2×10",
-          equipment: "Cable bar or dumbbells",
-          group: "ARMS",
-          howTo: "Elbows pinned to sides. Smooth curl, controlled lower.",
+          name: "Lat pulldown",
+          dose: "3×8",
+          equipment: "Lat pulldown machine",
+          group: "BACK",
+          howTo: "Pull to collarbone, elbows down. Don't lean back.",
+        },
+        {
+          id: "mom_b_s4",
+          slot: "strength",
+          name: "Seated row machine",
+          dose: "3×10",
+          equipment: "Seated row machine",
+          group: "BACK",
+          howTo: "Long spine, pull to belly, squeeze blades.",
+        },
+        {
+          id: "mom_b_s5",
+          slot: "strength",
+          name: "Rear delt fly machine",
+          dose: "3×12",
+          equipment: "Rear delt fly machine",
+          group: "BACK",
+          howTo: "Sit chest to pad. Lead with the elbows, pull handles wide and back. Squeeze rear delts.",
         },
 
         // ── Strength: CORE ──
         {
-          id: "mom_b_s10",
+          id: "mom_b_s6",
           slot: "strength",
           name: "Standing Pallof press",
           dose: "2×10/side",
@@ -381,14 +290,6 @@ export const momStrength: StaticPlan = {
         {
           id: "mom_b_c2",
           slot: "cooldown",
-          name: "Tandem stance balance",
-          dose: "3×20 sec",
-          equipment: "None",
-          howTo: "Stand with one foot directly in front of the other, heel touching toe (like a tightrope walker). Hold 20 sec. Switch lead foot. Repeat.",
-        },
-        {
-          id: "mom_b_c3",
-          slot: "cooldown",
           name: "Easy walk",
           dose: "3 min",
           equipment: "Treadmill or outside",
@@ -397,10 +298,10 @@ export const momStrength: StaticPlan = {
     },
 
     // ─────────────────────────────────────────────
-    // DAY C — Legs & Quad Focus (single-leg + leg variety; pec fly instead of chest press for chest variety)
+    // DAY C — Quad and Chest (legs first, quad emphasis + chest variety)
     // ─────────────────────────────────────────────
     C: {
-      title: "Legs & Quad Focus",
+      title: "Quad and Chest",
       items: [
         // ── Warmup ──
         {
@@ -441,42 +342,9 @@ export const momStrength: StaticPlan = {
           description: "Gentle. No forcing.",
         },
 
-        // ── Strength: BACK ──
+        // ── Strength: LEGS (first — it's a leg day) ──
         {
           id: "mom_c_s1",
-          slot: "strength",
-          name: "Lat pulldown",
-          dose: "3×8",
-          equipment: "Lat pulldown machine",
-          group: "BACK",
-          howTo: "Pull to collarbone, elbows down. Don't lean back.",
-        },
-
-        // ── Strength: CHEST ──
-        {
-          id: "mom_c_s2",
-          slot: "strength",
-          name: "Pec fly machine",
-          dose: "3×10",
-          equipment: "Pec fly machine",
-          group: "CHEST",
-          howTo: "Sit upright, elbows slightly bent. Bring handles together with control — feel the chest squeeze. Don't crash the stack on the return.",
-        },
-
-        // ── Strength: SHOULDERS ──
-        {
-          id: "mom_c_s3",
-          slot: "strength",
-          name: "DB lateral raise (seated)",
-          dose: "3×10",
-          equipment: "Dumbbells",
-          group: "SHOULDERS",
-          howTo: "Sit upright. Lead with the elbow, slight bend. Stop at shoulder height — not above.",
-        },
-
-        // ── Strength: LEGS ──
-        {
-          id: "mom_c_s4",
           slot: "strength",
           name: "Box squat (DB or cable goblet hold)",
           dose: "3×8",
@@ -487,7 +355,7 @@ export const momStrength: StaticPlan = {
           howTo: "Goblet hold at chest. Sit back to box, stand up. Box stops depth.",
         },
         {
-          id: "mom_c_s5",
+          id: "mom_c_s2",
           slot: "strength",
           name: "Leg extension machine",
           dose: "3×10",
@@ -497,48 +365,39 @@ export const momStrength: StaticPlan = {
           howTo: "Smooth tempo, controlled lower. Don't bang the stack.",
         },
         {
-          id: "mom_c_s6",
+          id: "mom_c_s3",
           slot: "strength",
           name: "Step-ups (low box)",
           dose: "3×8/side",
           equipment: "6-8\" box",
           group: "LEGS",
           kneeFlag: true,
-          howTo: "Drive through heel. Soft step-down — control the way down.",
-        },
-        {
-          id: "mom_c_s7",
-          slot: "strength",
-          name: "Hip abduction machine",
-          dose: "3×12",
-          equipment: "Hip abduction machine",
-          group: "LEGS",
-          howTo: "Press knees out against pads. Smooth tempo. Glute med — hip stability.",
-        },
-        {
-          id: "mom_c_s8",
-          slot: "strength",
-          name: "Calf raises (loaded)",
-          dose: "3×15",
-          equipment: "Calf machine or DBs",
-          group: "LEGS",
-          howTo: "Slow up, slower down. Full range — heel below toes at bottom, full point at top.",
+          howTo: "Drive through heel of the working leg. Soft step-down — control the descent.",
         },
 
-        // ── Strength: ARMS ──
+        // ── Strength: CHEST ──
         {
-          id: "mom_c_s9",
+          id: "mom_c_s4",
           slot: "strength",
-          name: "Triceps pressdown",
-          dose: "2×10",
-          equipment: "Cable + bar",
-          group: "ARMS",
-          howTo: "Elbows pinned to sides. Press down to full extension, controlled return.",
+          name: "Chest press machine",
+          dose: "3×10",
+          equipment: "Chest press machine",
+          group: "CHEST",
+          howTo: "Press straight forward, smooth tempo. No back arching.",
+        },
+        {
+          id: "mom_c_s5",
+          slot: "strength",
+          name: "Pec fly machine",
+          dose: "3×10",
+          equipment: "Pec fly machine",
+          group: "CHEST",
+          howTo: "Sit upright, elbows slightly bent. Bring handles together with control — feel the chest squeeze. Don't crash the stack on the return.",
         },
 
         // ── Strength: CORE ──
         {
-          id: "mom_c_s10",
+          id: "mom_c_s6",
           slot: "strength",
           name: "Standing Pallof press",
           dose: "2×10/side",
@@ -559,9 +418,10 @@ export const momStrength: StaticPlan = {
         {
           id: "mom_c_c2",
           slot: "cooldown",
-          name: "Single-leg balance",
-          dose: "3×20 sec/side",
-          equipment: "None",
+          name: "Calf raises (loaded)",
+          dose: "3×15",
+          equipment: "Calf machine or DBs",
+          howTo: "Slow up, slower down. Full range — heel below toes at bottom, full point at top.",
         },
         {
           id: "mom_c_c3",
