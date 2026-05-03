@@ -17,6 +17,7 @@ export type WorkoutItem = {
   kneeFlag?: boolean;
   finisherRounds?: number;
   suggestedLoad?: string;
+  group?: string;
 };
 
 export type WorkoutData = {

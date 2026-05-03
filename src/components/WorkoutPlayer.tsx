@@ -170,6 +170,22 @@ function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
       continue;
     }
 
+    // Group consecutive strength items that share a body-part group (e.g. BACK, CHEST, LEGS)
+    if (item.slot === "strength" && item.group) {
+      const groupName = item.group;
+      const groupItems: WorkoutItem[] = [];
+      while (idx < items.length && items[idx].slot === "strength" && items[idx].group === groupName) {
+        groupItems.push(items[idx]);
+        idx++;
+      }
+      screens.push({
+        type: "single",
+        label: groupName,
+        items: groupItems,
+      });
+      continue;
+    }
+
     // Group finisher items together
     if (item.slot === "finisher") {
       const finisherItems: WorkoutItem[] = [];

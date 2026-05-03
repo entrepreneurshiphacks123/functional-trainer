@@ -5,7 +5,8 @@ import type { StaticPlan } from "../plans";
 //   - No spine flexion or extension (osteoporosis fracture protocol)
 //   - No hip internal rotation (posterior hip precaution)
 //   - No squat below 90° (the box stops her at safe depth)
-//   - All loaded work on cables/machines (no free-weight overhead, no barbell back squat, no conventional deadlift)
+//   - Machines preferred over cables where a machine exists (her preference)
+//   - Body-part grouping: back → chest → shoulders → legs → arms → core
 //   - 3-phase structure: warmup → strength → cooldown (Pallof + carries cover core, no dedicated activation block)
 export const momStrength: StaticPlan = {
   id: "mom-strength",
@@ -62,50 +63,59 @@ export const momStrength: StaticPlan = {
           description: "Just warming the hips. No max effort.",
         },
 
-        // ── Strength ──
+        // ── Strength: BACK ──
         {
           id: "mom_a_s1",
           slot: "strength",
-          name: "Box squat (cable goblet hold)",
+          name: "Lat pulldown",
           dose: "3×8",
-          equipment: "Cable + box",
-          suggestedLoad: "15-25 lb",
-          kneeFlag: true,
-          howTo: "Hold cable handle at chest like a goblet. Sit back to the box, light touch, stand up. The box stops your depth — don't try to go below it.",
+          equipment: "Lat pulldown machine",
+          group: "BACK",
+          howTo: "Pull bar to collarbone, elbows down. Don't lean back.",
         },
         {
           id: "mom_a_s2",
           slot: "strength",
-          name: "Cable chest press",
+          name: "Seated row machine",
           dose: "3×10",
-          equipment: "Cable",
-          howTo: "Stand or seated. Press straight forward, smooth tempo. No back arching.",
+          equipment: "Seated row machine",
+          group: "BACK",
+          howTo: "Long spine, pull handles to belly, squeeze shoulder blades. Don't round forward at the bottom.",
         },
+
+        // ── Strength: CHEST ──
         {
           id: "mom_a_s3",
           slot: "strength",
-          name: "Cable seated row",
+          name: "Chest press machine",
           dose: "3×10",
-          equipment: "Cable",
-          howTo: "Long spine, pull to belly, squeeze shoulder blades. Don't lean back.",
+          equipment: "Chest press machine",
+          group: "CHEST",
+          howTo: "Press straight forward, smooth tempo. Don't lock elbows at top. No back arching.",
         },
+
+        // ── Strength: SHOULDERS ──
         {
           id: "mom_a_s4",
           slot: "strength",
-          name: "Cable pull-through (hip hinge)",
+          name: "DB lateral raise (seated)",
           dose: "3×10",
-          equipment: "Cable (low pulley)",
-          suggestedLoad: "15-20 lb",
-          hint: "NEW pattern",
-          howTo: "Face away from cable, handle between legs. Hinge at hips, soft knees, push hips back like closing a door with your butt. Stand tall — don't extend back at the top.",
+          equipment: "Dumbbells",
+          group: "SHOULDERS",
+          howTo: "Sit upright. Lead with the elbow, slight bend. Stop at shoulder height — not above.",
         },
+
+        // ── Strength: LEGS ──
         {
           id: "mom_a_s5",
           slot: "strength",
-          name: "Lat pulldown",
+          name: "Box squat (DB or cable goblet hold)",
           dose: "3×8",
-          equipment: "Cable / lat pulldown",
-          howTo: "Pull bar to collarbone, elbows down. Don't lean back.",
+          equipment: "DB or cable + box",
+          group: "LEGS",
+          suggestedLoad: "15-25 lb",
+          kneeFlag: true,
+          howTo: "Hold DB or cable handle at chest like a goblet. Sit back to the box, light touch, stand up. The box stops your depth — don't try to go below it.",
         },
         {
           id: "mom_a_s6",
@@ -113,6 +123,7 @@ export const momStrength: StaticPlan = {
           name: "Glute-focus leg press (feet HIGH)",
           dose: "3×10",
           equipment: "Leg press machine",
+          group: "LEGS",
           kneeFlag: true,
           howTo: "Place feet HIGH on the platform, heels near top, toes pointed down. Drive through heels — feel glutes and hams. Don't lock knees at top.",
         },
@@ -122,6 +133,7 @@ export const momStrength: StaticPlan = {
           name: "Step-ups (low box)",
           dose: "2×8/side",
           equipment: "6-8\" box",
+          group: "LEGS",
           kneeFlag: true,
           howTo: "Drive through heel of the working leg. Soft step-down — control the descent.",
         },
@@ -130,17 +142,20 @@ export const momStrength: StaticPlan = {
           slot: "strength",
           name: "Calf raises (loaded)",
           dose: "3×15",
-          equipment: "Cable handles or DBs",
+          equipment: "Calf machine or DBs",
+          group: "LEGS",
           howTo: "Slow up, slower down. Full range — heel below toes at bottom, full point at top.",
         },
+
+        // ── Strength: CORE ──
         {
           id: "mom_a_s9",
           slot: "strength",
           name: "Standing Pallof press",
           dose: "2×10/side",
           equipment: "Cable",
+          group: "CORE",
           suggestedLoad: "10-15 lb",
-          description: "Anti-rotation core",
           howTo: "Stand sideways to a chest-height cable. Hold handle at sternum with both hands. Press straight out, hold 2 seconds, return slow. Resist the cable's pull — don't let your trunk rotate.",
         },
 
@@ -173,10 +188,10 @@ export const momStrength: StaticPlan = {
     },
 
     // ─────────────────────────────────────────────
-    // DAY B — Hinge + Pull (alternate)
+    // DAY B — Back Focus (alternate)
     // ─────────────────────────────────────────────
     B: {
-      title: "Hinge + Pull",
+      title: "Back Focus",
       items: [
         // ── Warmup ──
         {
@@ -217,74 +232,88 @@ export const momStrength: StaticPlan = {
           howTo: "Side-lying, knees bent, feet stacked. Open top knee while keeping feet together. Don't roll the hip back.",
         },
 
-        // ── Strength ──
+        // ── Strength: BACK ──
         {
           id: "mom_b_s1",
           slot: "strength",
-          name: "Cable pull-through (hip hinge)",
-          dose: "3×10",
-          equipment: "Cable (low pulley)",
-          suggestedLoad: "15-20 lb",
-          howTo: "Face away from cable, handle between legs. Hinge hips back, soft knees. Stand tall — don't extend at top.",
+          name: "Lat pulldown",
+          dose: "3×8",
+          equipment: "Lat pulldown machine",
+          group: "BACK",
+          howTo: "Pull to collarbone, elbows down. Don't lean back.",
         },
         {
           id: "mom_b_s2",
           slot: "strength",
-          name: "Glute-focus leg press (feet HIGH)",
+          name: "Seated row machine",
           dose: "3×10",
-          equipment: "Leg press machine",
-          kneeFlag: true,
-          howTo: "Feet HIGH on platform, drive through heels. Glutes and hams do the work.",
+          equipment: "Seated row machine",
+          group: "BACK",
+          howTo: "Long spine, pull to belly, squeeze blades.",
         },
         {
           id: "mom_b_s3",
           slot: "strength",
-          name: "Lat pulldown",
-          dose: "3×8",
-          equipment: "Cable / lat pulldown",
-          howTo: "Pull to collarbone, elbows down. Don't lean back.",
+          name: "Rear delt fly machine",
+          dose: "3×12",
+          equipment: "Rear delt fly machine",
+          group: "BACK",
+          howTo: "Sit chest to pad. Lead with the elbows, pull handles wide and back. Squeeze rear delts.",
         },
+
+        // ── Strength: CHEST ──
         {
           id: "mom_b_s4",
           slot: "strength",
-          name: "Cable face pull",
-          dose: "3×12",
-          equipment: "Cable + rope",
-          howTo: "Cable at face height, rope attachment. Pull rope to eyebrows, elbows high and wide. Squeeze rear delts.",
+          name: "Chest press machine",
+          dose: "3×10",
+          equipment: "Chest press machine",
+          group: "CHEST",
+          howTo: "Press straight, smooth tempo. No arching.",
         },
+
+        // ── Strength: LEGS ──
         {
           id: "mom_b_s5",
           slot: "strength",
-          name: "Leg curl machine",
+          name: "Glute-focus leg press (feet HIGH)",
           dose: "3×10",
-          equipment: "Leg curl machine",
+          equipment: "Leg press machine",
+          group: "LEGS",
           kneeFlag: true,
-          howTo: "Smooth tempo, full range. Squeeze hamstrings at the top of the curl.",
+          howTo: "Feet HIGH on platform, drive through heels. Glutes and hams do the work.",
         },
         {
           id: "mom_b_s6",
           slot: "strength",
-          name: "Cable chest press",
+          name: "Leg curl machine",
           dose: "3×10",
-          equipment: "Cable",
-          howTo: "Press straight, smooth tempo. No arching.",
+          equipment: "Leg curl machine",
+          group: "LEGS",
+          kneeFlag: true,
+          howTo: "Smooth tempo, full range. Squeeze hamstrings at the top of the curl.",
         },
+
+        // ── Strength: ARMS ──
         {
           id: "mom_b_s7",
           slot: "strength",
-          name: "Cable bicep curl",
+          name: "Bicep curl (cable bar or DBs)",
           dose: "2×10",
-          equipment: "Cable + bar",
+          equipment: "Cable bar or dumbbells",
+          group: "ARMS",
           howTo: "Elbows pinned to sides. Smooth curl, controlled lower.",
         },
+
+        // ── Strength: CORE ──
         {
           id: "mom_b_s8",
           slot: "strength",
           name: "Standing Pallof press",
           dose: "2×10/side",
           equipment: "Cable",
+          group: "CORE",
           suggestedLoad: "10-15 lb",
-          description: "Anti-rotation core",
           howTo: "Stand sideways to cable, handle at sternum. Press out, hold 2 sec, resist rotation.",
         },
 
@@ -316,10 +345,10 @@ export const momStrength: StaticPlan = {
     },
 
     // ─────────────────────────────────────────────
-    // DAY C — Squat + Push (alternate)
+    // DAY C — Legs + Push Focus (alternate)
     // ─────────────────────────────────────────────
     C: {
-      title: "Squat + Push",
+      title: "Legs + Push Focus",
       items: [
         // ── Warmup ──
         {
@@ -360,40 +389,49 @@ export const momStrength: StaticPlan = {
           description: "Gentle. No forcing.",
         },
 
-        // ── Strength ──
+        // ── Strength: BACK ──
         {
           id: "mom_c_s1",
           slot: "strength",
-          name: "Box squat (cable goblet hold)",
+          name: "Lat pulldown",
           dose: "3×8",
-          equipment: "Cable + box",
-          suggestedLoad: "15-25 lb",
-          kneeFlag: true,
-          howTo: "Cable handle at chest. Sit back to box, stand up. Box stops depth.",
+          equipment: "Lat pulldown machine",
+          group: "BACK",
+          howTo: "Pull to collarbone, elbows down. Don't lean back.",
         },
+
+        // ── Strength: CHEST ──
         {
           id: "mom_c_s2",
           slot: "strength",
-          name: "Cable chest press",
+          name: "Chest press machine",
           dose: "3×10",
-          equipment: "Cable",
+          equipment: "Chest press machine",
+          group: "CHEST",
         },
+
+        // ── Strength: SHOULDERS ──
         {
           id: "mom_c_s3",
           slot: "strength",
-          name: "Step-ups (low box)",
-          dose: "3×8/side",
-          equipment: "6-8\" box",
-          kneeFlag: true,
-          howTo: "Drive through heel. Soft step-down — control the way down.",
+          name: "DB lateral raise (seated)",
+          dose: "3×10",
+          equipment: "Dumbbells",
+          group: "SHOULDERS",
+          howTo: "Sit upright. Lead with the elbow, slight bend. Stop at shoulder height — not above.",
         },
+
+        // ── Strength: LEGS ──
         {
           id: "mom_c_s4",
           slot: "strength",
-          name: "Cable seated row",
-          dose: "3×10",
-          equipment: "Cable",
-          howTo: "Long spine, pull to belly, squeeze blades.",
+          name: "Box squat (DB or cable goblet hold)",
+          dose: "3×8",
+          equipment: "DB or cable + box",
+          group: "LEGS",
+          suggestedLoad: "15-25 lb",
+          kneeFlag: true,
+          howTo: "Goblet hold at chest. Sit back to box, stand up. Box stops depth.",
         },
         {
           id: "mom_c_s5",
@@ -401,40 +439,49 @@ export const momStrength: StaticPlan = {
           name: "Leg extension machine",
           dose: "3×10",
           equipment: "Leg extension machine",
+          group: "LEGS",
           kneeFlag: true,
           howTo: "Smooth tempo, controlled lower. Don't bang the stack.",
         },
         {
           id: "mom_c_s6",
           slot: "strength",
-          name: "Cable lateral raise",
-          dose: "3×10",
-          equipment: "Cable (single arm)",
-          howTo: "Stop at shoulder height — not above. Lead with the elbow, slight bend.",
+          name: "Step-ups (low box)",
+          dose: "3×8/side",
+          equipment: "6-8\" box",
+          group: "LEGS",
+          kneeFlag: true,
+          howTo: "Drive through heel. Soft step-down — control the way down.",
         },
         {
           id: "mom_c_s7",
           slot: "strength",
-          name: "Cable triceps pressdown",
-          dose: "2×10",
-          equipment: "Cable + bar",
-          howTo: "Elbows pinned to sides. Press down, full extension, controlled return.",
+          name: "Calf raises (loaded)",
+          dose: "3×15",
+          equipment: "Calf machine or DBs",
+          group: "LEGS",
         },
+
+        // ── Strength: ARMS ──
         {
           id: "mom_c_s8",
           slot: "strength",
-          name: "Calf raises (loaded)",
-          dose: "3×15",
-          equipment: "Cable handles or DBs",
+          name: "Triceps pressdown",
+          dose: "2×10",
+          equipment: "Cable + bar",
+          group: "ARMS",
+          howTo: "Elbows pinned to sides. Press down to full extension, controlled return.",
         },
+
+        // ── Strength: CORE ──
         {
           id: "mom_c_s9",
           slot: "strength",
           name: "Standing Pallof press",
           dose: "2×10/side",
           equipment: "Cable",
+          group: "CORE",
           suggestedLoad: "10-15 lb",
-          description: "Anti-rotation core",
         },
 
         // ── Cooldown ──
