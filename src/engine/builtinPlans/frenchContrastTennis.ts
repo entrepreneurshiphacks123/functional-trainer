@@ -344,13 +344,13 @@ export const frenchContrastTennis: StaticPlan = {
         {
           id: "a_acc4",
           slot: "accessory",
-          name: "Landmine 180 rotation (heavy)",
+          name: "Landmine row to push press (single-arm)",
           dose: "3×6/side",
           equipment: "Barbell + landmine",
-          description: "Heavy controlled rotation — trunk strength, not power",
+          description: "Full-chain pull + leg-drive press — vanity + integration",
           suggestedLoad: "~70 lb (bar + 25)",
           howTo:
-            "Barbell end at chest, both hands gripped. Drive from hips to rotate the bar from one shoulder, around to the other side. Slow controlled return. Heavier and slower than the FC block version — building the rotational strength base, not the rate.",
+            "Stand to one side of the landmine, barbell end in one hand. Hinge to ~45°, row the bar end to your hip (slow controlled pull). Stand up, transition the bar end to shoulder height. Dip knees, then drive through the legs to push-press overhead. Return to shoulder, reset to hinge for next rep. Pull → press → leg drive in one — same kinetic chain as a serve.",
         },
 
         // ── Cooldown ──
