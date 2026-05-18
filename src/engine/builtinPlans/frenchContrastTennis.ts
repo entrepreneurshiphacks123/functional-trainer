@@ -35,6 +35,16 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "2 min",
           equipment: "Mini band",
         },
+        {
+          id: "a_w4",
+          slot: "prep",
+          name: "Side-lying clamshells + adductor lifts",
+          dose: "10/side each",
+          equipment: "None",
+          description: "Wake up adductors + abductors",
+          howTo:
+            "Clamshells: side-lying, knees bent, open top knee like a clamshell — 10/side. Then roll over, cross the top leg in front of the bottom leg, lift the bottom leg straight up — 10/side. 60 seconds total. Quick blood flow to the hip stabilizers.",
+        },
 
         // ── Core Activation ──
         {
@@ -67,6 +77,16 @@ export const frenchContrastTennis: StaticPlan = {
           description: "Anti-extension + anti-rotation",
           howTo:
             "Extend opposite arm and leg simultaneously. Hold 3 seconds at the top. Keep hips square — don't let the hip of the extended leg open up.",
+        },
+        {
+          id: "a_ca4",
+          slot: "core_activation",
+          name: "Side plank with hip dip",
+          dose: "8/side",
+          equipment: "None",
+          description: "Anti-lateral flexion",
+          howTo:
+            "Side plank on forearm, feet stacked. Dip hip toward the floor, then drive it back up above neutral. Slow control. Trains the QL and obliques — the muscles that resist lateral collapse on wide shots.",
         },
 
         // ── FC Block 1 — Hinge Power (single pass) ──
@@ -175,14 +195,16 @@ export const frenchContrastTennis: StaticPlan = {
         {
           id: "a_fc3_1",
           slot: "fc_block",
-          name: "Barbell bent-over row",
+          name: "Landmine T-bar row (two-handed)",
           dose: "3 reps @ 80%",
-          equipment: "Barbell",
+          equipment: "Barbell + landmine + V-handle",
           description: "Potentiate pull chain",
           fcBlock: 3,
           fcPosition: 1,
           restAfter: 20,
-          suggestedLoad: "135 lb",
+          suggestedLoad: "~135 lb (bar + 90 on loaded end)",
+          howTo:
+            "Barbell in landmine, V-handle clipped around the loaded end. Straddle the bar, hinge to ~45° with chest tall. Row explosively to chest, control down. Tighter pull pattern than the barbell row and friendlier on the grip — closer to the racquet-arm pull through contact.",
         },
         {
           id: "a_fc3_2",
@@ -258,27 +280,27 @@ export const frenchContrastTennis: StaticPlan = {
           slot: "tennis_movement",
           name: "Lateral hurdle hops",
           dose: "3 passes/direction",
-          equipment: "6\" hurdles (4 in a row)",
+          equipment: "6\" hurdles or 4 DBs spaced 2 ft apart",
           howTo:
-            "Set 4 hurdles in a line, 2 feet apart. Hop laterally over each on both feet. Land in split step stance after the last hurdle — feet wide, knees bent, ready position. Quick ground contacts between hurdles.",
+            "Set 4 hurdles (or DBs on the floor) in a line, 2 feet apart. Hop laterally over each on both feet. Land in split step stance after the last one — feet wide, knees bent, ready position. Quick ground contacts between hops.",
         },
         {
           id: "a_tm5",
           slot: "tennis_movement",
           name: "Split step → explosive first step 3m → stick",
           dose: "4/direction",
-          equipment: "None",
+          equipment: "None (or long band)",
           howTo:
-            "Ready position. Split step, then explode forward 3 meters — just 2-3 steps of maximum acceleration. Stick the landing in athletic stance for 2 seconds. The first step is the exercise — that's what wins points on court.",
+            "Ready position. Split step, then explode forward 3 meters — just 2-3 steps of maximum acceleration. Stick the landing in athletic stance for 2 seconds. The first step is the exercise — that's what wins points on court.\n\n**Band variation:** Loop a long band around your waist — anchored behind for accel resistance, or in front for overspeed decel. Turns the drill into a strength stimulus.",
         },
         {
           id: "a_tm6",
           slot: "tennis_movement",
           name: "Lateral bound → stick → crossover recovery",
           dose: "3/side",
-          equipment: "None",
+          equipment: "None (or long band)",
           howTo:
-            "Bound wide laterally, stick landing on outside leg for 2 seconds. Then crossover step to recover back to start. Mimics wide ball → recovery on court.",
+            "Bound wide laterally, stick landing on outside leg for 2 seconds. Then crossover step to recover back to start. Mimics wide ball → recovery on court.\n\n**Band variation:** Band around waist, anchored opposite the bound direction for accel resistance — or anchored same side as the bound for overspeed recovery.",
         },
         {
           id: "a_fin1",
@@ -307,6 +329,28 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Banded lateral walks",
           dose: "3×10/side",
           equipment: "Mini band",
+        },
+        {
+          id: "a_acc3",
+          slot: "accessory",
+          name: "DB single-leg RDL",
+          dose: "3×8/side",
+          equipment: "DBs",
+          description: "Single-leg posterior chain + balance",
+          suggestedLoad: "35 lb DBs",
+          howTo:
+            "Stand on one leg, DBs in both hands. Hinge at the hip, free leg extends behind you like a tail. Lower DBs until you feel hamstring stretch — back flat, hips square. Drive through standing-leg glute to return. Slow eccentric, controlled. Same single-leg loading pattern as planting on an open-stance forehand.",
+        },
+        {
+          id: "a_acc4",
+          slot: "accessory",
+          name: "Landmine 180 rotation (heavy)",
+          dose: "3×6/side",
+          equipment: "Barbell + landmine",
+          description: "Heavy controlled rotation — trunk strength, not power",
+          suggestedLoad: "~70 lb (bar + 25)",
+          howTo:
+            "Barbell end at chest, both hands gripped. Drive from hips to rotate the bar from one shoulder, around to the other side. Slow controlled return. Heavier and slower than the FC block version — building the rotational strength base, not the rate.",
         },
 
         // ── Cooldown ──
@@ -381,6 +425,16 @@ export const frenchContrastTennis: StaticPlan = {
           howTo:
             "Standing athletic stance. Press band out from chest and hold at full extension for 15 seconds. Fight the rotation. Don't let your hips shift.",
         },
+        {
+          id: "b_ca4",
+          slot: "core_activation",
+          name: "Side plank with hip dip",
+          dose: "8/side",
+          equipment: "None",
+          description: "Anti-lateral flexion (dynamic)",
+          howTo:
+            "Side plank on forearm, feet stacked. Dip hip toward the floor, then drive it back up above neutral. Slow control. Pairs with the Copenhagen — Copenhagen is the iso, this is the dynamic. Both prep the QL for hard lateral movement.",
+        },
 
         // ── FC Block 1 — Squat Power (single pass) ──
         {
@@ -402,13 +456,13 @@ export const frenchContrastTennis: StaticPlan = {
           slot: "fc_block",
           name: "Hurdle hops → stick landing",
           dose: "3 reps",
-          equipment: "6\" hurdles (3 in a row)",
+          equipment: "6\" hurdles or 3 DBs spaced 3 ft apart",
           description: "High-force vertical + landing mechanics",
           fcBlock: 1,
           fcPosition: 2,
           restAfter: 20,
           howTo:
-            "3 hurdles in a line, 3 feet apart. Hop over each continuously. Stick final landing in split step stance for 2 seconds. Minimize ground contact between hurdles.",
+            "3 hurdles (or DBs on the floor) in a line, 3 feet apart. Hop over each continuously. Stick final landing in split step stance for 2 seconds. Minimize ground contact between hops.",
         },
         {
           id: "b_fc1_3",
@@ -546,9 +600,9 @@ export const frenchContrastTennis: StaticPlan = {
           slot: "tennis_movement",
           name: "Lateral hurdle hops",
           dose: "3 passes/direction",
-          equipment: "6\" hurdles (4 in a row)",
+          equipment: "6\" hurdles or 4 DBs spaced 2 ft apart",
           howTo:
-            "4 hurdles in a line, 2 feet apart. Hop laterally over each. Land in split step after the last one. Quick ground contacts — hot feet.",
+            "4 hurdles (or DBs) in a line, 2 feet apart. Hop laterally over each. Land in split step after the last one. Quick ground contacts — hot feet.",
         },
         {
           id: "b_tm2",
@@ -564,9 +618,9 @@ export const frenchContrastTennis: StaticPlan = {
           slot: "tennis_movement",
           name: "Split step drop → explosive first step 3m",
           dose: "4/direction",
-          equipment: "None",
+          equipment: "None (or long band)",
           howTo:
-            "Start in ready position. Small hop (split step), land, explode laterally 3 meters. Just 2-3 steps of max acceleration and stick. The split step timing is the exercise — read and react.",
+            "Start in ready position. Small hop (split step), land, explode laterally 3 meters. Just 2-3 steps of max acceleration and stick. The split step timing is the exercise — read and react.\n\n**Band variation:** Loop a long band around your waist — anchored opposite the explosion direction for accel resistance, or anchored same direction for overspeed decel work.",
         },
         {
           id: "b_tm4",
@@ -582,9 +636,9 @@ export const frenchContrastTennis: StaticPlan = {
           slot: "tennis_movement",
           name: "Shuffle → decel → split step → first step forward",
           dose: "4 reps",
-          equipment: "None",
+          equipment: "None (or long band)",
           howTo:
-            "Lateral shuffle 5m, decel, split step, explosive first step forward 3m and stick. Mimics baseline defense → approach shot transition. The transition from lateral to linear is the skill.",
+            "Lateral shuffle 5m, decel, split step, explosive first step forward 3m and stick. Mimics baseline defense → approach shot transition. The transition from lateral to linear is the skill.\n\n**Band variation:** Band around waist, anchored behind for accel resistance through the forward burst, or in front for overspeed first-step.",
         },
         {
           id: "b_fin1",
@@ -613,6 +667,37 @@ export const frenchContrastTennis: StaticPlan = {
           name: "Tibialis raises",
           dose: "3×15",
           equipment: "None or band",
+        },
+        {
+          id: "b_acc3",
+          slot: "accessory",
+          name: "Cossack squat",
+          dose: "3×6/side",
+          equipment: "DB (goblet)",
+          description: "Adductor + single-leg under load",
+          suggestedLoad: "35 lb DB",
+          howTo:
+            "Wide stance, DB at chest. Sit into one hip — working knee tracks over toe, opposite leg straight with toe lifted up. Feel the inner-thigh stretch on the straight side and squat depth on the working side. Slow control up. Builds the adductor strength + hip mobility you need to recover from wide balls.",
+        },
+        {
+          id: "b_acc4",
+          slot: "accessory",
+          name: "Single-leg glute bridge",
+          dose: "3×10/side",
+          equipment: "None",
+          description: "Single-leg posterior chain",
+          howTo:
+            "Lie on back, one foot planted (heel close to glute), other leg extended straight up. Drive hip up through the planted heel — squeeze glute hard at top. Slow down. Don't let the hips drop laterally. Trains the single-leg drive pattern that pushes you off the ground on every direction change.",
+        },
+        {
+          id: "b_acc5",
+          slot: "accessory",
+          name: "Standing banded hip abduction",
+          dose: "2×15/side",
+          equipment: "Mini band",
+          description: "Glute med isolation",
+          howTo:
+            "Mini band around ankles. Stand tall, slight knee bend. Lift one leg out to the side against the band — control back to start. Lock the glute med so it does the work, not the hip flexor.",
         },
 
         // ── Cooldown ──
@@ -662,6 +747,16 @@ export const frenchContrastTennis: StaticPlan = {
           equipment: "Med ball",
           description: "CNS primer",
         },
+        {
+          id: "c_w5",
+          slot: "prep",
+          name: "Side-lying clamshells + adductor lifts",
+          dose: "10/side each",
+          equipment: "None",
+          description: "Wake up hip stabilizers",
+          howTo:
+            "Clamshells: 10/side. Then roll over, top leg crossed in front, lift bottom leg 10. Quick prep so the hips aren't asleep through the upper body day.",
+        },
 
         // ── Core Activation ──
         {
@@ -694,6 +789,16 @@ export const frenchContrastTennis: StaticPlan = {
           description: "Anti-extension + rotational control",
           howTo:
             "Extend opposite arm and leg. At the top, rotate trunk slightly toward the extended arm side, then return to neutral. Trains rotational control — prepares trunk for the rotational FC blocks.",
+        },
+        {
+          id: "c_ca4",
+          slot: "core_activation",
+          name: "Side plank with hip dip",
+          dose: "8/side",
+          equipment: "None",
+          description: "Anti-lateral flexion",
+          howTo:
+            "Side plank on forearm, feet stacked. Dip hip toward the floor, then drive it back up above neutral. Slow control. Primes the QL and obliques before the rotational FC blocks — rotation needs a stable lateral chain.",
         },
 
         // ── FC Block 1 — Pressing Power (single pass) ──
@@ -871,9 +976,9 @@ export const frenchContrastTennis: StaticPlan = {
           slot: "tennis_movement",
           name: "Split step → explosive first step 3m → decel → recovery step",
           dose: "4 reps",
-          equipment: "None",
+          equipment: "None (or long band)",
           howTo:
-            "Ready position. Split step, explode forward 3m, decel in 2 steps, crossover step left then right to recover. Full direction change chain — short space, maximum intent.",
+            "Ready position. Split step, explode forward 3m, decel in 2 steps, crossover step left then right to recover. Full direction change chain — short space, maximum intent.\n\n**Band variation:** Band around waist, anchored behind for accel resistance, or in front for overspeed decel. Loads the chain without needing space.",
         },
         {
           id: "c_tm3",
@@ -889,9 +994,9 @@ export const frenchContrastTennis: StaticPlan = {
           slot: "tennis_movement",
           name: "Lateral shuffle → split step → explosive first step",
           dose: "4/direction",
-          equipment: "None",
+          equipment: "None (or long band)",
           howTo:
-            "Shuffle 5m, split step, explode forward 3m and stick. The split step is the trigger — read and react.",
+            "Shuffle 5m, split step, explode forward 3m and stick. The split step is the trigger — read and react.\n\n**Band variation:** Band around waist, anchored opposite the burst direction for accel work, or same direction for overspeed.",
         },
         {
           id: "c_tm5",
@@ -903,16 +1008,28 @@ export const frenchContrastTennis: StaticPlan = {
           howTo:
             "Face wall at 45 degrees. Quick rotational throws — catch and immediately throw again. Speed > power. Reactive rotation at game speed.",
         },
+        // ── Strength Block (replaces finisher — vanity work that supports the serve) ──
         {
-          id: "c_fin1",
-          slot: "finisher",
-          name: "KB swing → goblet squat → press (complex)",
-          dose: "3 reps",
-          equipment: "KB",
-          finisherRounds: 3,
-          suggestedLoad: "35 lb KB",
+          id: "c_str1",
+          slot: "strength",
+          name: "Barbell bench press",
+          dose: "3×8",
+          equipment: "Barbell + bench",
+          description: "Pressing strength — moderate load, full ROM",
+          suggestedLoad: "155 lb (bar + 55/side)",
           howTo:
-            "KB swing, clean to rack, goblet squat, press overhead. That's one rep. Full kinetic chain: hinge → clean → squat → press. Builds the ground-up force production that powers every stroke.",
+            "Lighter than the FC potentiation triple. Brief pause at chest, drive up controlled. This is the volume work that builds the tendon resilience and pressing capacity the heavy single can't.",
+        },
+        {
+          id: "c_str2",
+          slot: "strength",
+          name: "Incline DB press",
+          dose: "3×10",
+          equipment: "DBs + incline bench",
+          description: "Upper chest + anterior delt — supports serve volume",
+          suggestedLoad: "40 lb DBs",
+          howTo:
+            "Incline ~30°. DBs to ear level at the bottom, press up but don't lock out (keep tension on the chest). Slow eccentric. Builds the front of the shoulder that takes the brunt of serve volume.",
         },
 
         // ── Accessories ──
@@ -973,6 +1090,16 @@ export const frenchContrastTennis: StaticPlan = {
           dose: "2 min",
           equipment: "None",
         },
+        {
+          id: "d_w4",
+          slot: "prep",
+          name: "Side-lying clamshells + adductor lifts",
+          dose: "10/side each",
+          equipment: "None",
+          description: "Wake up hip stabilizers before plyos",
+          howTo:
+            "Clamshells: 10/side. Roll over, top leg crossed in front, lift bottom leg 10. Quick blood flow to the hips before the elastic work.",
+        },
 
         // ── Core Activation ──
         {
@@ -1004,6 +1131,16 @@ export const frenchContrastTennis: StaticPlan = {
           description: "Anti-extension + coordination",
           howTo:
             "Opposite arm and leg extend. Reach PAST your normal range — fingertips and toes pushing away from center. 3-second extension.",
+        },
+        {
+          id: "d_ca4",
+          slot: "core_activation",
+          name: "Side plank with hip dip",
+          dose: "8/side",
+          equipment: "None",
+          description: "Anti-lateral flexion",
+          howTo:
+            "Side plank on forearm, feet stacked. Dip hip toward the floor, then drive it back up above neutral. Slow control — primes the QL for lateral plyometrics where one-sided landing loads stack on the lateral chain.",
         },
 
         // ── FC Block 1 — Vertical Elasticity (single pass) ──
@@ -1187,9 +1324,9 @@ export const frenchContrastTennis: StaticPlan = {
           slot: "tennis_movement",
           name: "Split step → react → explosive first step 3m → stick",
           dose: "4 reps",
-          equipment: "None",
+          equipment: "None (or long band)",
           howTo:
-            "Ready position. Visual cue (partner points or ball drop). Split step, read, explode to the target 3m away. Stick landing in athletic stance. Reaction is the exercise — not the distance.",
+            "Ready position. Visual cue (partner points or ball drop). Split step, read, explode to the target 3m away. Stick landing in athletic stance. Reaction is the exercise — not the distance.\n\n**Band variation:** Band around waist, anchored opposite the burst direction for accel resistance, or anchored same direction for overspeed decel.",
         },
         {
           id: "d_tm4",
