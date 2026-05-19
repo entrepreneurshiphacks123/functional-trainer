@@ -699,6 +699,17 @@ export const frenchContrastTennis: StaticPlan = {
           howTo:
             "Mini band around ankles. Stand tall, slight knee bend. Lift one leg out to the side against the band — control back to start. Lock the glute med so it does the work, not the hip flexor.",
         },
+        {
+          id: "b_acc6",
+          slot: "accessory",
+          name: "Split squat iso hold (lengthened)",
+          dose: "3×30s/side",
+          equipment: "DB (goblet)",
+          description: "Yielding iso — tendon stiffness + decel capacity",
+          suggestedLoad: "25 lb DB",
+          howTo:
+            "Drop into a deep split squat — back knee 1 inch off the floor, front shin vertical, weight on the whole front foot. DB at chest. Hold dead still for 30 seconds. This is the lengthened position you live in during deceleration — building tendon stiffness here is direct injury prevention for tennis knees.",
+        },
 
         // ── Cooldown ──
         {
@@ -1358,6 +1369,17 @@ export const frenchContrastTennis: StaticPlan = {
           suggestedLoad: "8 lb",
           howTo:
             "Three throws in sequence without rest: overhead slam, pick up, rotational throw left, pick up, rotational throw right. That's one round. Multi-planar power endurance.",
+        },
+        {
+          id: "d_fin3",
+          slot: "finisher",
+          name: "Wall sit (terminal iso)",
+          dose: "60–90 sec",
+          equipment: "Wall",
+          finisherRounds: 1,
+          description: "Yielding iso — quad endurance + knee health",
+          howTo:
+            "Back flat against wall, thighs parallel to floor, knees at 90°, feet under knees. Hold. One round, hold as long as you can up to 90 sec. Sucks, then it's over — the kind of finisher you'll actually do.",
         },
 
         // ── Accessories ──
