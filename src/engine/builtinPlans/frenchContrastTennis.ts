@@ -55,7 +55,7 @@ export const frenchContrastTennis: StaticPlan = {
           equipment: "None",
           description: "Anti-extension",
           howTo:
-            "Flatten lower back to floor. Extend opposite arm and leg on exhale. 3-second extend, 2-second return. Feel your deep core brace, not your hip flexors.",
+            "Flatten lower back to floor. Extend opposite arm and leg on exhale. 3-second extend, 2-second return. Feel your deep core brace, not your hip flexors.\n\n**Progression (you're past bodyweight):** hold a light DB or plate (5–10 lb) in the extending-arm hand — the longer lever makes the anti-extension brace work harder.",
         },
         {
           id: "a_ca2",
@@ -93,14 +93,16 @@ export const frenchContrastTennis: StaticPlan = {
         {
           id: "a_fc1_1",
           slot: "fc_block",
-          name: "Trap bar deadlift",
+          name: "Machine hip thrust",
           dose: "3 reps @ 80%",
-          equipment: "Trap bar",
-          description: "Potentiate posterior chain",
+          equipment: "Hip thrust machine (or barbell RDL)",
+          description: "Potentiate posterior chain — glute drive",
           fcBlock: 1,
           fcPosition: 1,
           restAfter: 20,
-          suggestedLoad: "205 lb (bar + 80/side)",
+          suggestedLoad: "~200 lb (machine)",
+          howTo:
+            "Pad across the hips, back against the support. Drive through your heels to full hip extension — squeeze the glutes HARD at the top, ribs down (don't arch the low back to finish). Heavy triple to potentiate the glutes for the broad jump that follows. Spares the low back and hamstrings vs a deadlift — pure hip drive.\n\n**No machine free? Barbell RDL works** — hinge to mid-shin, flat back, ~135 lb for 3.",
         },
         {
           id: "a_fc1_2",
@@ -347,18 +349,6 @@ export const frenchContrastTennis: StaticPlan = {
           howTo:
             "Bound wide laterally, stick landing on outside leg for 2 seconds. Then crossover step to recover back to start. Mimics wide ball → recovery on court.\n\n**Band variation:** Band around waist, anchored opposite the bound direction for accel resistance — or anchored same side as the bound for overspeed recovery.",
         },
-        {
-          id: "a_fin1",
-          slot: "finisher",
-          name: "KB clean + squat + press (complex)",
-          dose: "3/side",
-          equipment: "KB",
-          finisherRounds: 3,
-          suggestedLoad: "35 lb KB",
-          howTo:
-            "Single-arm KB clean to rack position. Squat. Press overhead at the top. That's one rep. Full-body power chain: pull → squat → push. Builds the ground-up force production tennis demands.",
-        },
-
         // ── Accessories ──
         {
           id: "a_acc1",
@@ -378,24 +368,13 @@ export const frenchContrastTennis: StaticPlan = {
         {
           id: "a_acc3",
           slot: "accessory",
-          name: "DB single-leg RDL",
-          dose: "3×8/side",
-          equipment: "DBs",
-          description: "Single-leg posterior chain + balance",
-          suggestedLoad: "35 lb DBs",
+          name: "Suitcase carry",
+          dose: "3×40 ft/side",
+          equipment: "Heavy DB or KB",
+          description: "Loaded anti-lateral flexion — low-back + QL resilience",
+          suggestedLoad: "50–70 lb",
           howTo:
-            "Stand on one leg, DBs in both hands. Hinge at the hip, free leg extends behind you like a tail. Lower DBs until you feel hamstring stretch — back flat, hips square. Drive through standing-leg glute to return. Slow eccentric, controlled. Same single-leg loading pattern as planting on an open-stance forehand.",
-        },
-        {
-          id: "a_acc4",
-          slot: "accessory",
-          name: "Landmine row to push press (single-arm)",
-          dose: "3×6/side",
-          equipment: "Barbell + landmine",
-          description: "Full-chain pull + leg-drive press — vanity + integration",
-          suggestedLoad: "~70 lb (bar + 25)",
-          howTo:
-            "Stand to one side of the landmine, barbell end in one hand. Hinge to ~45°, row the bar end to your hip (slow controlled pull). Stand up, transition the bar end to shoulder height. Dip knees, then drive through the legs to push-press overhead. Return to shoulder, reset to hinge for next rep. Pull → press → leg drive in one — same kinetic chain as a serve.",
+            "Hold one heavy DB/KB at your side like a suitcase. Walk tall and SLOW — do not let the weight pull you into a side bend. Ribs stacked over hips, shoulders level. The whole exercise is resisting the lateral pull. Builds the erector + QL endurance that keeps the low back resilient through long matches. Switch sides each set.",
         },
 
         // ── Cooldown ──
@@ -730,18 +709,6 @@ export const frenchContrastTennis: StaticPlan = {
           howTo:
             "Lateral shuffle 5m, decel, split step, explosive first step forward 3m and stick. Mimics baseline defense → approach shot transition. The transition from lateral to linear is the skill.\n\n**Band variation:** Band around waist, anchored behind for accel resistance through the forward burst, or in front for overspeed first-step.",
         },
-        {
-          id: "b_fin1",
-          slot: "finisher",
-          name: "Med-ball slam → lateral shuffle → slam",
-          dose: "1 round (slam → shuffle → slam → shuffle back)",
-          equipment: "Med ball",
-          finisherRounds: 3,
-          suggestedLoad: "10 lb",
-          howTo:
-            "Overhead slam, pick up ball, lateral shuffle 5m, slam again, shuffle back. That's one round. Combines vertical power with lateral movement — like transitioning between baseline shots.",
-        },
-
         // ── Accessories ──
         {
           id: "b_acc1",
@@ -759,17 +726,6 @@ export const frenchContrastTennis: StaticPlan = {
           equipment: "None or band",
         },
         {
-          id: "b_acc3",
-          slot: "accessory",
-          name: "Cossack squat",
-          dose: "3×6/side",
-          equipment: "DB (goblet)",
-          description: "Adductor + single-leg under load",
-          suggestedLoad: "35 lb DB",
-          howTo:
-            "Wide stance, DB at chest. Sit into one hip — working knee tracks over toe, opposite leg straight with toe lifted up. Feel the inner-thigh stretch on the straight side and squat depth on the working side. Slow control up. Builds the adductor strength + hip mobility you need to recover from wide balls.",
-        },
-        {
           id: "b_acc4",
           slot: "accessory",
           name: "Single-leg glute bridge",
@@ -778,16 +734,6 @@ export const frenchContrastTennis: StaticPlan = {
           description: "Single-leg posterior chain",
           howTo:
             "Lie on back, one foot planted (heel close to glute), other leg extended straight up. Drive hip up through the planted heel — squeeze glute hard at top. Slow down. Don't let the hips drop laterally. Trains the single-leg drive pattern that pushes you off the ground on every direction change.",
-        },
-        {
-          id: "b_acc5",
-          slot: "accessory",
-          name: "Standing banded hip abduction",
-          dose: "2×15/side",
-          equipment: "Mini band",
-          description: "Glute med isolation",
-          howTo:
-            "Mini band around ankles. Stand tall, slight knee bend. Lift one leg out to the side against the band — control back to start. Lock the glute med so it does the work, not the hip flexor.",
         },
         {
           id: "b_acc6",
@@ -799,6 +745,17 @@ export const frenchContrastTennis: StaticPlan = {
           suggestedLoad: "25 lb DB",
           howTo:
             "Drop into a deep split squat — back knee 1 inch off the floor, front shin vertical, weight on the whole front foot. DB at chest. Hold dead still for 30 seconds. This is the lengthened position you live in during deceleration — building tendon stiffness here is direct injury prevention for tennis knees.",
+        },
+        {
+          id: "b_acc7",
+          slot: "accessory",
+          name: "Suitcase carry",
+          dose: "3×40 ft/side",
+          equipment: "Heavy DB or KB",
+          description: "Loaded anti-lateral flexion — low-back + QL resilience",
+          suggestedLoad: "50–70 lb",
+          howTo:
+            "Hold one heavy DB/KB at your side like a suitcase. Walk tall and SLOW — do not let the weight pull you into a side bend. Ribs stacked over hips, shoulders level. The whole exercise is resisting the lateral pull. On your lateral day this directly trains the QL that fires every time you reach wide. Switch sides each set.",
         },
 
         // ── Cooldown ──
@@ -1246,7 +1203,7 @@ export const frenchContrastTennis: StaticPlan = {
           equipment: "None",
           description: "Anti-extension under full-body tension",
           howTo:
-            "Arms overhead, legs extended, lower back pressed to floor. If you can't hold 20s, bend knees slightly. This is the foundation of trunk stiffness for plyometrics.",
+            "Arms overhead, legs extended, lower back pressed to floor. If you can't hold 20s, bend knees slightly. This is the foundation of trunk stiffness for plyometrics.\n\n**Progression:** hold a light plate/DB overhead in both hands — loads the anti-extension brace now that the bodyweight version is easy.",
         },
         {
           id: "d_ca2",
@@ -1283,14 +1240,16 @@ export const frenchContrastTennis: StaticPlan = {
         {
           id: "d_fc1_1",
           slot: "fc_block",
-          name: "Trap bar deadlift (lighter, 75%)",
+          name: "Machine hip thrust (lighter, faster)",
           dose: "3 reps",
-          equipment: "Trap bar",
-          description: "Potentiate without grinding — fast bar speed",
+          equipment: "Hip thrust machine (or barbell RDL)",
+          description: "Potentiate without grinding — fast glute drive",
           fcBlock: 1,
           fcPosition: 1,
           restAfter: 20,
-          suggestedLoad: "175 lb (bar + 65/side)",
+          suggestedLoad: "~160 lb (machine)",
+          howTo:
+            "Same as Day A but lighter and FAST — this primes vertical pop without grinding. Drive through the heels, snap to full hip extension, squeeze glutes, ribs down. Speed of the drive is the point.\n\n**No machine? Barbell RDL ~115 lb for 3, fast off the floor.**",
         },
         {
           id: "d_fc1_2",
@@ -1479,15 +1438,6 @@ export const frenchContrastTennis: StaticPlan = {
             "In-in-out pattern — step in with one foot, step in with the other, step out with the lead foot. Quick lateral weight transfers through the ladder.",
         },
         {
-          id: "d_tm2",
-          slot: "tennis_movement",
-          name: "Line hops — front/back + side/side",
-          dose: "20s on / 10s off × 3 rounds",
-          equipment: "None",
-          howTo:
-            "Two patterns: hop forward and back over a line, then side to side. Quick ground contacts, ankle stiffness drill. Stay on balls of feet.",
-        },
-        {
           id: "d_tm3",
           slot: "tennis_movement",
           name: "Split step → react → explosive first step 3m → stick",
@@ -1505,27 +1455,6 @@ export const frenchContrastTennis: StaticPlan = {
           description: "Once-per-week sprint work — skip if no space",
           howTo:
             "Sprint 10m, 3-step decel, split step, backpedal to start. This is the one day per week you open it up to full speed. If you don't have 10m of straight line, replace with 5m shuttles (forward → back × 3).",
-        },
-        {
-          id: "d_fin1",
-          slot: "finisher",
-          name: "Burpee → broad jump → explosive start",
-          dose: "3 reps",
-          equipment: "None",
-          finisherRounds: 3,
-          howTo:
-            "Burpee (chest to floor), explode up into a broad jump, land and immediately take 2-3 explosive steps forward. Full-body power + transition to first-step speed.",
-        },
-        {
-          id: "d_fin2",
-          slot: "finisher",
-          name: "Med-ball complex: overhead slam + rotational throw L + rotational throw R",
-          dose: "3 throws (slam + throw L + throw R)",
-          equipment: "Med ball",
-          finisherRounds: 3,
-          suggestedLoad: "8 lb",
-          howTo:
-            "Three throws in sequence without rest: overhead slam, pick up, rotational throw left, pick up, rotational throw right. That's one round. Multi-planar power endurance.",
         },
         {
           id: "d_fin3",
