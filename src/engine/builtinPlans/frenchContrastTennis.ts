@@ -246,6 +246,41 @@ export const frenchContrastTennis: StaticPlan = {
             "Band anchored high. Straight arms, pull from overhead to hips as fast as possible. Snap the band down. Pure speed — the band assist lets you move faster than bodyweight allows.",
         },
 
+        // ── Athletic Complex — Linear Drive + Rotation ──
+        {
+          id: "a_ath1",
+          slot: "athletic",
+          name: "Cable row to knee drive",
+          dose: "3×6/side",
+          equipment: "Cable or band",
+          description: "Anti-rotation pull + single-leg knee drive — integrated (staple)",
+          suggestedLoad: "~30 lb",
+          howTo:
+            "Anchor cable/band at chest height. Hold the handle in the hand OPPOSITE your standing leg, slight stagger to start. Row the handle to your ribs while exploding the opposite knee up to a tall single-leg stand — finish balanced on one leg, knee at hip height, handle at your side. Hold the balance 1 second, return under control. Pull and knee-drive fire together — your loaded split-step-to-first-step in one rep. One of your staples.",
+        },
+        {
+          id: "a_ath2",
+          slot: "athletic",
+          name: "Explosive knee drive to rotational step",
+          dose: "3×5/side",
+          equipment: "DB or med ball",
+          description: "Knee drive → step → loaded trunk rotation, multi-planar (staple)",
+          suggestedLoad: "20–25 lb DB or 10 lb ball",
+          howTo:
+            "Hold a DB or med ball at chest. Standing on one leg, drive the free knee up explosively to hip height (1-sec punch at the top). From the top of the knee drive, step that foot forward into a lunge and rotate your trunk over the front leg, then rotate back to center as you push back to the start. Drive → step → turn → recover. The exact sequence of loading and turning into an open-stance forehand off a hard first step. Your other staple.",
+        },
+        {
+          id: "a_ath3",
+          slot: "athletic",
+          name: "Single-leg RDL to high pull",
+          dose: "3×6/side",
+          equipment: "DB",
+          description: "Posterior chain → triple extension → pull, single-leg",
+          suggestedLoad: "35 lb DB",
+          howTo:
+            "DB in the hand opposite the standing leg. Hinge on one leg into a single-leg RDL (free leg back, flat back). As you snap back up, explode into triple extension and pull the DB into a high pull — elbow up to shoulder height — while driving the free knee up to hip height. Hinge-load → explosive stand → pull. Ties the posterior chain to the upward drive: the ground-up sequence of every push off a wide ball.",
+        },
+
         // ── Tennis Movement ──
         {
           id: "a_tm1",
@@ -274,6 +309,16 @@ export const frenchContrastTennis: StaticPlan = {
           equipment: "Agility ladder",
           howTo:
             "Salsa pattern, switch lead foot mid-ladder, drop into a lunge every 3rd rep. Coordination + decel loading in one drill.",
+        },
+        {
+          id: "a_tm3b",
+          slot: "tennis_movement",
+          name: "Carioca (grapevine)",
+          dose: "2 passes/direction",
+          equipment: "None (5–10m space)",
+          description: "Hip-rotation footwork — the moving unit turn",
+          howTo:
+            "Move laterally leading the motion with your HIPS, not your feet. Trail leg crosses IN FRONT of the lead leg → step out with the lead leg → trail leg crosses BEHIND → step out. Front-behind-front-behind, hips rotating fully open and closed on each cross. Stay low, fast feet, eyes forward as if tracking the ball — not down at your feet. The full hip rotation is the whole point: it's the unit turn your lower body makes loading a groundstroke while still moving. Build speed each pass — sloppy-slow teaches nothing, crisp-fast teaches the rhythm.",
         },
         {
           id: "a_tm4",
@@ -594,6 +639,41 @@ export const frenchContrastTennis: StaticPlan = {
             "Stiff ankle, minimal knee bend. Quick ground contacts on one leg. Same cue as regular pogos — drumstick, not a thud. The single-leg version builds the ankle stiffness you need for hard cuts.",
         },
 
+        // ── Athletic Complex — Lateral Flow + Single-Leg ──
+        {
+          id: "b_ath1",
+          slot: "athletic",
+          name: "Crossover step-up to rotational reach",
+          dose: "3×6/side",
+          equipment: "DB + box",
+          description: "Single-leg drive + rotation, crossover pattern",
+          suggestedLoad: "25–30 lb DB",
+          howTo:
+            "Box to your side. DB at chest. Cross your OUTSIDE leg over and plant it on the box, drive up to a single-leg stand driving the trailing knee up to hip height. At the top, rotate your trunk toward the standing-leg side and reach the DB across your body. Rotate back, step down under control. The crossover step-up IS the mechanic of recovering from a wide ball — the rotation loads the trunk the way the next shot will.",
+        },
+        {
+          id: "b_ath2",
+          slot: "athletic",
+          name: "Lateral lunge to knee-drive bound",
+          dose: "3×5/side",
+          equipment: "Bodyweight or light DB",
+          description: "Lateral single-leg load → plyo bound (plyometric)",
+          suggestedLoad: "Bodyweight or 15 lb",
+          howTo:
+            "Drop into a lateral lunge — sit into the OUTSIDE hip, inside leg straight, chest tall. Explosively push off the bent leg and bound up and toward the straight-leg side, driving the trailing knee up, and stick the landing on the opposite leg for 1 second. That's one rep — reset, go the other way. Loads the adductor/lateral hip then converts it to a single-leg bound: the load-and-explode of pushing out of a defensive wide stance. True plyo — full intent on the push-off, quiet on the stick.",
+        },
+        {
+          id: "b_ath3",
+          slot: "athletic",
+          name: "Skater bound to med-ball rotation",
+          dose: "3×5/side",
+          equipment: "Med ball",
+          description: "Lateral plyo + reactive rotation combo (plyometric)",
+          suggestedLoad: "8–10 lb",
+          howTo:
+            "Med ball at chest. Skater-bound laterally — push off one leg, land on the other in a stuck single-leg position. The INSTANT you stick, fire a rotational chop/throw of the ball toward the landing-leg side (into a wall, or decelerate hard and hold if no wall). Bound → stick → rotate. Marries the lateral plyo landing to the rotational fire of hitting on the move — landing and loading at the same time, like an open-stance shot off a sprint.",
+        },
+
         // ── Tennis Movement ──
         {
           id: "b_tm1",
@@ -630,6 +710,16 @@ export const frenchContrastTennis: StaticPlan = {
           equipment: "Agility ladder",
           howTo:
             "In-in-out pattern — step in with one foot, step in with the other, step out with the lead foot. Quick lateral movement through the ladder.",
+        },
+        {
+          id: "b_tm4b",
+          slot: "tennis_movement",
+          name: "Gravity step (cross-step first move)",
+          dose: "5/direction, walk back between",
+          equipment: "None (5m space)",
+          description: "The elite first move — detailed mechanics",
+          howTo:
+            "This is the actual first step pros use to cover wide balls — faster than a shuffle. From an athletic ready stance:\n\n1. **Pre-load the split step** — small hop, land on the balls of both feet, knees soft, weight centered.\n2. **Drop step / gravity step** — to move RIGHT, the FIRST thing that moves is your LEFT foot turning out and your hips dropping/falling toward the right. You let gravity pull you sideways — don't push up, fall out.\n3. **Cross-step** — the left leg crosses over in front and drives hard into the ground as the right foot opens to point where you're going.\n4. **Accelerate** — 2–3 hard crossover/run steps to the ball, then decel into a hitting base.\n\nRep it slow first to get the drop-step sequence, then at full speed. Cue: 'fall, then run' — the fall is what makes it fast. Most players waste the first beat pushing UP; the gravity step turns that beat into free sideways distance.",
         },
         {
           id: "b_tm5",
@@ -971,6 +1061,41 @@ export const frenchContrastTennis: StaticPlan = {
             "Light band, arms straight in front. Pull apart as fast as humanly possible. Snap to full stretch. Speed is the only variable that matters here — not range, not resistance.",
         },
 
+        // ── Athletic Complex — Rotational Power Flow ──
+        {
+          id: "c_ath1",
+          slot: "athletic",
+          name: "Reverse lunge to landmine rotational press",
+          dose: "3×5/side",
+          equipment: "Barbell + landmine",
+          description: "Single-leg → knee drive → rotational press, full chain",
+          suggestedLoad: "~50–60 lb",
+          howTo:
+            "Hold the landmine bar end at one shoulder. Step back into a reverse lunge on the SAME-side leg. As you drive up out of the lunge, drive the back knee forward and up AND press the bar up and across your body with a trunk rotation toward the press side. Lunge → drive → rotate-press, one motion. The ground-up-to-overhead-with-rotation chain is the serve and the overhead — the closest single movement to it. Your knee-drive-to-rotational-turn pattern, loaded overhead.",
+        },
+        {
+          id: "c_ath2",
+          slot: "athletic",
+          name: "Band lift to rotational step-through",
+          dose: "3×6/side",
+          equipment: "Long band or cable",
+          description: "Low-to-high rotation + step-through (anti-chop pattern)",
+          suggestedLoad: "~25 lb",
+          howTo:
+            "Band anchored LOW to one side. Start with hands low across your body at the anchor-side hip. Lift the band up and across to the opposite shoulder while stepping the anchor-side foot THROUGH and rotating your whole body away from the anchor — finish tall, fully rotated, on a stable base. Reverse under control. Low-to-high rotation tied to a step is the backhand drive and the loading turn — the step-through teaches the feet to move WITH the rotation, not after it.",
+        },
+        {
+          id: "c_ath3",
+          slot: "athletic",
+          name: "Half-kneeling to standing rotational row + knee drive",
+          dose: "3×5/side",
+          equipment: "Band or cable",
+          description: "Pull + stand + rotation + knee drive, integrated",
+          suggestedLoad: "~30 lb",
+          howTo:
+            "Start half-kneeling, band anchored in front at chest height, handle in the hand opposite the down knee. Row the handle to your ribs as you drive UP to a standing single-leg stand — driving the down-leg knee up to hip height — and rotate your trunk toward the pulling side. Pull → stand → knee-drive → rotate, all one motion. The rise-and-rotate-while-pulling is the signature of pulling into a two-hander or a loaded forehand off a low ball.",
+        },
+
         // ── Tennis Movement ──
         {
           id: "c_tm1",
@@ -1309,6 +1434,38 @@ export const frenchContrastTennis: StaticPlan = {
           restAfter: 150,
           howTo:
             "Stand on one spot. Hop forward, back to center, right, back to center, backward, back to center, left, back to center. That's one round. Quick ground contacts, stiff ankles. Covers all 4 directions — the movement vocabulary of court coverage.",
+        },
+
+        // ── Athletic Complex — Reactive Plyo Flow ──
+        {
+          id: "d_ath1",
+          slot: "athletic",
+          name: "Broad bound to single-leg stick + rotational reach",
+          dose: "3×4/side",
+          equipment: "None",
+          description: "Plyo bound → single-leg decel → rotation",
+          howTo:
+            "Bound forward off two feet, land and stick on ONE leg — absorb soft, hold rigid for 1 second. At the stick, rotate your trunk and reach both arms across your body toward the standing-leg side, then reset. The single-leg stick is max decel; the rotational reach loads the trunk while you're already braking — the real demand of hitting off a hard stop. Land quiet — if you hear the landing, you're absorbing wrong.",
+        },
+        {
+          id: "d_ath2",
+          slot: "athletic",
+          name: "Depth drop to lateral bound to stick",
+          dose: "3×4/side",
+          equipment: "Box (12\")",
+          description: "Reactive plyo — drop → lateral bound → single-leg stick",
+          howTo:
+            "Stand on a 12\" box. Step off, land on two feet, and the INSTANT you touch, explode into a lateral bound to the side and stick the landing on the outside leg. Minimize the ground-contact time between the drop landing and the bound — that coupling is the reactive piece. Drop → react → bound → stick. The fastest possible coupling of absorbing force and redirecting it sideways: a defensive cut at full speed.",
+        },
+        {
+          id: "d_ath3",
+          slot: "athletic",
+          name: "Scissor jump to rotational stick",
+          dose: "3×6 alternating + stick",
+          equipment: "None",
+          description: "Plyo split jumps → rotational single-leg stick",
+          howTo:
+            "Start in a split-stance lunge. Jump and scissor the legs in the air, landing in the opposite split — soft, controlled. Do 5 fast alternating scissor jumps, then on the 6th land and immediately rotate your trunk toward the front leg and stick on that front leg for 1 second. Continuous elastic split jumps capped by a rotational decel — trains the split-step rhythm and the turn that follows the read.",
         },
 
         // ── Tennis Movement ──

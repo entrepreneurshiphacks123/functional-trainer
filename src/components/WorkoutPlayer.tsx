@@ -133,6 +133,21 @@ function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
       continue;
     }
 
+    // Group athletic complex items together (integrated multi-planar movements)
+    if (item.slot === "athletic") {
+      const athItems: WorkoutItem[] = [];
+      while (idx < items.length && items[idx].slot === "athletic") {
+        athItems.push(items[idx]);
+        idx++;
+      }
+      screens.push({
+        type: "single",
+        label: "Athletic Complex",
+        items: athItems,
+      });
+      continue;
+    }
+
     // Group accessory items together
     if (item.slot === "accessory") {
       const accItems: WorkoutItem[] = [];
