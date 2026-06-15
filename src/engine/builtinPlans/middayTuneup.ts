@@ -1,4 +1,6 @@
-export const middayTuneup = {
+import type { StaticPlan } from "../plans";
+
+export const middayTuneup: StaticPlan = {
   id: "midday-tuneup",
   name: "Midday Tune-Up",
   icon: "🧘",
@@ -84,4 +86,4 @@ export const middayTuneup = {
       ],
     },
   },
-} as const;
+};

@@ -1,4 +1,6 @@
-export const minimalEquipmentHotel = {
+import type { StaticPlan } from "../plans";
+
+export const minimalEquipmentHotel: StaticPlan = {
   id: "minimal-equipment-hotel",
   name: "Minimal Equipment (Hotel)",
   icon: "🧳",
@@ -49,4 +51,4 @@ export const minimalEquipmentHotel = {
       ],
     },
   },
-} as const;
+};

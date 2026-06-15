@@ -1,4 +1,6 @@
-export const athleticStrengthFootwork = {
+import type { StaticPlan } from "../plans";
+
+export const athleticStrengthFootwork: StaticPlan = {
   id: "athletic-strength-footwork",
   name: "Athletic Strength + Footwork",
   icon: "⚡️",
@@ -79,4 +81,4 @@ export const athleticStrengthFootwork = {
       ],
     },
   },
-} as const;
+};

@@ -1,4 +1,6 @@
-export const feelBetterJointFriendly = {
+import type { StaticPlan } from "../plans";
+
+export const feelBetterJointFriendly: StaticPlan = {
   id: "feel-better-joint-friendly",
   name: "Feel Better (Back + Knees)",
   icon: "🧠🦵",
@@ -58,4 +60,4 @@ export const feelBetterJointFriendly = {
       ],
     },
   },
-} as const;
+};

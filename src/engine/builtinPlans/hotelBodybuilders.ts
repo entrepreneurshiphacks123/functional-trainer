@@ -1,4 +1,6 @@
-export const hotelBodybuilders = {
+import type { StaticPlan } from "../plans";
+
+export const hotelBodybuilders: StaticPlan = {
   id: "hotel-bodybuilders",
   name: "Hotel Bodybuilders",
   icon: "🏨💪",
@@ -76,4 +78,4 @@ export const hotelBodybuilders = {
       ],
     },
   },
-} as const;
+};
