@@ -1,3 +1,4 @@
+import { frenchContrastTennisV2 } from "./frenchContrastTennisV2";
 import { frenchContrastTennis } from "./frenchContrastTennis";
 import { functionalFitness45 } from "./functionalFitness";
 import { athleticStrengthFootwork } from "./athleticStrengthFootwork";
@@ -10,7 +11,8 @@ import { momStrength } from "./momStrength";
 // NOTE: This is intentionally a plain object array (no type import)
 // to avoid circular imports with ../plans.ts.
 export const BUILTIN_PLANS = [
-  frenchContrastTennis,    // NEW — first position = default
+  frenchContrastTennisV2,  // NEW — Phase 2, first position = default
+  frenchContrastTennis,    // V1 — kept for reference/fallback
   functionalFitness45,
   athleticStrengthFootwork,
   feelBetterJointFriendly,
