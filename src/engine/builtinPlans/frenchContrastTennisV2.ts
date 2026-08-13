@@ -805,16 +805,16 @@ export const frenchContrastTennisV2: StaticPlan = {
         {
           id: "c_fc2_3",
           slot: "fc_block",
-          name: "Heavy landmine rotational lunge to press",
-          dose: "4/side",
-          equipment: "Barbell + landmine",
-          description: "Chained lunge + rotation + press",
+          name: "Heavy cable woodchopper, high-to-low",
+          dose: "5/side",
+          equipment: "Cable machine",
+          description: "Loaded rotational power — different implement than the landmine work above",
           fcBlock: 2,
           fcPosition: 3,
           restAfter: 20,
-          suggestedLoad: "~50-60 lb",
+          suggestedLoad: "Heavy — leave 1-2 reps in the tank",
           howTo:
-            "Step into a reverse lunge while rotating and pressing the landmine sleeve across your body. Integrated, chained sequence.",
+            "Set the cable high, handle in both hands. Rotate hips and trunk to pull the handle down and across your body to the opposite hip, like chopping wood. Power comes from the hip turn, not the arms — let your back foot pivot.",
         },
         {
           id: "c_fc2_4",
@@ -893,6 +893,8 @@ export const frenchContrastTennisV2: StaticPlan = {
           dose: "3×5/side",
           equipment: "Barbell + landmine",
           description: "Chained lunge + rotation + press — integrated",
+          howTo:
+            "Hold the landmine sleeve at chest height with both hands. Step back into a reverse lunge, loading into the front leg. Drive up out of the lunge by extending that front leg, and as you stand, rotate your trunk away from the landmine anchor while pressing the bar out and across your body. The press is powered by the leg drive and hip turn, not your arms — hips lead, press follows, same as transferring ground force into a forehand. Reset under control, repeat.",
         },
         {
           id: "c_ath2",
@@ -1103,15 +1105,15 @@ export const frenchContrastTennisV2: StaticPlan = {
         {
           id: "d_fc2_3",
           slot: "fc_block",
-          name: "Lateral bound to stick, continuous ×2",
-          dose: "3×2/side",
+          name: "Continuous lateral shuffle-bound (rapid, no stick)",
+          dose: "3×6 continuous (3 each direction)",
           equipment: "None",
-          description: "Same intensity as the old banded shuffle, different footwork",
+          description: "Rhythmic/continuous elastic quality — contrasts the discrete stick-landing version in Athletic Complex",
           fcBlock: 2,
           fcPosition: 3,
           restAfter: 20,
           howTo:
-            "Two lateral bounds in a row on the same side with a quick stick between them, no full reset.",
+            "Rapid lateral shuffle-bounds, side to side, staying light and quick on the ground — no pause or stick between reps. Same intensity as the old banded shuffle, different footwork, and deliberately different from the depth-drop-to-stick move in Athletic Complex.",
         },
         {
           id: "d_fc2_4",
