@@ -1,5 +1,6 @@
 import Capacitor
 import Foundation
+import os
 
 /// Capacitor calls and listener notification are thread-safe; Swift 6 just can't see that.
 private struct Unchecked<T>: @unchecked Sendable { let value: T }
@@ -15,6 +16,11 @@ public class TrainerNativePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "getIndex", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setWristNotifications", returnType: CAPPluginReturnPromise),
     ]
+
+    private static let log = Logger(subsystem: "com.stevenellis.functionaltrainer", category: "health")
+
+    /// Task 7 fills this with heart-rate samples collected during the session.
+    var heartRateSamples: [(Date, Int)] = []
 
     public override func load() {
         // The lock-screen intent runs in this process; it reaches JS through here (not on JS-driven setIndex).
@@ -62,10 +68,23 @@ public class TrainerNativePlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     @objc func endSession(_ call: CAPPluginCall) {
+        let startedAtMs = call.getDouble("startedAt")
+        let endedAtMs = call.getDouble("endedAt")
+        let save = call.getBool("save") ?? false
+        let samples = heartRateSamples
         let box = Unchecked(value: call)
         Task { @MainActor in
             await WorkoutSession.shared.endAndClear()
             box.value.resolve()
+            // Only a finished workout is saved. A save error never blocks or delays Done.
+            guard save, let s = startedAtMs, let e = endedAtMs,
+                  let plan = HealthSaver.plan(start: Date(timeIntervalSince1970: s / 1000),
+                                              end: Date(timeIntervalSince1970: e / 1000),
+                                              samples: samples) else { return }
+            Task.detached {
+                do { try await HealthSaver.save(plan) }
+                catch { TrainerNativePlugin.log.error("Health save failed: \(error.localizedDescription, privacy: .public)") }
+            }
         }
     }
 

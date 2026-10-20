@@ -32,7 +32,7 @@ type ListenerHandle = { remove: () => Promise<void> };
 interface TrainerNativePlugin {
   startSession(p: SessionStartPayload): Promise<void>;
   setIndex(p: { index: number }): Promise<void>;
-  endSession(p: { startedAt: number; endedAt: number; title: string }): Promise<void>;
+  endSession(p: { startedAt: number; endedAt: number; title: string; save?: boolean }): Promise<void>;
   getIndex(): Promise<{ index: number | null }>;
   setWristNotifications(p: { on: boolean }): Promise<void>;
   startHeartRate(): Promise<void>;
@@ -65,7 +65,7 @@ export const startSession = (p: SessionStartPayload): Promise<void> =>
 export const setIndex = (index: number): Promise<void> =>
   safeCall("setIndex", () => TrainerNative.setIndex({ index }));
 
-export const endSession = (p: { startedAt: number; endedAt: number; title: string }): Promise<void> =>
+export const endSession = (p: { startedAt: number; endedAt: number; title: string; save?: boolean }): Promise<void> =>
   safeCall("endSession", () => TrainerNative.endSession(p));
 
 export async function getIndex(): Promise<number | null> {

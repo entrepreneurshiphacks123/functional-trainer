@@ -660,7 +660,7 @@ export default function WorkoutPlayer({
               <Button icon="✅" onClick={() => {
                 haptic();
                 try { localStorage.removeItem("wp_state_v3"); } catch {}
-                if (startedAt) void endSession({ startedAt, endedAt: Date.now(), title: dayTitle ?? workoutLabel });
+                if (startedAt) void endSession({ startedAt, endedAt: Date.now(), title: dayTitle ?? workoutLabel, save: true });
                 onFinish();
               }}>
                 Done
