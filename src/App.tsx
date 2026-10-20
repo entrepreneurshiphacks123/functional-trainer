@@ -6,7 +6,7 @@ import CalendarView from "./components/CalendarView";
 import PlanControls from "./components/PlanControls";
 import Settings from "./components/Settings";
 import { loadState, saveState, Mode, Soreness, AppState } from "./engine/storage";
-import { findPlan, getWorkoutForPlan, getDayTitleForPlan } from "./engine/plans";
+import { findPlan, getWorkoutForPlan, getDayTitleForPlan, sorenessDays } from "./engine/plans";
 import { MovementPattern } from "../types/MovementPattern";
 import { applyTheme, loadTheme, saveTheme, Theme } from "./ui/theme";
 import { BottomNav } from "./ui/Primitives";
@@ -57,8 +57,9 @@ export default function App() {
   const shoulderRed = soreness?.shoulder_stability === "red";
 
   let plannedDay = computedPlannedDay;
-  if (shoulderRed && plannedDay === "C") plannedDay = nextDayKey(dayKeys, "C");
-  if (kneeRed && plannedDay === "B") plannedDay = nextDayKey(dayKeys, "B");
+  const sore = sorenessDays(plan);
+  if (shoulderRed && plannedDay === sore.shoulder) plannedDay = nextDayKey(dayKeys, sore.shoulder);
+  if (kneeRed && plannedDay === sore.knee) plannedDay = nextDayKey(dayKeys, sore.knee);
 
   const workout = useMemo(() => {
     if (!mode) return null;

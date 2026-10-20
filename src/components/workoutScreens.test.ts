@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { buildScreens, skipTargetIndex } from "./WorkoutPlayer";
-import { getWorkoutForPlan } from "../engine/plans";
+import { getWorkoutForPlan, sorenessDays } from "../engine/plans";
 import { frenchContrastTennisV2 } from "../engine/builtinPlans/frenchContrastTennisV2";
 import type { WorkoutItem } from "../../types/WorkoutItem";
 
@@ -45,4 +45,8 @@ test("V2 labels unchanged", () => {
     .filter((s) => s.type === "fc_block")
     .map((s) => s.label);
   expect(fcLabels).toEqual(["French Contrast 1 of 3", "French Contrast 2 of 3", "French Contrast 3 of 3"]);
+});
+
+test("plans without their own soreness mapping keep the original C/B days", () => {
+  expect(sorenessDays(frenchContrastTennisV2)).toEqual({ shoulder: "C", knee: "B" });
 });

@@ -22,6 +22,7 @@ export const frenchContrastV3: StaticPlan = {
   icon: "🎾",
   kind: "static",
   dayKeys: ["A", "B", "C"],
+  sorenessDays: { shoulder: "B", knee: "C" },
   days: {
     // ─────────────────────────────────────────────
     // DAY A: Hinge + Linear

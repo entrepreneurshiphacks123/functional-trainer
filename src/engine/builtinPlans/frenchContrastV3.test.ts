@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { frenchContrastV3 } from "./frenchContrastV3";
-import { getWorkoutForPlan } from "../plans";
+import { getWorkoutForPlan, sorenessDays } from "../plans";
 import type { WorkoutItem } from "../../../types/WorkoutItem";
 
 const dedupe = (xs: string[]) => xs.filter((x, i) => i === 0 || x !== xs[i - 1]);
@@ -74,4 +74,10 @@ test("Day C opens with the back squat", () => {
 
 test("suggested loads don't repeat the ~ the player already adds", () => {
   expect(all.filter((i) => /^~/.test(i.suggestedLoad ?? "")).map((i) => i.id)).toEqual([]);
+});
+
+test("soreness day mapping follows V3's own layout", () => {
+  expect(sorenessDays(frenchContrastV3)).toEqual({ shoulder: "B", knee: "C" });
+  expect(frenchContrastV3.days.B.title).toMatch(/upper/i);
+  expect(frenchContrastV3.days.C.title).toMatch(/squat/i);
 });
