@@ -83,11 +83,12 @@ private struct LockScreenCardView: View {
                     .font(.system(size: 28, weight: .bold).monospacedDigit())
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                    .frame(width: 108, alignment: .leading)
+                    .frame(width: 88, alignment: .leading)
                 VStack(alignment: .leading, spacing: 0) {
                     Text(state.title)
                         .font(.system(size: 14, weight: .bold))
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                         .truncationMode(.tail)
                     (Text(state.position)
                         + Text(state.heartRate.map { "  ♥ \($0)" } ?? "")
