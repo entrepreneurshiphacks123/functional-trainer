@@ -105,7 +105,7 @@ export const frenchContrastV3: StaticPlan = {
           fcBlock: 1,
           fcPosition: 1,
           restAfter: 20,
-          suggestedLoad: "~185 lb",
+          suggestedLoad: "185 lb",
           howTo:
             "Bar at the thighs, hinge at the hips with a flat back, bar travels close to the shins. Feel the hamstrings load, not the low back. Stop when you feel the stretch, don't chase depth with a rounded spine. This is the potentiator for the jumps that follow.",
         },
@@ -162,7 +162,7 @@ export const frenchContrastV3: StaticPlan = {
           fcBlock: 2,
           fcPosition: 1,
           restAfter: 20,
-          suggestedLoad: "~225 lb",
+          suggestedLoad: "225 lb",
           howTo:
             "Upper back on the bench, bar over the hip crease with a pad. Drive through the heels to full hip extension, ribs down, chin tucked. Pause: at the top of every rep, squeeze the glutes and hold the bar still for a slow 3-count, then lower under control. Feel it in the glutes, not the low back. Common mistake: cranking the lower back to fake the lockout.",
         },
@@ -275,7 +275,7 @@ export const frenchContrastV3: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           optional: true,
-          suggestedLoad: "~115 lb",
+          suggestedLoad: "115 lb",
           howTo:
             "Hinge to about 45°, flat back, bar hanging below the chest. Row the bar to the lower ribs and squeeze the shoulder blades together. Feel the lats and mid-back, not the low back. Common mistake: standing up and heaving the bar with momentum.",
         },
@@ -336,7 +336,7 @@ export const frenchContrastV3: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           optional: true,
-          suggestedLoad: "~70 lb",
+          suggestedLoad: "70 lb",
           howTo:
             "Hold the barbell end in one hand. Stand on the opposite leg. Hinge at the hip, lowering the barbell toward the ground while the free leg extends behind you. At the bottom, rotate your trunk toward the standing leg, then rotate back as you stand. Mimics loading position on open-stance shots.",
         },
@@ -392,7 +392,7 @@ export const frenchContrastV3: StaticPlan = {
           dose: "3×6/side",
           equipment: "Cable",
           description: "Pull + drive",
-          suggestedLoad: "~30 lb",
+          suggestedLoad: "30 lb",
           howTo:
             "Anchor cable at chest height. Hold the handle in the hand OPPOSITE your standing leg, slight stagger to start. Row the handle to your ribs while exploding the opposite knee up to a tall single-leg stand — finish balanced on one leg, knee at hip height, handle at your side. Hold the balance 1 second, return under control. One of your staples.",
         },
@@ -416,7 +416,7 @@ export const frenchContrastV3: StaticPlan = {
           dose: "4×5",
           equipment: "Barbell",
           group: "Barbell deadlift",
-          suggestedLoad: "~225 lb",
+          suggestedLoad: "225 lb",
           howTo:
             "Bar over mid-foot, hinge down and grip just outside the legs. Brace, pull the slack out of the bar, then push the floor away. Feel the glutes and hamstrings drive, lats tight. Common mistake: yanking the bar off the floor with a rounded back.",
         },
@@ -438,7 +438,7 @@ export const frenchContrastV3: StaticPlan = {
           dose: "3×8",
           equipment: "Barbell",
           group: "Barbell good morning",
-          suggestedLoad: "~95 lb",
+          suggestedLoad: "95 lb",
           howTo:
             "Bar on the upper back, soft knees. Push the hips straight back until the torso is near parallel, then drive the hips forward to stand. Feel the hamstrings stretch. Keep the weight modest, common mistake is rounding the back or turning it into a squat.",
         },
@@ -570,7 +570,7 @@ export const frenchContrastV3: StaticPlan = {
           fcBlock: 1,
           fcPosition: 1,
           restAfter: 20,
-          suggestedLoad: "~155 lb",
+          suggestedLoad: "155 lb",
           howTo:
             "Shoulder blades pinned back and down, feet planted, bar over the mid-chest. Lower under control until the bar touches the chest, then pause: hold the bar motionless on the chest for a full 3-count, no bouncing and no relaxing the upper back, then drive it up fast. Feel the chest and triceps load from a dead stop. Common mistake: cutting the pause short or flaring the elbows wide.",
         },
@@ -626,7 +626,7 @@ export const frenchContrastV3: StaticPlan = {
           fcBlock: 2,
           fcPosition: 1,
           restAfter: 20,
-          suggestedLoad: "~70 lb",
+          suggestedLoad: "70 lb",
           howTo:
             "Hold the landmine sleeve in one hand at chest height, stance offset. Rotate the trunk to swing the bar across your body and back, resisting the urge to let your trunk get pulled by the offset load.",
         },
@@ -740,7 +740,7 @@ export const frenchContrastV3: StaticPlan = {
           fcPosition: 1,
           restAfter: 20,
           optional: true,
-          suggestedLoad: "~115 lb",
+          suggestedLoad: "115 lb",
           howTo:
             "Straddle the bar with a V-handle, hinge to about 45° with a flat back. Row the handle to your ribs and squeeze the shoulder blades. Feel the lats and mid-back. Common mistake: standing up to heave the weight, keep the hinge angle fixed.",
         },
@@ -770,7 +770,7 @@ export const frenchContrastV3: StaticPlan = {
           fcPosition: 3,
           restAfter: 20,
           optional: true,
-          suggestedLoad: "~30-35 lb",
+          suggestedLoad: "30-35 lb",
           howTo:
             "Half-kneeling, cable low. Explosive concentric pull to ribs, controlled eccentric. Cable gives a more consistent arc than a band.",
         },
@@ -878,7 +878,7 @@ export const frenchContrastV3: StaticPlan = {
           dose: "4×6",
           equipment: "Barbell",
           group: "Barbell overhead press",
-          suggestedLoad: "~95 lb",
+          suggestedLoad: "95 lb",
           howTo:
             "Bar at the collarbone, elbows just in front of the bar, glutes squeezed. Press straight up and move the head through once the bar passes the forehead, finish with biceps by the ears. Feel the shoulders and triceps drive. Common mistake: leaning back and turning it into an incline press.",
         },
@@ -1030,7 +1030,7 @@ export const frenchContrastV3: StaticPlan = {
           fcBlock: 1,
           fcPosition: 1,
           restAfter: 20,
-          suggestedLoad: "~185 lb",
+          suggestedLoad: "185 lb",
           howTo:
             "Bar on the upper back, feet just outside shoulder width. Brace, sit down between the hips until the thighs are at least parallel, then drive up hard. Feel the quads and glutes load. Common mistake: knees caving in or the chest folding forward out of the hole.",
         },
@@ -1326,7 +1326,7 @@ export const frenchContrastV3: StaticPlan = {
           dose: "3×5/side",
           equipment: "Sandbag",
           description: "Loaded core — anti-lateral flexion",
-          suggestedLoad: "~40 lb",
+          suggestedLoad: "40 lb",
           howTo:
             "Sandbag on one shoulder. Step wide into a lateral lunge to the side opposite the bag, then drive hard off that leg back to center and up into a knee drive. Feel the obliques fight the side-bend from the offset load. Common mistake: leaning toward the bag instead of staying tall.",
         },
@@ -1339,7 +1339,7 @@ export const frenchContrastV3: StaticPlan = {
           dose: "3×6/side",
           equipment: "Barbell + rack",
           group: "Barbell reverse lunge",
-          suggestedLoad: "~115 lb",
+          suggestedLoad: "115 lb",
           howTo:
             "Bar on the upper back. Step back into a long lunge, back knee just above the floor, then drive through the front heel to return. Feel the front glute and quad. Common mistake: front knee caving in or taking a short step that loads the knee.",
         },

@@ -71,3 +71,7 @@ test("Day C opens with the back squat", () => {
   const first = frenchContrastV3.days.C.items.find((i: WorkoutItem) => i.slot === "fc_block");
   expect(first?.name).toMatch(/back squat/i);
 });
+
+test("suggested loads don't repeat the ~ the player already adds", () => {
+  expect(all.filter((i) => /^~/.test(i.suggestedLoad ?? "")).map((i) => i.id)).toEqual([]);
+});
