@@ -1,5 +1,6 @@
 import Foundation
 import HealthKit
+import os
 
 /// What gets written to Health for one finished workout.
 struct HealthWritePlan: @unchecked Sendable {
@@ -9,16 +10,27 @@ struct HealthWritePlan: @unchecked Sendable {
 }
 
 enum HealthSaver {
-    /// Pure: nil when the window is empty or backwards; drops samples outside start...end.
+    private static let log = Logger(subsystem: "com.stevenellis.functionaltrainer", category: "health")
+    static let maxWorkoutDuration: TimeInterval = 6 * 3600
+
+    /// Pure: nil when the window is empty, backwards or over 6 hours (a stale session);
+    /// drops samples outside start...end.
     static func plan(start: Date, end: Date, samples: [(Date, Int)]) -> HealthWritePlan? {
         guard end > start else { return nil }
+        guard end.timeIntervalSince(start) <= maxWorkoutDuration else {
+            log.error("Skipping Health save: workout window over 6 hours (stale session)")
+            return nil
+        }
         return HealthWritePlan(start: start, end: end,
                                samples: samples.filter { $0.0 >= start && $0.0 <= end })
     }
 
     /// Needs HealthKit on a device; verified at the device checkpoint, not unit-tested.
     static func save(_ plan: HealthWritePlan) async throws {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
+        guard HKHealthStore.isHealthDataAvailable() else {
+            log.error("Health data unavailable on this device; workout not saved")
+            return
+        }
         let store = HKHealthStore()
         let hr = HKQuantityType(.heartRate)
         try await store.requestAuthorization(toShare: [HKObjectType.workoutType(), hr], read: [])

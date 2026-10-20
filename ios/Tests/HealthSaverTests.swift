@@ -31,4 +31,10 @@ final class HealthSaverTests: XCTestCase {
         XCTAssertEqual(plan?.start, start)
         XCTAssertEqual(plan?.end, end)
     }
+
+    func testWorkoutOverSixHoursGivesNoPlan() {
+        let sixHours: TimeInterval = 6 * 3600
+        XCTAssertNil(HealthSaver.plan(start: start, end: start.addingTimeInterval(sixHours + 1), samples: []))
+        XCTAssertNotNil(HealthSaver.plan(start: start, end: start.addingTimeInterval(sixHours), samples: []))
+    }
 }
