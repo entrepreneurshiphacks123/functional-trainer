@@ -4,7 +4,7 @@ import { getLoadFor, setLoadFor, getAllLoads } from "../engine/loadLog";
 import { pad2, toLocalDateKey } from "../utils/date";
 import { WorkoutItem, WorkoutData } from "../../types/WorkoutItem";
 import { startSession, setIndex, endSession, getIndex, onIndexChanged } from "../native/bridge";
-import { sessionStartPayload } from "../native/liveSnapshot";
+import { sessionStartPayload, sessionTransition } from "../native/liveSnapshot";
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
   prep: "Warm-up",
@@ -330,27 +330,33 @@ export default function WorkoutPlayer({
   }, [items, screenIdx, startedAt, elapsedSec]);
 
   // Native live session (no-ops on the web)
-  const sessionSentRef = React.useRef(false);
+  const prevStartedAtRef = React.useRef<number | null>(null);
+  const screenIdxRef = React.useRef(screenIdx);
+  screenIdxRef.current = screenIdx;
   React.useEffect(() => {
-    if (!startedAt || sessionSentRef.current) return;
-    const payload = sessionStartPayload({
-      startedAt,
-      planName: planName ?? "",
-      dayTitle: dayTitle ?? workoutLabel,
-      screens,
-      index: screenIdx,
-    });
-    if (!payload) return;
-    sessionSentRef.current = true;
-    void startSession(payload);
-  }, [startedAt, planName, dayTitle, workoutLabel, screens, screenIdx]);
+    const prev = prevStartedAtRef.current;
+    prevStartedAtRef.current = startedAt;
+    const t = sessionTransition(prev, startedAt);
+    if ((t === "end" || t === "restart") && prev !== null) {
+      void endSession({ startedAt: prev, endedAt: Date.now(), title: dayTitle ?? workoutLabel });
+    }
+    if (t === "start" || t === "restart") {
+      const payload = sessionStartPayload({
+        startedAt,
+        planName: planName ?? "",
+        dayTitle: dayTitle ?? workoutLabel,
+        screens,
+        index: screenIdxRef.current,
+      });
+      if (payload) void startSession(payload);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startedAt]);
 
   React.useEffect(() => {
     if (startedAt) void setIndex(screenIdx);
   }, [screenIdx, startedAt]);
 
-  const screenIdxRef = React.useRef(screenIdx);
-  screenIdxRef.current = screenIdx;
   const screensLenRef = React.useRef(screens.length);
   screensLenRef.current = screens.length;
 

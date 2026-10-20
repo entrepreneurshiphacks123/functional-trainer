@@ -35,3 +35,13 @@ export function sessionStartPayload(args: {
     index: args.index,
   };
 }
+
+export function sessionTransition(
+  prev: number | null,
+  next: number | null,
+): "start" | "end" | "restart" | "none" {
+  if (prev === next) return "none";
+  if (next === null) return "end";
+  if (prev === null) return "start";
+  return "restart";
+}

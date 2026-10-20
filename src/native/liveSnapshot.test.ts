@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { toSnapshots, sessionStartPayload } from "./liveSnapshot";
+import { toSnapshots, sessionStartPayload, sessionTransition } from "./liveSnapshot";
 import { getIndex, startSession } from "./bridge";
 import type { WorkoutScreen } from "../components/WorkoutPlayer";
 import type { WorkoutItem } from "../../types/WorkoutItem";
@@ -69,4 +69,12 @@ test("on the web, getIndex resolves null and startSession resolves undefined", a
   await expect(
     startSession({ startedAt: 1, planName: "P", dayTitle: "D", snapshots: [], index: 0 }),
   ).resolves.toBeUndefined();
+});
+
+test("sessionTransition decides start/end/restart from previous and next startedAt", () => {
+  expect(sessionTransition(null, 5)).toBe("start");
+  expect(sessionTransition(5, null)).toBe("end");
+  expect(sessionTransition(5, 9)).toBe("restart");
+  expect(sessionTransition(5, 5)).toBe("none");
+  expect(sessionTransition(null, null)).toBe("none");
 });
