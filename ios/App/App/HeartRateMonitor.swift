@@ -25,6 +25,11 @@ final class HeartRateMonitor: NSObject, @preconcurrency CBCentralManagerDelegate
         return b.count >= 3 ? Int(b[1]) | (Int(b[2]) << 8) : nil
     }
 
+    /// Band reports 0 with no skin contact; nothing outside 30...250 is a real reading.
+    nonisolated static func plausible(_ bpm: Int) -> Int? {
+        (30...250).contains(bpm) ? bpm : nil
+    }
+
     func start() {
         guard !running else { return }
         running = true
@@ -56,10 +61,21 @@ final class HeartRateMonitor: NSObject, @preconcurrency CBCentralManagerDelegate
         scan()
     }
 
+    /// A GATT failure leaves the link up but useless; cancelling makes didDisconnect call lost(), which rescans.
+    private func abandon(_ peripheral: CBPeripheral) {
+        central?.cancelPeripheralConnection(peripheral)
+    }
+
     // MARK: CBCentralManagerDelegate
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        if central.state == .poweredOn { scan() }
+        if central.state == .poweredOn {
+            scan()
+        } else {
+            // Powered off or unauthorized: didDisconnect is not reliable, so drop the held peripheral.
+            peripheral = nil
+            if running { onUpdate?(nil, .searching) }
+        }
     }
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral,
@@ -86,21 +102,26 @@ final class HeartRateMonitor: NSObject, @preconcurrency CBCentralManagerDelegate
     // MARK: CBPeripheralDelegate
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        guard let service = peripheral.services?.first(where: { $0.uuid == Self.serviceUUID }) else { return }
+        guard error == nil, let service = peripheral.services?.first(where: { $0.uuid == Self.serviceUUID }) else {
+            return abandon(peripheral)
+        }
         peripheral.discoverCharacteristics([Self.measurementUUID], for: service)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        guard let c = service.characteristics?.first(where: { $0.uuid == Self.measurementUUID }) else { return }
+        guard error == nil, let c = service.characteristics?.first(where: { $0.uuid == Self.measurementUUID }) else {
+            return abandon(peripheral)
+        }
         peripheral.setNotifyValue(true, for: c)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        if error != nil { return abandon(peripheral) }
         if characteristic.isNotifying, running { onUpdate?(nil, .connected) }
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         guard running, let data = characteristic.value, let bpm = Self.parse(data) else { return }
-        onUpdate?(bpm, .connected)
+        onUpdate?(Self.plausible(bpm), .connected)
     }
 }

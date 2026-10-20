@@ -20,6 +20,21 @@ final class HeartRateParseTests: XCTestCase {
     }
 }
 
+final class HeartRatePlausibilityTests: XCTestCase {
+    func testZeroAndImplausibleAreNil() {
+        XCTAssertNil(HeartRateMonitor.plausible(0))
+        XCTAssertNil(HeartRateMonitor.plausible(29))
+        XCTAssertNil(HeartRateMonitor.plausible(251))
+        XCTAssertNil(HeartRateMonitor.plausible(300))
+    }
+
+    func testRealValuesPassThrough() {
+        XCTAssertEqual(HeartRateMonitor.plausible(30), 30)
+        XCTAssertEqual(HeartRateMonitor.plausible(72), 72)
+        XCTAssertEqual(HeartRateMonitor.plausible(250), 250)
+    }
+}
+
 @MainActor
 final class HeartRateSessionTests: XCTestCase {
     private func activeSession() -> WorkoutSession {
