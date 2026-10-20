@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { toSnapshots, sessionStartPayload, sessionTransition } from "./liveSnapshot";
+import { toSnapshots, sessionStartPayload, sessionTransition, shortTitle, abbreviate } from "./liveSnapshot";
 import { getIndex, startSession } from "./bridge";
 import type { WorkoutScreen } from "../components/WorkoutPlayer";
 import type { WorkoutItem } from "../../types/WorkoutItem";
@@ -37,7 +37,7 @@ test("a 4-item FC screen gives 4 name · dose lines and keeps the label", () => 
     items: [item(0, "Barbell back squat", "5 @ 80%"), item(1), item(2), item(3)],
   };
   const [snap] = toSnapshots([fc]);
-  expect(snap.title).toBe("French Contrast 4 of 5 · optional");
+  expect(snap.title).toBe("Contrast 4/5 · opt");
   expect(snap.lines).toHaveLength(4);
   expect(snap.lines[0]).toBe("Barbell back squat · 5 @ 80%");
 });
@@ -59,7 +59,9 @@ test("sessionStartPayload carries the snapshots and index", () => {
     startedAt: 123,
     planName: "P",
     dayTitle: "D",
-    snapshots: [{ title: "A", lines: ["Move 0 · 3 x 8"], isLast: true }],
+    snapshots: [
+      { title: "A", lines: ["Move 0 · 3 x 8"], rows: [{ name: "Move 0", dose: "3 x 8", pos: null }], isLast: true },
+    ],
     index: 0,
   });
 });
@@ -77,4 +79,42 @@ test("sessionTransition decides start/end/restart from previous and next started
   expect(sessionTransition(5, 9)).toBe("restart");
   expect(sessionTransition(5, 5)).toBe("none");
   expect(sessionTransition(null, null)).toBe("none");
+});
+
+test("shortTitle shortens FC labels and leaves others alone", () => {
+  expect(shortTitle("French Contrast 3 of 5")).toBe("Contrast 3/5");
+  expect(shortTitle("French Contrast 4 of 5 · optional")).toBe("Contrast 4/5 · opt");
+  for (const l of ["Warm-up", "Athletic Complex", "Barbell deadlift"]) expect(shortTitle(l)).toBe(l);
+});
+
+test("abbreviate shortens the whole word Lateral only", () => {
+  expect(abbreviate("Lateral raise")).toBe("Lat raise");
+  expect(abbreviate("Band lateral walk")).toBe("Band lat walk");
+  expect(abbreviate("Collateral")).toBe("Collateral");
+});
+
+test("abbreviation applies to rows and lines", () => {
+  const sc: WorkoutScreen = { type: "single", label: "X", items: [item(0, "Lateral lunge", "3 x 8")] };
+  const [snap] = toSnapshots([sc]);
+  expect(snap.lines[0]).toBe("Lat lunge · 3 x 8");
+  expect(snap.rows[0]).toEqual({ name: "Lat lunge", dose: "3 x 8", pos: null });
+});
+
+test("rows: 4 items give 4 rows; 6 items give 3 rows plus +3 more", () => {
+  expect(toSnapshots([screen("W", 4)])[0].rows).toHaveLength(4);
+  const rows = toSnapshots([screen("W", 6)])[0].rows;
+  expect(rows).toHaveLength(4);
+  expect(rows.slice(0, 3).map((r) => r.name)).toEqual(["Move 0", "Move 1", "Move 2"]);
+  expect(rows[3]).toEqual({ name: "+3 more", dose: "", pos: null });
+});
+
+test("pos is fcPosition on FC rows and null elsewhere", () => {
+  const fc: WorkoutScreen = {
+    type: "fc_block",
+    label: "French Contrast 1 of 5",
+    items: [1, 2, 3, 4].map((p) => ({ ...item(p), fcPosition: p as 1 | 2 | 3 | 4 })),
+  };
+  expect(toSnapshots([fc])[0].rows.map((r) => r.pos)).toEqual([1, 2, 3, 4]);
+  const single: WorkoutScreen = { type: "single", label: "S", items: [{ ...item(0), fcPosition: 2 }] };
+  expect(toSnapshots([single])[0].rows[0].pos).toBeNull();
 });

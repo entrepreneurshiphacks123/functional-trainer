@@ -81,7 +81,7 @@ final class WorkoutSession {
 
     func currentState(heartRate: Int? = nil) -> WorkoutActivityAttributes.ContentState {
         let s = snapshots.indices.contains(index) ? snapshots[index] : LiveSnapshot(title: "", lines: [], isLast: true)
-        return .init(title: s.title, lines: s.lines, isLast: s.isLast,
+        return .init(title: s.title, lines: s.lines, rows: s.rows, isLast: s.isLast,
                      position: "\(index + 1) / \(snapshots.count)", heartRate: heartRate)
     }
 

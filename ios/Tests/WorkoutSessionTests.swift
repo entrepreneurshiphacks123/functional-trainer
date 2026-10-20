@@ -51,6 +51,28 @@ final class WorkoutSessionTests: XCTestCase {
         XCTAssertEqual(s.currentState(heartRate: 120).heartRate, 120)
     }
 
+    func testSnapshotWithoutRowsDecodesWithEmptyRows() throws {
+        let json = #"{"title":"T","lines":["a"],"isLast":false}"#.data(using: .utf8)!
+        let snap = try JSONDecoder().decode(LiveSnapshot.self, from: json)
+        XCTAssertEqual(snap.rows, [])
+        XCTAssertEqual(snap.lines, ["a"])
+    }
+
+    func testSnapshotWithRowsDecodesPos() throws {
+        let json = #"{"title":"T","lines":[],"rows":[{"name":"Squat","dose":"5 @ 80%","pos":1},{"name":"Plank","dose":"30s","pos":null}],"isLast":false}"#.data(using: .utf8)!
+        let snap = try JSONDecoder().decode(LiveSnapshot.self, from: json)
+        XCTAssertEqual(snap.rows, [LiveRow(name: "Squat", dose: "5 @ 80%", pos: 1), LiveRow(name: "Plank", dose: "30s", pos: nil)])
+    }
+
+    func testCurrentStateCarriesRows() {
+        let s = WorkoutSession(defaults: suite())
+        let rows = [LiveRow(name: "Squat", dose: "5", pos: 2)]
+        s.start(payload: SessionPayload(
+            startedAt: Date(timeIntervalSince1970: 1000), planName: "V3", dayTitle: "Day A",
+            snapshots: [LiveSnapshot(title: "T", lines: [], rows: rows, isLast: true)], index: 0))
+        XCTAssertEqual(s.currentState().rows, rows)
+    }
+
     func testPersistsAndClears() {
         let d = suite()
         let s = WorkoutSession(defaults: d)
