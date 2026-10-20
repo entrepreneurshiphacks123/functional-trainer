@@ -51,6 +51,19 @@ The app keeps logs, plans and state in `localStorage` (`training_os_state_v1`, `
 - He has no Apple Watch, so no heart rate comes in by default. He wants a **wrist tracker**, not a chest strap, and chose the **Xiaomi Smart Band 10** (~$50), which can broadcast heart rate over standard Bluetooth. Build the heart-rate part now; test it once the band arrives. With the band: the app connects directly over the standard Bluetooth heart-rate service (the vendor app isn't involved), shows live heart rate in the app and on the lock screen, and saves the heart-rate samples to Health with the workout. That way Health gets the heart rate even if the vendor's own Health sync is patchy. He may need to turn on heart-rate broadcast on the band before each session; the app should say so if it finds no sensor.
 - Check that HealthKit works under the free Personal Team before building on it.
 
+## Wrist notifications on the band (Steven's call)
+
+The Xiaomi band can't run third-party apps from an iPhone (blocked on global firmware; every sideload route needs Android). Instead, the workout reaches his wrist as notifications, which the iPhone already forwards to the band.
+
+- On workout start and on every screen change (in-app Next/Prev or the lock-screen Next), post one **local notification** for the new screen:
+  - title: the position line, like "Contrast 3 of 5" or "Lift 2 of 3"
+  - body: one line per exercise on that screen, "name · dose", names shortened so each line stays short (the band truncates long text)
+- **Replace, don't pile up.** Remove the previous workout notification when posting the next, so Notification Center holds only the current screen.
+- **No sound on the phone.** The band buzzes on its own when a notification arrives.
+- **Foreground case:** when the app is open, still present the notification (`willPresent` returns banner and list), so it reaches Notification Center and gets forwarded to the band.
+- A **"Wrist notifications"** on/off switch in Settings, on by default in the native app. Ask for notification permission the first time a workout starts with it on.
+- One-time setup for Steven, shown in Settings next to the switch: in Mi Fitness, allow notifications from this app.
+
 ## Calls settled after review (my calls)
 
 - **Repo move is step 0.** Move the folder to `~/dev/PERSONAL/functional-trainer` and leave a symlink at the old path. The remote and the Cloudflare Pages deploy (driven by GitHub) are unaffected.
