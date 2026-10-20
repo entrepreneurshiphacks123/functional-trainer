@@ -103,10 +103,12 @@ final class WorkoutSession {
     }
 
     /// Stores the latest bpm. Returns true when the Live Activity should be pushed now:
-    /// a session is active and the last push was at least 5 s ago.
+    /// a session is active and, for a real bpm, the last push was at least 5 s ago.
+    /// A nil bpm (band dropped or stopped) always pushes, so a stale value never lingers.
     func recordHeartRate(_ bpm: Int?, now: Date = Date()) -> Bool {
         heartRate = bpm
-        return isActive && now.timeIntervalSince(lastPushAt) >= Self.heartRatePushInterval
+        guard isActive else { return false }
+        return bpm == nil || now.timeIntervalSince(lastPushAt) >= Self.heartRatePushInterval
     }
 
     func markPushed(at date: Date) { lastPushAt = date }

@@ -49,6 +49,14 @@ final class HeartRateSessionTests: XCTestCase {
         XCTAssertTrue(s.recordHeartRate(102, now: t.addingTimeInterval(5)))
     }
 
+    func testNilBpmBypassesThrottle() {
+        let s = activeSession()
+        let t = Date(timeIntervalSince1970: 100)
+        s.markPushed(at: t)
+        XCTAssertTrue(s.recordHeartRate(nil, now: t.addingTimeInterval(1)))
+        XCTAssertNil(s.heartRate)
+    }
+
     func testNoPushWithoutActiveSessionAndEndClearsBpm() {
         let idle = WorkoutSession(defaults: UserDefaults(suiteName: "test-\(UUID())")!)
         XCTAssertFalse(idle.recordHeartRate(90, now: Date()))
