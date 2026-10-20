@@ -158,15 +158,92 @@ final class WorkoutSessionTests: XCTestCase {
         XCTAssertFalse(s.currentState().isFirst)
     }
 
-    func testAttributesWithoutKindDecodeAsControl() throws {
-        let json = #"{"planName":"V3","dayTitle":"A","startedAt":1000}"#.data(using: .utf8)!
-        let a = try JSONDecoder().decode(WorkoutActivityAttributes.self, from: json)
-        XCTAssertEqual(a.kind, "control")
-    }
-
     func testContentStateWithoutIsFirstDecodes() throws {
         let json = #"{"title":"T","lines":[],"rows":[],"isLast":false,"position":"1 / 3"}"#.data(using: .utf8)!
         let st = try JSONDecoder().decode(WorkoutActivityAttributes.ContentState.self, from: json)
         XCTAssertFalse(st.isFirst)
+    }
+
+    // MARK: Single Live Activity
+
+    /// Fake ActivityKit. `visibleAfterRequest: false` models the lag where a fresh request is not yet in `Activity.activities`.
+    private final class FakeActivities {
+        var visible: [String] = []
+        var alive: Set<String> = []
+        var requests = 0, updates = 0
+        var ended: [String] = []
+        var visibleAfterRequest = true
+        func ops() -> LiveActivityPusher.Ops {
+            .init(
+                enabled: { true },
+                running: { self.visible },
+                isAlive: { self.alive.contains($0) },
+                request: { _, _ in
+                    self.requests += 1
+                    let id = "act-\(self.requests)"
+                    self.alive.insert(id)
+                    if self.visibleAfterRequest { self.visible.append(id) }
+                    return id
+                },
+                update: { _, _ in self.updates += 1 },
+                end: { id in
+                    self.ended.append(id)
+                    self.alive.remove(id)
+                    self.visible.removeAll { $0 == id }
+                })
+        }
+    }
+
+    func testTwoRapidAppliesRequestExactlyOneActivity() async {
+        let fake = FakeActivities()
+        fake.visibleAfterRequest = false
+        let s = WorkoutSession(defaults: suite())
+        s.pusher = LiveActivityPusher(ops: fake.ops())
+        s.wristPostHook = { _ in }
+        s.start(payload: payload())
+        async let a: Void = s.apply()
+        async let b: Void = s.apply()
+        _ = await (a, b)
+        XCTAssertEqual(fake.requests, 1)
+        XCTAssertEqual(fake.updates, 1)
+    }
+
+    func testApplyAfterRequestStillInvisibleUpdatesInsteadOfRequesting() async {
+        let fake = FakeActivities()
+        fake.visibleAfterRequest = false
+        let s = WorkoutSession(defaults: suite())
+        s.pusher = LiveActivityPusher(ops: fake.ops())
+        s.wristPostHook = { _ in }
+        s.start(payload: payload())
+        await s.apply()
+        await s.apply()
+        XCTAssertEqual(fake.requests, 1)
+    }
+
+    func testExtraActivitiesAreEndedOnPush() async {
+        let fake = FakeActivities()
+        fake.visible = ["old-1", "old-2", "old-3"]
+        fake.alive = ["old-1", "old-2", "old-3"]
+        let s = WorkoutSession(defaults: suite())
+        s.pusher = LiveActivityPusher(ops: fake.ops())
+        s.wristPostHook = { _ in }
+        s.start(payload: payload())
+        await s.apply()
+        XCTAssertEqual(fake.requests, 0)
+        XCTAssertEqual(fake.ended.count, 2)
+        XCTAssertEqual(fake.visible.count, 1)
+        XCTAssertEqual(fake.updates, 1)
+    }
+
+    func testActivityDismissedByUserIsRequestedAgain() async {
+        let fake = FakeActivities()
+        let s = WorkoutSession(defaults: suite())
+        s.pusher = LiveActivityPusher(ops: fake.ops())
+        s.wristPostHook = { _ in }
+        s.start(payload: payload())
+        await s.apply()
+        fake.visible = []; fake.alive = []
+        await s.apply()
+        XCTAssertEqual(fake.requests, 2)
     }
 }

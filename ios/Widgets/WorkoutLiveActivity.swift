@@ -6,13 +6,7 @@ import WidgetKit
 struct WorkoutLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: WorkoutActivityAttributes.self) { context in
-            Group {
-                if context.attributes.kind == "list" {
-                    ListCardView(state: context.state)
-                } else {
-                    ControlCardView(attributes: context.attributes, state: context.state)
-                }
-            }
+            LockScreenCardView(attributes: context.attributes, state: context.state)
                 .activityBackgroundTint(Color.black.opacity(0.25))
                 .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
@@ -64,88 +58,77 @@ private let rowDotColors: [Int: Color] = [
 
 private struct NavCapsule: View {
     let label: String
+    let minWidth: CGFloat
 
     var body: some View {
         Text(label)
             .font(.system(size: 16, weight: .bold))
-            .frame(minWidth: 52, minHeight: 44)
-            .padding(.horizontal, 10)
+            .frame(minWidth: minWidth, minHeight: 40)
             .background(Capsule().fill(Color.white.opacity(0.18)))
             .overlay(Capsule().stroke(Color.white.opacity(0.3), lineWidth: 0.5))
             .contentShape(Capsule())
     }
 }
 
-/// Card 1: timer, title and position on the left, Back and Next on the right.
-private struct ControlCardView: View {
+/// The one lock-screen card: header (timer, title, position, Back/Next) over up to 4 exercise rows.
+/// Must fit the ~160 pt lock-screen limit: 10 + 40 header + 6 + 4 rows (~19 each, 2 apart) + 6 + 10 is about 150.
+private struct LockScreenCardView: View {
     let attributes: WorkoutActivityAttributes
     let state: WorkoutActivityAttributes.ContentState
 
     var body: some View {
-        HStack(alignment: .center, spacing: 8) {
-            Text(timerInterval: attributes.startedAt...Date.distantFuture, countsDown: false, showsHours: true)
-                .font(.system(size: 32, weight: .bold).monospacedDigit())
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .frame(width: 122, alignment: .leading)
-            VStack(alignment: .leading, spacing: 0) {
-                Text(state.title)
-                    .font(.system(size: 14, weight: .bold))
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center, spacing: 8) {
+                Text(timerInterval: attributes.startedAt...Date.distantFuture, countsDown: false, showsHours: true)
+                    .font(.system(size: 28, weight: .bold).monospacedDigit())
                     .lineLimit(1)
-                    .truncationMode(.tail)
-                (Text(state.position)
-                    + Text(state.heartRate.map { "  ♥ \($0)" } ?? "")
-                        .foregroundColor(Color(red: 1, green: 0.35, blue: 0.45)))
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.65))
-                    .lineLimit(1)
-            }
-            Spacer(minLength: 4)
-            if !state.isFirst {
-                Button(intent: PrevScreenIntent()) { NavCapsule(label: "‹") }
-                    .buttonStyle(.plain)
-            }
-            if !state.isLast {
-                Button(intent: NextScreenIntent()) { NavCapsule(label: "Next ›") }
-                    .buttonStyle(.plain)
-            }
-        }
-        .foregroundStyle(.white)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-    }
-}
-
-/// Card 2: title and exercise rows only. Must fit the ~160 pt lock-screen limit with 5 rows.
-private struct ListCardView: View {
-    let state: WorkoutActivityAttributes.ContentState
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(state.title)
-                .font(.system(size: 16, weight: .bold))
-                .lineLimit(1)
-                .truncationMode(.tail)
-            ForEach(Array(state.rows.enumerated()), id: \.offset) { _, row in
-                HStack(spacing: 6) {
-                    if let pos = row.pos {
-                        Circle().fill(rowDotColors[pos] ?? .white).frame(width: 8, height: 8)
-                    }
-                    Text(row.name)
-                        .font(.system(size: 17, weight: .semibold))
+                    .minimumScaleFactor(0.7)
+                    .frame(width: 108, alignment: .leading)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(state.title)
+                        .font(.system(size: 14, weight: .bold))
                         .lineLimit(1)
                         .truncationMode(.tail)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(row.dose)
-                        .font(.system(size: 16).monospacedDigit())
+                    (Text(state.position)
+                        + Text(state.heartRate.map { "  ♥ \($0)" } ?? "")
+                            .foregroundColor(Color(red: 1, green: 0.35, blue: 0.45)))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.65))
                         .lineLimit(1)
-                        .fixedSize(horizontal: true, vertical: false)
+                }
+                Spacer(minLength: 4)
+                if !state.isFirst {
+                    Button(intent: PrevScreenIntent()) { NavCapsule(label: "‹", minWidth: 44) }
+                        .buttonStyle(.plain)
+                }
+                if !state.isLast {
+                    Button(intent: NextScreenIntent()) { NavCapsule(label: "Next ›", minWidth: 72) }
+                        .buttonStyle(.plain)
+                }
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(Array(state.rows.enumerated()), id: \.offset) { _, row in
+                    HStack(spacing: 6) {
+                        if let pos = row.pos {
+                            Circle().fill(rowDotColors[pos] ?? .white).frame(width: 8, height: 8)
+                        }
+                        Text(row.name)
+                            .font(.system(size: 16, weight: .semibold))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(row.dose)
+                            .font(.system(size: 15).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.65))
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
+                    }
                 }
             }
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.top, 10)
+        .padding(.bottom, 10)
     }
 }

@@ -45,19 +45,6 @@ struct WorkoutActivityAttributes: ActivityAttributes {
     var planName: String
     var dayTitle: String
     var startedAt: Date
-    /// "control" (timer + Back/Next) or "list" (exercise rows). Both run at once.
-    var kind: String = "control"
-}
-
-extension WorkoutActivityAttributes {
-    // `kind` is absent in attributes stored before the two-card change.
-    init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        planName = try c.decode(String.self, forKey: .planName)
-        dayTitle = try c.decode(String.self, forKey: .dayTitle)
-        startedAt = try c.decode(Date.self, forKey: .startedAt)
-        kind = try c.decodeIfPresent(String.self, forKey: .kind) ?? "control"
-    }
 }
 
 extension WorkoutActivityAttributes.ContentState {

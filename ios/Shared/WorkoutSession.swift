@@ -1,6 +1,5 @@
 import ActivityKit
 import Foundation
-import os
 
 struct SessionPayload: Codable, Hashable, Sendable {
     var startedAt: Date
@@ -24,12 +23,10 @@ final class WorkoutSession {
     private(set) var dayTitle = ""
     /// Latest band bpm. Every push reads it, so a screen change never blanks it.
     private(set) var heartRate: Int?
-    private nonisolated static let log = Logger(subsystem: "com.stevenellis.functionaltrainer", category: "liveactivity")
 
     /// Test seams. Default to the real Live Activity push and wrist notification.
-    var pushHook: (WorkoutActivityAttributes, ActivityContent<WorkoutActivityAttributes.ContentState>) async -> Void = {
-        await WorkoutSession.pushActivity($0, $1)
-    }
+    var pusher = LiveActivityPusher()
+    var pushHook: ((WorkoutActivityAttributes, ActivityContent<WorkoutActivityAttributes.ContentState>) async -> Void)?
     var wristPostHook: (LiveSnapshot) async -> Void = { await WristNotification.post($0) }
     private var lastPushAt = Date.distantPast
     private static let heartRatePushInterval: TimeInterval = 5
@@ -113,10 +110,10 @@ final class WorkoutSession {
         lastPushAt = Date()
         let content = ActivityContent(state: currentState(heartRate: heartRate), staleDate: nil)
         let attrs = WorkoutActivityAttributes(planName: planName, dayTitle: dayTitle, startedAt: startedAt)
-        await pushHook(attrs, content)
+        if let pushHook { await pushHook(attrs, content) } else { await pusher.push(attrs, content) }
         // The session may have ended while the push was in flight; never leave a ghost behind.
         guard isActive else {
-            await Self.endAllActivities()
+            await pusher.endAll()
             return
         }
         if WristNotification.isOn(), snapshots.indices.contains(index) {
@@ -137,37 +134,7 @@ final class WorkoutSession {
 
     /// Ends any Live Activity, including one orphaned by a previous process, without touching the stored session.
     func endActivity() async {
-        await Self.endAllActivities()
-    }
-
-    // Activity objects are not Sendable, so all ActivityKit work stays off the main actor.
-    private nonisolated static func pushActivity(
-        _ attrs: WorkoutActivityAttributes,
-        _ content: ActivityContent<WorkoutActivityAttributes.ContentState>
-    ) async {
-        // "list" first, then "control", so "control" is the newest activity.
-        for kind in ["list", "control"] {
-            var a = attrs
-            a.kind = kind
-            if let existing = Activity<WorkoutActivityAttributes>.activities.first(where: { $0.attributes.kind == kind }) {
-                await existing.update(content)
-            } else if ActivityAuthorizationInfo().areActivitiesEnabled {
-                do {
-                    _ = try Activity.request(attributes: a, content: content, pushType: nil)
-                } catch {
-                    log.error("Activity.request (\(kind, privacy: .public)) failed: \(error.localizedDescription, privacy: .public)")
-                }
-            } else {
-                log.error("Live Activities are disabled for this app; no lock-screen card")
-                return
-            }
-        }
-    }
-
-    private nonisolated static func endAllActivities() async {
-        for a in Activity<WorkoutActivityAttributes>.activities {
-            await a.end(nil, dismissalPolicy: .immediate)
-        }
+        await pusher.endAll()
     }
 
     func advanceAndApply() async {
