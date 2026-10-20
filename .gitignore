@@ -27,3 +27,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Capacitor / iOS
+ios/App/App/public
+ios/build
+ios/*.xcodeproj
