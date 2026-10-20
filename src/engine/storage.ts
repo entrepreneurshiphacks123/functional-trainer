@@ -29,6 +29,7 @@ export type AppState = {
   activePlanId?: string;
   dayOverride?: string | null;
   trainingDaysPerWeek?: 3 | 4;
+  wristNotifications?: boolean;
 };
 
 const STORAGE_KEY = "training_os_state_v1";
@@ -115,6 +116,7 @@ export function loadState(): AppState {
       activePlanId: safeString(parsed.activePlanId) ?? defaultState.activePlanId,
       dayOverride: parsed.dayOverride === null ? null : safeString(parsed.dayOverride) ?? null,
       trainingDaysPerWeek: parsed.trainingDaysPerWeek === 3 ? 3 : 4,
+      wristNotifications: typeof parsed.wristNotifications === "boolean" ? parsed.wristNotifications : undefined,
     };
   } catch {
     return { ...defaultState };

@@ -1,0 +1,249 @@
+import XCTest
+@testable import App
+
+@MainActor
+final class WorkoutSessionTests: XCTestCase {
+    private func payload(index: Int = 0, startedAt: Date = Date(timeIntervalSince1970: 1000)) -> SessionPayload {
+        SessionPayload(
+            startedAt: startedAt, planName: "V3", dayTitle: "Day A",
+            snapshots: [
+                LiveSnapshot(title: "Warm-up", lines: ["a", "b"], isLast: false),
+                LiveSnapshot(title: "French Contrast", lines: ["c"], isLast: false),
+                LiveSnapshot(title: "Finish", lines: [], isLast: true),
+            ],
+            index: index)
+    }
+
+    private func suite() -> UserDefaults { UserDefaults(suiteName: "test-\(UUID())")! }
+
+    func testAdvanceMovesForward() {
+        let s = WorkoutSession(defaults: suite())
+        s.start(payload: payload())
+        XCTAssertTrue(s.advance())
+        XCTAssertEqual(s.index, 1)
+    }
+
+    func testAdvanceOnLastReturnsFalse() {
+        let s = WorkoutSession(defaults: suite())
+        s.start(payload: payload(index: 2))
+        XCTAssertFalse(s.advance())
+        XCTAssertEqual(s.index, 2)
+    }
+
+    func testSetIndexClamps() {
+        let s = WorkoutSession(defaults: suite())
+        s.start(payload: payload())
+        XCTAssertTrue(s.setIndex(99))
+        XCTAssertEqual(s.index, 2)
+        XCTAssertFalse(s.setIndex(99))
+    }
+
+    func testCurrentState() {
+        let s = WorkoutSession(defaults: suite())
+        s.start(payload: payload(index: 2))
+        let st = s.currentState(heartRate: nil)
+        XCTAssertEqual(st.title, "Finish")
+        XCTAssertEqual(st.lines, [])
+        XCTAssertTrue(st.isLast)
+        XCTAssertEqual(st.position, "3 / 3")
+        s.setIndex(1)
+        XCTAssertEqual(s.currentState(heartRate: 120).lines, ["c"])
+        XCTAssertEqual(s.currentState(heartRate: 120).heartRate, 120)
+    }
+
+    func testSnapshotWithoutRowsDecodesWithEmptyRows() throws {
+        let json = #"{"title":"T","lines":["a"],"isLast":false}"#.data(using: .utf8)!
+        let snap = try JSONDecoder().decode(LiveSnapshot.self, from: json)
+        XCTAssertEqual(snap.rows, [])
+        XCTAssertEqual(snap.lines, ["a"])
+    }
+
+    func testSnapshotWithRowsDecodesPos() throws {
+        let json = #"{"title":"T","lines":[],"rows":[{"name":"Squat","dose":"5 @ 80%","pos":1},{"name":"Plank","dose":"30s","pos":null}],"isLast":false}"#.data(using: .utf8)!
+        let snap = try JSONDecoder().decode(LiveSnapshot.self, from: json)
+        XCTAssertEqual(snap.rows, [LiveRow(name: "Squat", dose: "5 @ 80%", pos: 1), LiveRow(name: "Plank", dose: "30s", pos: nil)])
+    }
+
+    func testCurrentStateCarriesRows() {
+        let s = WorkoutSession(defaults: suite())
+        let rows = [LiveRow(name: "Squat", dose: "5", pos: 2)]
+        s.start(payload: SessionPayload(
+            startedAt: Date(timeIntervalSince1970: 1000), planName: "V3", dayTitle: "Day A",
+            snapshots: [LiveSnapshot(title: "T", lines: [], rows: rows, isLast: true)], index: 0))
+        XCTAssertEqual(s.currentState().rows, rows)
+    }
+
+    func testPersistsAndClears() {
+        let d = suite()
+        let s = WorkoutSession(defaults: d)
+        s.start(payload: payload())
+        s.advance()
+        let restored = WorkoutSession(defaults: d)
+        XCTAssertEqual(restored.index, 1)
+        XCTAssertEqual(restored.snapshots.count, 3)
+        s.end()
+        XCTAssertEqual(WorkoutSession(defaults: d).snapshots.count, 0)
+    }
+
+    func testSameStartedAtKeepsIndexButReplacesSnapshots() {
+        let s = WorkoutSession(defaults: suite())
+        s.start(payload: payload())
+        s.advance()
+        var p = payload(index: 0)
+        p.dayTitle = "Day B"
+        s.start(payload: p)
+        XCTAssertEqual(s.index, 1)
+        XCTAssertEqual(s.dayTitle, "Day B")
+        s.start(payload: payload(index: 2, startedAt: Date(timeIntervalSince1970: 2000)))
+        XCTAssertEqual(s.index, 2)
+    }
+
+    func testApplyAfterEndRequestsAndPostsNothing() async {
+        let s = WorkoutSession(defaults: suite())
+        var pushes = 0, posts = 0
+        s.pushHook = { _, _ in pushes += 1 }
+        s.wristPostHook = { _ in posts += 1 }
+        s.start(payload: payload())
+        s.end()
+        await s.apply()
+        XCTAssertEqual(pushes, 0)
+        XCTAssertEqual(posts, 0)
+    }
+
+    func testEndDuringPushSuppressesWristPost() async {
+        let s = WorkoutSession(defaults: suite())
+        var posts = 0
+        s.wristPostHook = { _ in posts += 1 }
+        s.start(payload: payload())
+        s.pushHook = { _, _ in s.end() }
+        await s.apply()
+        XCTAssertEqual(posts, 0)
+    }
+
+    func testBackAtZeroReturnsFalseAndStays() {
+        let s = WorkoutSession(defaults: suite())
+        s.start(payload: payload())
+        XCTAssertFalse(s.back())
+        XCTAssertEqual(s.index, 0)
+    }
+
+    func testBackFromTwoGivesOneAndPersists() {
+        let d = suite()
+        let s = WorkoutSession(defaults: d)
+        s.start(payload: payload(index: 2))
+        XCTAssertTrue(s.back())
+        XCTAssertEqual(s.index, 1)
+        XCTAssertEqual(WorkoutSession(defaults: d).index, 1)
+    }
+
+    func testBackAndApplyFiresOnIndexChanged() async {
+        let s = WorkoutSession(defaults: suite())
+        s.pushHook = { _, _ in }
+        s.wristPostHook = { _ in }
+        s.start(payload: payload(index: 2))
+        var changed: [Int] = []
+        s.onIndexChanged = { changed.append($0) }
+        await s.backAndApply()
+        XCTAssertEqual(changed, [1])
+        await s.backAndApply()
+        await s.backAndApply()
+        XCTAssertEqual(changed, [1, 0])
+    }
+
+    func testIsFirstFollowsIndex() {
+        let s = WorkoutSession(defaults: suite())
+        s.start(payload: payload())
+        XCTAssertTrue(s.currentState().isFirst)
+        s.advance()
+        XCTAssertFalse(s.currentState().isFirst)
+    }
+
+    func testContentStateWithoutIsFirstDecodes() throws {
+        let json = #"{"title":"T","lines":[],"rows":[],"isLast":false,"position":"1 / 3"}"#.data(using: .utf8)!
+        let st = try JSONDecoder().decode(WorkoutActivityAttributes.ContentState.self, from: json)
+        XCTAssertFalse(st.isFirst)
+    }
+
+    // MARK: Single Live Activity
+
+    /// Fake ActivityKit. `visibleAfterRequest: false` models the lag where a fresh request is not yet in `Activity.activities`.
+    private final class FakeActivities {
+        var visible: [String] = []
+        var alive: Set<String> = []
+        var requests = 0, updates = 0
+        var ended: [String] = []
+        var visibleAfterRequest = true
+        func ops() -> LiveActivityPusher.Ops {
+            .init(
+                enabled: { true },
+                running: { self.visible },
+                isAlive: { self.alive.contains($0) },
+                request: { _, _ in
+                    self.requests += 1
+                    let id = "act-\(self.requests)"
+                    self.alive.insert(id)
+                    if self.visibleAfterRequest { self.visible.append(id) }
+                    return id
+                },
+                update: { _, _ in self.updates += 1 },
+                end: { id in
+                    self.ended.append(id)
+                    self.alive.remove(id)
+                    self.visible.removeAll { $0 == id }
+                })
+        }
+    }
+
+    func testTwoRapidAppliesRequestExactlyOneActivity() async {
+        let fake = FakeActivities()
+        fake.visibleAfterRequest = false
+        let s = WorkoutSession(defaults: suite())
+        s.pusher = LiveActivityPusher(ops: fake.ops())
+        s.wristPostHook = { _ in }
+        s.start(payload: payload())
+        async let a: Void = s.apply()
+        async let b: Void = s.apply()
+        _ = await (a, b)
+        XCTAssertEqual(fake.requests, 1)
+        XCTAssertEqual(fake.updates, 1)
+    }
+
+    func testApplyAfterRequestStillInvisibleUpdatesInsteadOfRequesting() async {
+        let fake = FakeActivities()
+        fake.visibleAfterRequest = false
+        let s = WorkoutSession(defaults: suite())
+        s.pusher = LiveActivityPusher(ops: fake.ops())
+        s.wristPostHook = { _ in }
+        s.start(payload: payload())
+        await s.apply()
+        await s.apply()
+        XCTAssertEqual(fake.requests, 1)
+    }
+
+    func testExtraActivitiesAreEndedOnPush() async {
+        let fake = FakeActivities()
+        fake.visible = ["old-1", "old-2", "old-3"]
+        fake.alive = ["old-1", "old-2", "old-3"]
+        let s = WorkoutSession(defaults: suite())
+        s.pusher = LiveActivityPusher(ops: fake.ops())
+        s.wristPostHook = { _ in }
+        s.start(payload: payload())
+        await s.apply()
+        XCTAssertEqual(fake.requests, 0)
+        XCTAssertEqual(fake.ended.count, 2)
+        XCTAssertEqual(fake.visible.count, 1)
+        XCTAssertEqual(fake.updates, 1)
+    }
+
+    func testActivityDismissedByUserIsRequestedAgain() async {
+        let fake = FakeActivities()
+        let s = WorkoutSession(defaults: suite())
+        s.pusher = LiveActivityPusher(ops: fake.ops())
+        s.wristPostHook = { _ in }
+        s.start(payload: payload())
+        await s.apply()
+        fake.visible = []; fake.alive = []
+        await s.apply()
+        XCTAssertEqual(fake.requests, 2)
+    }
+}

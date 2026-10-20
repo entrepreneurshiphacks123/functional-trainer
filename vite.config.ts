@@ -5,7 +5,7 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   plugins: [
     react(),
-    VitePWA({
+    ...(process.env.VITE_NATIVE === "1" ? [] : [VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["icons/icon-192.png", "icons/icon-512.png"],
       manifest: {
@@ -35,6 +35,6 @@ export default defineConfig({
         // Avoid caching API calls (you don't have any yet, but safe)
         navigateFallback: "/index.html",
       },
-    }),
+    })]),
   ],
 });

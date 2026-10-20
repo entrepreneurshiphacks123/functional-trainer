@@ -3,6 +3,9 @@ import { Card, Screen, Button, TinyIconButton, Modal } from "../ui/Primitives";
 import { getLoadFor, setLoadFor, getAllLoads } from "../engine/loadLog";
 import { pad2, toLocalDateKey } from "../utils/date";
 import { WorkoutItem, WorkoutData } from "../../types/WorkoutItem";
+import { startSession, setIndex, endSession, getIndex, onIndexChanged, startHeartRate, stopHeartRate, onHeartRate, isNative } from "../native/bridge";
+import type { HeartRateStatus } from "../native/bridge";
+import { sessionStartPayload, sessionTransition } from "../native/liveSnapshot";
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
   prep: "Warm-up",
@@ -269,6 +272,8 @@ function collectEquipmentWithLoads(items: WorkoutItem[]): { name: string; weight
 export default function WorkoutPlayer({
   workout,
   workoutLabel,
+  planName,
+  dayTitle,
   modeLabel,
   plannedDay,
   dayKeys,
@@ -278,6 +283,8 @@ export default function WorkoutPlayer({
 }: {
   workout: WorkoutData;
   workoutLabel: string;
+  planName?: string;
+  dayTitle?: string;
   modeLabel: string;
   plannedDay: string;
   dayKeys: string[];
@@ -322,6 +329,73 @@ export default function WorkoutPlayer({
   React.useEffect(() => {
     saveWP({ sig: itemsSig(items), screenIdx, startedAt, elapsedSec, ts: Date.now() });
   }, [items, screenIdx, startedAt, elapsedSec]);
+
+  // Native live session (no-ops on the web)
+  const prevStartedAtRef = React.useRef<number | null>(null);
+  const screenIdxRef = React.useRef(screenIdx);
+  screenIdxRef.current = screenIdx;
+  React.useEffect(() => {
+    const prev = prevStartedAtRef.current;
+    prevStartedAtRef.current = startedAt;
+    const t = sessionTransition(prev, startedAt);
+    if ((t === "end" || t === "restart") && prev !== null) {
+      void endSession({ startedAt: prev, endedAt: Date.now(), title: dayTitle ?? workoutLabel });
+    }
+    if (isNative()) {
+      if (t === "end") void stopHeartRate();
+      if (t === "start" || t === "restart") void startHeartRate();
+    }
+    if (t === "start" || t === "restart") {
+      const payload = sessionStartPayload({
+        startedAt,
+        planName: planName ?? "",
+        dayTitle: dayTitle ?? workoutLabel,
+        screens,
+        index: screenIdxRef.current,
+      });
+      if (payload) void startSession(payload);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startedAt]);
+
+  // Band heart rate (native app only)
+  const [hr, setHr] = React.useState<{ bpm: number | null; status: HeartRateStatus }>({ bpm: null, status: "off" });
+  React.useEffect(() => {
+    if (!isNative()) return;
+    return onHeartRate((bpm, status) => setHr({ bpm, status }));
+  }, []);
+
+  // On cold relaunch the restored screenIdx is stale; native may hold a newer one.
+  // Don't push anything to native until the first getIndex() answer has been adopted.
+  const nativeIndexSyncedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (startedAt && nativeIndexSyncedRef.current) void setIndex(screenIdx);
+  }, [screenIdx, startedAt]);
+
+  const screensLenRef = React.useRef(screens.length);
+  screensLenRef.current = screens.length;
+
+  React.useEffect(() => {
+    const apply = (i: number | null) => {
+      if (typeof i !== "number" || !Number.isInteger(i)) return;
+      if (i < 0 || i > screensLenRef.current - 1) return;
+      if (i !== screenIdxRef.current) setScreenIdx(i);
+    };
+    const sync = () => {
+      void getIndex().then((i) => {
+        nativeIndexSyncedRef.current = true;
+        apply(i);
+      });
+    };
+    sync();
+    const onVis = () => { if (document.visibilityState === "visible") sync(); };
+    document.addEventListener("visibilitychange", onVis);
+    const unsub = onIndexChanged(apply);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      unsub();
+    };
+  }, []);
 
   const startSessionIfNeeded = React.useCallback(() => {
     if (startedAt) return;
@@ -444,6 +518,11 @@ export default function WorkoutPlayer({
           >
             {formatHMMSS(elapsedSec)}
           </div>
+          {hr.status !== "off" && (
+            <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, marginTop: 8 }}>
+              {hr.status === "connected" && hr.bpm !== null ? `♥ ${hr.bpm}` : "♥ --"}
+            </div>
+          )}
           {!startedAt && (
             <button
               onClick={() => { haptic(); startSessionIfNeeded(); }}
@@ -603,7 +682,13 @@ export default function WorkoutPlayer({
                 Next
               </Button>
             ) : (
-              <Button icon="✅" onClick={() => { haptic(); try { localStorage.removeItem("wp_state_v3"); } catch {} onFinish(); }}>
+              <Button icon="✅" onClick={() => {
+                haptic();
+                try { localStorage.removeItem("wp_state_v3"); } catch {}
+                if (startedAt) void endSession({ startedAt, endedAt: Date.now(), title: dayTitle ?? workoutLabel, save: true });
+                if (isNative()) void stopHeartRate();
+                onFinish();
+              }}>
                 Done
               </Button>
             )}

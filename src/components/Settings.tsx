@@ -2,7 +2,9 @@ import React, { useMemo, useState } from "react";
 import { Card, Button, Screen } from "../ui/Primitives";
 import { getAllPlans, loadUserPlans, saveUserPlans, upsertUserPlan, validateUploadedPlan } from "../engine/plans";
 import { Theme } from "../ui/theme";
-import { resetAllAppData, loadState, saveState } from "../engine/storage";
+import { resetAllAppData } from "../engine/storage";
+import { buildBackup, inspectBackup, restoreBackup } from "../engine/backup";
+import { isNative, shareFile } from "../native/bridge";
 
 function downloadJson(filename: string, obj: any) {
   const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
@@ -22,12 +24,16 @@ export default function Settings({
   onBack,
   trainingDaysPerWeek,
   onTrainingDaysChange,
+  wristNotifications,
+  onWristNotificationsChange,
 }: {
   theme: Theme;
   onThemeToggle: () => void;
   onBack: () => void;
   trainingDaysPerWeek: 3 | 4;
   onTrainingDaysChange: (days: 3 | 4) => void;
+  wristNotifications: boolean;
+  onWristNotificationsChange: (on: boolean) => void;
 }) {
   const [refresh, setRefresh] = useState(0);
   const plans = useMemo(() => getAllPlans(), [refresh]);
@@ -52,16 +58,20 @@ export default function Settings({
   };
 
   const exportData = () => {
-    const state = loadState();
-    downloadJson(`trainer-backup-${new Date().toISOString().split('T')[0]}.json`, state);
+    const now = new Date();
+    const name = `trainer-backup-${now.toISOString().split('T')[0]}.json`;
+    const backup = buildBackup(localStorage, now);
+    if (isNative()) void shareFile(name, JSON.stringify(backup, null, 2));
+    else downloadJson(name, backup);
   };
 
   const importData = async (file: File) => {
     const text = await file.text();
     try {
       const parsed = JSON.parse(text);
-      if (confirm("This will overwrite your current settings and history. Continue?")) {
-        saveState(parsed);
+      const count = Object.keys(inspectBackup(parsed)).length;
+      if (confirm(`This will overwrite ${count} saved item${count === 1 ? "" : "s"} (history, plans, loads, settings) with the backup. Continue?`)) {
+        restoreBackup(localStorage, parsed);
         window.location.reload();
       }
     } catch {
@@ -114,6 +124,34 @@ export default function Settings({
             </div>
           </div>
         </Card>
+
+        {isNative() && (
+          <Card title="Wrist notifications">
+            <div style={{ display: "grid", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {([true, false] as const).map((on) => (
+                  <button
+                    key={String(on)}
+                    onClick={() => onWristNotificationsChange(on)}
+                    style={{
+                      padding: "14px",
+                      background: wristNotifications === on ? "var(--accent)" : "var(--bg)",
+                      color: wristNotifications === on ? "var(--accent-text)" : "var(--text)",
+                      border: "var(--bw) solid var(--border)",
+                      fontWeight: 950,
+                      fontSize: 16,
+                    }}
+                  >
+                    {on ? "On" : "Off"}
+                  </button>
+                ))}
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.6 }}>
+                In Mi Fitness, allow notifications from Functional Trainer.
+              </div>
+            </div>
+          </Card>
+        )}
 
         <Card title="Workout Plans">
           <div style={{ display: "grid", gap: 12 }}>
