@@ -39,9 +39,37 @@ struct WorkoutActivityAttributes: ActivityAttributes {
         var isLast: Bool
         var position: String
         var heartRate: Int?
+        var isFirst: Bool
     }
 
     var planName: String
     var dayTitle: String
     var startedAt: Date
+    /// "control" (timer + Back/Next) or "list" (exercise rows). Both run at once.
+    var kind: String = "control"
+}
+
+extension WorkoutActivityAttributes {
+    // `kind` is absent in attributes stored before the two-card change.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        planName = try c.decode(String.self, forKey: .planName)
+        dayTitle = try c.decode(String.self, forKey: .dayTitle)
+        startedAt = try c.decode(Date.self, forKey: .startedAt)
+        kind = try c.decodeIfPresent(String.self, forKey: .kind) ?? "control"
+    }
+}
+
+extension WorkoutActivityAttributes.ContentState {
+    // `isFirst` is absent in states pushed before the Back button.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        title = try c.decode(String.self, forKey: .title)
+        lines = try c.decode([String].self, forKey: .lines)
+        rows = try c.decode([LiveRow].self, forKey: .rows)
+        isLast = try c.decode(Bool.self, forKey: .isLast)
+        position = try c.decode(String.self, forKey: .position)
+        heartRate = try c.decodeIfPresent(Int.self, forKey: .heartRate)
+        isFirst = try c.decodeIfPresent(Bool.self, forKey: .isFirst) ?? false
+    }
 }

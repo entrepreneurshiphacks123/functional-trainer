@@ -79,10 +79,19 @@ final class WorkoutSession {
         return true
     }
 
+    @discardableResult
+    func back() -> Bool {
+        guard index > 0 else { return false }
+        index -= 1
+        persist()
+        return true
+    }
+
     func currentState(heartRate: Int? = nil) -> WorkoutActivityAttributes.ContentState {
         let s = snapshots.indices.contains(index) ? snapshots[index] : LiveSnapshot(title: "", lines: [], isLast: true)
         return .init(title: s.title, lines: s.lines, rows: s.rows, isLast: s.isLast,
-                     position: "\(index + 1) / \(snapshots.count)", heartRate: heartRate)
+                     position: "\(index + 1) / \(snapshots.count)", heartRate: heartRate,
+                     isFirst: index == 0)
     }
 
     func end() {
@@ -136,16 +145,22 @@ final class WorkoutSession {
         _ attrs: WorkoutActivityAttributes,
         _ content: ActivityContent<WorkoutActivityAttributes.ContentState>
     ) async {
-        if let existing = Activity<WorkoutActivityAttributes>.activities.first {
-            await existing.update(content)
-        } else if ActivityAuthorizationInfo().areActivitiesEnabled {
-            do {
-                _ = try Activity.request(attributes: attrs, content: content, pushType: nil)
-            } catch {
-                log.error("Activity.request failed: \(error.localizedDescription, privacy: .public)")
+        // "list" first, then "control", so "control" is the newest activity.
+        for kind in ["list", "control"] {
+            var a = attrs
+            a.kind = kind
+            if let existing = Activity<WorkoutActivityAttributes>.activities.first(where: { $0.attributes.kind == kind }) {
+                await existing.update(content)
+            } else if ActivityAuthorizationInfo().areActivitiesEnabled {
+                do {
+                    _ = try Activity.request(attributes: a, content: content, pushType: nil)
+                } catch {
+                    log.error("Activity.request (\(kind, privacy: .public)) failed: \(error.localizedDescription, privacy: .public)")
+                }
+            } else {
+                log.error("Live Activities are disabled for this app; no lock-screen card")
+                return
             }
-        } else {
-            log.error("Live Activities are disabled for this app; no lock-screen card")
         }
     }
 
@@ -157,6 +172,12 @@ final class WorkoutSession {
 
     func advanceAndApply() async {
         guard advance() else { return }
+        await apply()
+        onIndexChanged?(index)
+    }
+
+    func backAndApply() async {
+        guard back() else { return }
         await apply()
         onIndexChanged?(index)
     }

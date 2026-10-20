@@ -100,12 +100,12 @@ test("abbreviation applies to rows and lines", () => {
   expect(snap.rows[0]).toEqual({ name: "Lat lunge", dose: "3 x 8", pos: null });
 });
 
-test("rows: 4 items give 4 rows; 6 items give 3 rows plus +3 more", () => {
-  expect(toSnapshots([screen("W", 4)])[0].rows).toHaveLength(4);
+test("rows: 5 items give 5 rows; 6 items give 4 rows plus +2 more", () => {
+  expect(toSnapshots([screen("W", 5)])[0].rows).toHaveLength(5);
   const rows = toSnapshots([screen("W", 6)])[0].rows;
-  expect(rows).toHaveLength(4);
-  expect(rows.slice(0, 3).map((r) => r.name)).toEqual(["Move 0", "Move 1", "Move 2"]);
-  expect(rows[3]).toEqual({ name: "+3 more", dose: "", pos: null });
+  expect(rows).toHaveLength(5);
+  expect(rows.slice(0, 4).map((r) => r.name)).toEqual(["Move 0", "Move 1", "Move 2", "Move 3"]);
+  expect(rows[4]).toEqual({ name: "+2 more", dose: "", pos: null });
 });
 
 test("pos is fcPosition on FC rows and null elsewhere", () => {

@@ -9,7 +9,7 @@ export type LiveSnapshot = {
 };
 
 const MAX_LINES = 5;
-const MAX_ROWS = 4;
+const MAX_ROWS = 5;
 
 export function shortTitle(label: string): string {
   return label.replace(/^French Contrast (\d+) of (\d+)( · optional)?$/, (_, n, total, opt) =>

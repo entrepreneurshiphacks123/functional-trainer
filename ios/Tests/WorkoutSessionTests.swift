@@ -119,4 +119,54 @@ final class WorkoutSessionTests: XCTestCase {
         await s.apply()
         XCTAssertEqual(posts, 0)
     }
+
+    func testBackAtZeroReturnsFalseAndStays() {
+        let s = WorkoutSession(defaults: suite())
+        s.start(payload: payload())
+        XCTAssertFalse(s.back())
+        XCTAssertEqual(s.index, 0)
+    }
+
+    func testBackFromTwoGivesOneAndPersists() {
+        let d = suite()
+        let s = WorkoutSession(defaults: d)
+        s.start(payload: payload(index: 2))
+        XCTAssertTrue(s.back())
+        XCTAssertEqual(s.index, 1)
+        XCTAssertEqual(WorkoutSession(defaults: d).index, 1)
+    }
+
+    func testBackAndApplyFiresOnIndexChanged() async {
+        let s = WorkoutSession(defaults: suite())
+        s.pushHook = { _, _ in }
+        s.wristPostHook = { _ in }
+        s.start(payload: payload(index: 2))
+        var changed: [Int] = []
+        s.onIndexChanged = { changed.append($0) }
+        await s.backAndApply()
+        XCTAssertEqual(changed, [1])
+        await s.backAndApply()
+        await s.backAndApply()
+        XCTAssertEqual(changed, [1, 0])
+    }
+
+    func testIsFirstFollowsIndex() {
+        let s = WorkoutSession(defaults: suite())
+        s.start(payload: payload())
+        XCTAssertTrue(s.currentState().isFirst)
+        s.advance()
+        XCTAssertFalse(s.currentState().isFirst)
+    }
+
+    func testAttributesWithoutKindDecodeAsControl() throws {
+        let json = #"{"planName":"V3","dayTitle":"A","startedAt":1000}"#.data(using: .utf8)!
+        let a = try JSONDecoder().decode(WorkoutActivityAttributes.self, from: json)
+        XCTAssertEqual(a.kind, "control")
+    }
+
+    func testContentStateWithoutIsFirstDecodes() throws {
+        let json = #"{"title":"T","lines":[],"rows":[],"isLast":false,"position":"1 / 3"}"#.data(using: .utf8)!
+        let st = try JSONDecoder().decode(WorkoutActivityAttributes.ContentState.self, from: json)
+        XCTAssertFalse(st.isFirst)
+    }
 }
