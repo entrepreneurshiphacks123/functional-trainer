@@ -75,4 +75,26 @@ final class WorkoutSessionTests: XCTestCase {
         s.start(payload: payload(index: 2, startedAt: Date(timeIntervalSince1970: 2000)))
         XCTAssertEqual(s.index, 2)
     }
+
+    func testApplyAfterEndRequestsAndPostsNothing() async {
+        let s = WorkoutSession(defaults: suite())
+        var pushes = 0, posts = 0
+        s.pushHook = { _, _ in pushes += 1 }
+        s.wristPostHook = { _ in posts += 1 }
+        s.start(payload: payload())
+        s.end()
+        await s.apply()
+        XCTAssertEqual(pushes, 0)
+        XCTAssertEqual(posts, 0)
+    }
+
+    func testEndDuringPushSuppressesWristPost() async {
+        let s = WorkoutSession(defaults: suite())
+        var posts = 0
+        s.wristPostHook = { _ in posts += 1 }
+        s.start(payload: payload())
+        s.pushHook = { _, _ in s.end() }
+        await s.apply()
+        XCTAssertEqual(posts, 0)
+    }
 }

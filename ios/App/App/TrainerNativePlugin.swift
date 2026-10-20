@@ -137,6 +137,7 @@ public class TrainerNativePlugin: CAPPlugin, CAPBridgedPlugin {
         notifyListeners("heartRate", data: ["bpm": bpm ?? NSNull(), "status": status.rawValue])
         let session = WorkoutSession.shared
         if let bpm, session.isActive { heartRateSamples.append((Date(), bpm)) }
-        if session.recordHeartRate(bpm) { Task { await session.apply() } }
+        // .off comes from stopHeartRate during Done/reset; pushing then would resurrect a card.
+        if session.recordHeartRate(bpm), status != .off { Task { await session.apply() } }
     }
 }

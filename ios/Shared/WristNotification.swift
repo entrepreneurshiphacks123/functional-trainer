@@ -1,11 +1,13 @@
 import Foundation
 import UserNotifications
+import os
 
 /// The current block as one replaceable notification, so a paired band buzzes on each Next.
 enum WristNotification {
     static let identifier = "workout-current"
     static let defaultsKey = "wristNotifications.on"
     static let maxLineLength = 28
+    private static let log = Logger(subsystem: "com.stevenellis.functionaltrainer", category: "wrist")
 
     /// Read when JS is asleep (lock-screen Next), so it lives in UserDefaults. On when unset.
     static func isOn(defaults: UserDefaults = .standard) -> Bool {
@@ -25,7 +27,12 @@ enum WristNotification {
     }
 
     static func requestAuthorization() async {
-        _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert])
+        do {
+            let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert])
+            if !granted { log.error("Notification authorization denied; no wrist notifications") }
+        } catch {
+            log.error("Notification authorization failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     /// Replaces any delivered or pending copy, then posts immediately.
@@ -34,7 +41,8 @@ enum WristNotification {
         center.removeDeliveredNotifications(withIdentifiers: [identifier])
         center.removePendingNotificationRequests(withIdentifiers: [identifier])
         let request = UNNotificationRequest(identifier: identifier, content: content(for: snapshot), trigger: nil)
-        try? await center.add(request)
+        do { try await center.add(request) }
+        catch { log.error("Wrist notification add failed: \(error.localizedDescription, privacy: .public)") }
     }
 
     static func clear() {

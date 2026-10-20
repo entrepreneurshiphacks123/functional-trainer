@@ -1,5 +1,6 @@
 import ActivityKit
 import Foundation
+import os
 
 struct SessionPayload: Codable, Hashable, Sendable {
     var startedAt: Date
@@ -23,6 +24,13 @@ final class WorkoutSession {
     private(set) var dayTitle = ""
     /// Latest band bpm. Every push reads it, so a screen change never blanks it.
     private(set) var heartRate: Int?
+    private nonisolated static let log = Logger(subsystem: "com.stevenellis.functionaltrainer", category: "liveactivity")
+
+    /// Test seams. Default to the real Live Activity push and wrist notification.
+    var pushHook: (WorkoutActivityAttributes, ActivityContent<WorkoutActivityAttributes.ContentState>) async -> Void = {
+        await WorkoutSession.pushActivity($0, $1)
+    }
+    var wristPostHook: (LiveSnapshot) async -> Void = { await WristNotification.post($0) }
     private var lastPushAt = Date.distantPast
     private static let heartRatePushInterval: TimeInterval = 5
 
@@ -96,9 +104,14 @@ final class WorkoutSession {
         lastPushAt = Date()
         let content = ActivityContent(state: currentState(heartRate: heartRate), staleDate: nil)
         let attrs = WorkoutActivityAttributes(planName: planName, dayTitle: dayTitle, startedAt: startedAt)
-        await Self.pushActivity(attrs, content)
+        await pushHook(attrs, content)
+        // The session may have ended while the push was in flight; never leave a ghost behind.
+        guard isActive else {
+            await Self.endAllActivities()
+            return
+        }
         if WristNotification.isOn(), snapshots.indices.contains(index) {
-            await WristNotification.post(snapshots[index])
+            await wristPostHook(snapshots[index])
         }
     }
 
@@ -126,7 +139,13 @@ final class WorkoutSession {
         if let existing = Activity<WorkoutActivityAttributes>.activities.first {
             await existing.update(content)
         } else if ActivityAuthorizationInfo().areActivitiesEnabled {
-            _ = try? Activity.request(attributes: attrs, content: content, pushType: nil)
+            do {
+                _ = try Activity.request(attributes: attrs, content: content, pushType: nil)
+            } catch {
+                log.error("Activity.request failed: \(error.localizedDescription, privacy: .public)")
+            }
+        } else {
+            log.error("Live Activities are disabled for this app; no lock-screen card")
         }
     }
 
@@ -143,9 +162,9 @@ final class WorkoutSession {
     }
 
     func endAndClear() async {
+        end()  // first, so an apply() racing this teardown sees an inactive session
         await endActivity()
         WristNotification.clear()
-        end()
     }
 
     private func persist() {
