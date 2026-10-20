@@ -3,7 +3,8 @@ import { Card, Screen, Button, TinyIconButton, Modal } from "../ui/Primitives";
 import { getLoadFor, setLoadFor, getAllLoads } from "../engine/loadLog";
 import { pad2, toLocalDateKey } from "../utils/date";
 import { WorkoutItem, WorkoutData } from "../../types/WorkoutItem";
-import { startSession, setIndex, endSession, getIndex, onIndexChanged } from "../native/bridge";
+import { startSession, setIndex, endSession, getIndex, onIndexChanged, startHeartRate, stopHeartRate, onHeartRate, isNative } from "../native/bridge";
+import type { HeartRateStatus } from "../native/bridge";
 import { sessionStartPayload, sessionTransition } from "../native/liveSnapshot";
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
@@ -340,6 +341,10 @@ export default function WorkoutPlayer({
     if ((t === "end" || t === "restart") && prev !== null) {
       void endSession({ startedAt: prev, endedAt: Date.now(), title: dayTitle ?? workoutLabel });
     }
+    if (isNative()) {
+      if (t === "end") void stopHeartRate();
+      if (t === "start" || t === "restart") void startHeartRate();
+    }
     if (t === "start" || t === "restart") {
       const payload = sessionStartPayload({
         startedAt,
@@ -352,6 +357,13 @@ export default function WorkoutPlayer({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startedAt]);
+
+  // Band heart rate (native app only)
+  const [hr, setHr] = React.useState<{ bpm: number | null; status: HeartRateStatus }>({ bpm: null, status: "off" });
+  React.useEffect(() => {
+    if (!isNative()) return;
+    return onHeartRate((bpm, status) => setHr({ bpm, status }));
+  }, []);
 
   React.useEffect(() => {
     if (startedAt) void setIndex(screenIdx);
@@ -498,6 +510,11 @@ export default function WorkoutPlayer({
           >
             {formatHMMSS(elapsedSec)}
           </div>
+          {hr.status !== "off" && (
+            <div style={{ fontSize: 13, fontWeight: 900, opacity: 0.6, marginTop: 8 }}>
+              {hr.status === "connected" && hr.bpm !== null ? `♥ ${hr.bpm}` : "♥ --"}
+            </div>
+          )}
           {!startedAt && (
             <button
               onClick={() => { haptic(); startSessionIfNeeded(); }}
@@ -661,6 +678,7 @@ export default function WorkoutPlayer({
                 haptic();
                 try { localStorage.removeItem("wp_state_v3"); } catch {}
                 if (startedAt) void endSession({ startedAt, endedAt: Date.now(), title: dayTitle ?? workoutLabel, save: true });
+                if (isNative()) void stopHeartRate();
                 onFinish();
               }}>
                 Done

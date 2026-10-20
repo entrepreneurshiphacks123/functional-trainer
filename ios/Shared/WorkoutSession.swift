@@ -21,6 +21,10 @@ final class WorkoutSession {
     private(set) var startedAt: Date?
     private(set) var planName = ""
     private(set) var dayTitle = ""
+    /// Latest band bpm. Every push reads it, so a screen change never blanks it.
+    private(set) var heartRate: Int?
+    private var lastPushAt = Date.distantPast
+    private static let heartRatePushInterval: TimeInterval = 5
 
     /// Set by the Capacitor plugin so a lock-screen advance can tell JS (decision 4).
     var onIndexChanged: ((Int) -> Void)?
@@ -79,15 +83,17 @@ final class WorkoutSession {
         startedAt = nil
         planName = ""
         dayTitle = ""
+        heartRate = nil
         defaults.removeObject(forKey: Self.storeKey)
     }
 
     // MARK: Live Activity
 
     /// The one place that pushes the current state out: Live Activity and wrist notification.
-    /// Task 7 feeds heart rate in.
-    func apply(heartRate: Int? = nil) async {
+    /// Carries the stored heart rate.
+    func apply() async {
         guard isActive, let startedAt else { return }
+        lastPushAt = Date()
         let content = ActivityContent(state: currentState(heartRate: heartRate), staleDate: nil)
         let attrs = WorkoutActivityAttributes(planName: planName, dayTitle: dayTitle, startedAt: startedAt)
         await Self.pushActivity(attrs, content)
@@ -95,6 +101,15 @@ final class WorkoutSession {
             await WristNotification.post(snapshots[index])
         }
     }
+
+    /// Stores the latest bpm. Returns true when the Live Activity should be pushed now:
+    /// a session is active and the last push was at least 5 s ago.
+    func recordHeartRate(_ bpm: Int?, now: Date = Date()) -> Bool {
+        heartRate = bpm
+        return isActive && now.timeIntervalSince(lastPushAt) >= Self.heartRatePushInterval
+    }
+
+    func markPushed(at date: Date) { lastPushAt = date }
 
     /// Ends any Live Activity, including one orphaned by a previous process, without touching the stored session.
     func endActivity() async {

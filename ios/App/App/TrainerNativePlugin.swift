@@ -15,12 +15,15 @@ public class TrainerNativePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "endSession", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getIndex", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setWristNotifications", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "startHeartRate", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "stopHeartRate", returnType: CAPPluginReturnPromise),
     ]
 
     private static let log = Logger(subsystem: "com.stevenellis.functionaltrainer", category: "health")
 
-    /// Task 7 fills this with heart-rate samples collected during the session.
+    /// Heart-rate samples collected while a session is active. Touched only on the main actor.
     var heartRateSamples: [(Date, Int)] = []
+    private var monitor: HeartRateMonitor?
 
     public override func load() {
         // The lock-screen intent runs in this process; it reaches JS through here (not on JS-driven setIndex).
@@ -71,9 +74,11 @@ public class TrainerNativePlugin: CAPPlugin, CAPBridgedPlugin {
         let startedAtMs = call.getDouble("startedAt")
         let endedAtMs = call.getDouble("endedAt")
         let save = call.getBool("save") ?? false
-        let samples = heartRateSamples
         let box = Unchecked(value: call)
+        let me = Unchecked(value: self)
         Task { @MainActor in
+            let samples = me.value.heartRateSamples
+            me.value.heartRateSamples = []
             await WorkoutSession.shared.endAndClear()
             box.value.resolve()
             // Only a finished workout is saved. A save error never blocks or delays Done.
@@ -101,5 +106,37 @@ public class TrainerNativePlugin: CAPPlugin, CAPBridgedPlugin {
         WristNotification.setOn(on)
         if !on { WristNotification.clear() }
         call.resolve()
+    }
+
+    @objc func startHeartRate(_ call: CAPPluginCall) {
+        let box = Unchecked(value: call)
+        let me = Unchecked(value: self)
+        Task { @MainActor in
+            let plugin = me.value
+            if plugin.monitor == nil {
+                let m = HeartRateMonitor()
+                m.onUpdate = { bpm, status in plugin.heartRateUpdate(bpm, status) }
+                plugin.monitor = m
+            }
+            plugin.monitor?.start()
+            box.value.resolve()
+        }
+    }
+
+    @objc func stopHeartRate(_ call: CAPPluginCall) {
+        let box = Unchecked(value: call)
+        let me = Unchecked(value: self)
+        Task { @MainActor in
+            me.value.monitor?.stop()
+            box.value.resolve()
+        }
+    }
+
+    @MainActor
+    private func heartRateUpdate(_ bpm: Int?, _ status: HeartRateMonitor.Status) {
+        notifyListeners("heartRate", data: ["bpm": bpm ?? NSNull(), "status": status.rawValue])
+        let session = WorkoutSession.shared
+        if let bpm, session.isActive { heartRateSamples.append((Date(), bpm)) }
+        if session.recordHeartRate(bpm) { Task { await session.apply() } }
     }
 }
