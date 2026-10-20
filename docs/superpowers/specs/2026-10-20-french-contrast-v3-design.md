@@ -23,7 +23,7 @@ He trains alone. Anything that needs a partner is out.
 ## Non-goals and anti-goals
 
 - No reactive ball catches or anything that needs a partner or thrower. Steven ruled this out.
-- No trap bar (V2 removed it on purpose). The barbell is used the way V2 uses it: in the landmine, and for the Zercher squat (heavy KB as the alternative). No free-standing barbell lifts.
+- No trap bar (V2 removed it on purpose).
 - Don't change V2 or the other plans.
 - Don't let drop-jump impact pile up. Five contrast blocks of max-effort jumps, 3 days a week, is already a lot.
 
@@ -68,7 +68,9 @@ Each day's 5 FC blocks lean on its theme. 1-2 blocks a day come from another are
 
 ## Equipment
 
-Dumbbells, kettlebell, landmine, cable, bands, sliders, Bosu ball, sandbag, med ball, TRX, flat bench, incline bench, a step-up block, and plyo boxes in several heights. Use the boxes for drops (pick the height in the `howTo`) and the block for step-ups.
+Barbell and squat rack, dumbbells, kettlebell, landmine, cable, bands, sliders, Bosu ball, sandbag, med ball, TRX, flat bench, incline bench, a step-up block, and plyo boxes in several heights. Use the boxes for drops (pick the height in the `howTo`) and the block for step-ups.
+
+**Barbell lifts are in** (Steven's call). Use them freely in the lifts and as the heavy (1st) exercise in FC blocks. **Back squat replaces the Zercher squat** everywhere V2 used it.
 
 **No chest-supported rows** (Steven doesn't like them). Use other rows: single-arm DB row, TRX row, cable row, landmine row.
 
