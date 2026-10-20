@@ -18,6 +18,7 @@ export type WorkoutItem = {
   finisherRounds?: number;
   suggestedLoad?: string;
   group?: string;
+  optional?: boolean;
 };
 
 export type WorkoutData = {

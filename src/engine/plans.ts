@@ -28,6 +28,9 @@ export type StaticPlan = {
 
   // ✅ Plan-specific add-on only for high_performance mode
   highPerformanceExtraByDay?: Partial<Record<string, any>>;
+
+  // Which day to skip when a joint is flagged red in the soreness check (defaults: shoulder C, knee B)
+  sorenessDays?: { shoulder: string; knee: string };
 };
 
 export type WorkoutPlan = GeneratedPlan | StaticPlan;
@@ -162,6 +165,10 @@ function insertBeforeFinish(items: any[], extra: any) {
   const idxFinish = items.map((x) => x.slot).lastIndexOf("cooldown");
   if (idxFinish >= 0) return [...items.slice(0, idxFinish), extra, ...items.slice(idxFinish)];
   return [...items, extra];
+}
+
+export function sorenessDays(plan: WorkoutPlan): { shoulder: string; knee: string } {
+  return (plan.kind === "static" && plan.sorenessDays) || { shoulder: "C", knee: "B" };
 }
 
 export function getWorkoutForPlan(args: {
