@@ -73,7 +73,7 @@ const FC_POSITION_LABELS: Record<number, string> = {
 
 // ------- Group items into "screens" -------
 // Each screen is either a single item or a group of FC block items
-type WorkoutScreen = {
+export type WorkoutScreen = {
   type: "single" | "fc_block" | "finisher";
   label: string;
   items: WorkoutItem[];
@@ -81,7 +81,7 @@ type WorkoutScreen = {
   roundCount?: number; // for finisher
 };
 
-function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
+export function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
   const screens: WorkoutScreen[] = [];
   let idx = 0;
 
@@ -178,7 +178,7 @@ function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
       const totalBlocks = [...new Set(items.filter((x) => x.fcBlock).map((x) => x.fcBlock!))].length;
       screens.push({
         type: "fc_block",
-        label: `French Contrast ${blockNum} of ${totalBlocks}`,
+        label: `French Contrast ${blockNum} of ${totalBlocks}${blockItems.some((x) => x.optional) ? " · optional" : ""}`,
         items: blockItems,
         restNote,
       });
@@ -229,6 +229,16 @@ function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
   }
 
   return screens;
+}
+
+// From an optional FC block, the first complex screen to skip ahead to (null if none)
+export function skipTargetIndex(screens: WorkoutScreen[], fromIdx: number): number | null {
+  const from = screens[fromIdx];
+  if (!from || from.type !== "fc_block" || !from.items.some((x) => x.optional)) return null;
+  for (let i = fromIdx + 1; i < screens.length; i++) {
+    if (screens[i].items[0]?.slot === "athletic") return i;
+  }
+  return null;
 }
 
 // Collect unique equipment with saved weights
