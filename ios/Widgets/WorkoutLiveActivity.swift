@@ -65,7 +65,9 @@ private struct LockScreenView: View {
             HStack(spacing: 8) {
                 Text(attributes.startedAt, style: .timer)
                     .font(.system(size: 24, weight: .bold).monospacedDigit())
-                    .frame(width: 84, alignment: .leading)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .frame(width: 104, alignment: .leading)
                 Text(state.title)
                     .font(.system(size: 13, weight: .bold))
                     .lineLimit(1)
@@ -91,6 +93,8 @@ private struct LockScreenView: View {
                         Text(row.dose)
                             .font(.system(size: 13).monospacedDigit())
                             .foregroundStyle(.white.opacity(0.65))
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
                     }
                 }
             }
