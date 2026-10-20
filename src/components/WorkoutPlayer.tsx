@@ -391,6 +391,7 @@ export default function WorkoutPlayer({
   };
 
   const screen = screens[screenIdx];
+  const skipTarget = skipTargetIndex(screens, screenIdx);
   const screenTitle = workoutLabel
     ? `Day ${plannedDay} — ${workoutLabel}`
     : modeLabel || "Workout";
@@ -583,6 +584,13 @@ export default function WorkoutPlayer({
             }}>
               Next: {screens[screenIdx + 1].label}
             </div>
+          )}
+
+          {/* Skip remaining optional FC blocks */}
+          {skipTarget !== null && (
+            <Button icon="⏭" variant="ghost" style={{ marginTop: 12 }} onClick={() => { haptic(); setScreenIdx(skipTarget); }}>
+              Skip to complexes
+            </Button>
           )}
 
           {/* Navigation */}
