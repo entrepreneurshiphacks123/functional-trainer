@@ -9,6 +9,9 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # xcodegen first: `cap sync` reads the generated project through the ios/App/App.xcodeproj symlink.
 (cd "$ROOT/ios" && xcodegen generate)
 (cd "$ROOT" && npm run build:native)
+# Generate again: XcodeGen only adds files that exist at generate time, and the first pass
+# ran before `cap sync` created public/, capacitor.config.json and config.xml.
+(cd "$ROOT/ios" && xcodegen generate)
 
 cd "$ROOT/ios"
 xcodebuild -project App.xcodeproj -scheme App \
