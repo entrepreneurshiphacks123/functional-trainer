@@ -3,6 +3,8 @@ import { Card, Screen, Button, TinyIconButton, Modal } from "../ui/Primitives";
 import { getLoadFor, setLoadFor, getAllLoads } from "../engine/loadLog";
 import { pad2, toLocalDateKey } from "../utils/date";
 import { WorkoutItem, WorkoutData } from "../../types/WorkoutItem";
+import { startSession, setIndex, endSession, getIndex, onIndexChanged } from "../native/bridge";
+import { sessionStartPayload } from "../native/liveSnapshot";
 
 const slotLabel: Record<WorkoutItem["slot"], string> = {
   prep: "Warm-up",
@@ -269,6 +271,8 @@ function collectEquipmentWithLoads(items: WorkoutItem[]): { name: string; weight
 export default function WorkoutPlayer({
   workout,
   workoutLabel,
+  planName,
+  dayTitle,
   modeLabel,
   plannedDay,
   dayKeys,
@@ -278,6 +282,8 @@ export default function WorkoutPlayer({
 }: {
   workout: WorkoutData;
   workoutLabel: string;
+  planName?: string;
+  dayTitle?: string;
   modeLabel: string;
   plannedDay: string;
   dayKeys: string[];
@@ -322,6 +328,48 @@ export default function WorkoutPlayer({
   React.useEffect(() => {
     saveWP({ sig: itemsSig(items), screenIdx, startedAt, elapsedSec, ts: Date.now() });
   }, [items, screenIdx, startedAt, elapsedSec]);
+
+  // Native live session (no-ops on the web)
+  const sessionSentRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!startedAt || sessionSentRef.current) return;
+    const payload = sessionStartPayload({
+      startedAt,
+      planName: planName ?? "",
+      dayTitle: dayTitle ?? workoutLabel,
+      screens,
+      index: screenIdx,
+    });
+    if (!payload) return;
+    sessionSentRef.current = true;
+    void startSession(payload);
+  }, [startedAt, planName, dayTitle, workoutLabel, screens, screenIdx]);
+
+  React.useEffect(() => {
+    if (startedAt) void setIndex(screenIdx);
+  }, [screenIdx, startedAt]);
+
+  const screenIdxRef = React.useRef(screenIdx);
+  screenIdxRef.current = screenIdx;
+  const screensLenRef = React.useRef(screens.length);
+  screensLenRef.current = screens.length;
+
+  React.useEffect(() => {
+    const apply = (i: number | null) => {
+      if (typeof i !== "number" || !Number.isInteger(i)) return;
+      if (i < 0 || i > screensLenRef.current - 1) return;
+      if (i !== screenIdxRef.current) setScreenIdx(i);
+    };
+    const sync = () => { void getIndex().then(apply); };
+    sync();
+    const onVis = () => { if (document.visibilityState === "visible") sync(); };
+    document.addEventListener("visibilitychange", onVis);
+    const unsub = onIndexChanged(apply);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      unsub();
+    };
+  }, []);
 
   const startSessionIfNeeded = React.useCallback(() => {
     if (startedAt) return;
@@ -603,7 +651,12 @@ export default function WorkoutPlayer({
                 Next
               </Button>
             ) : (
-              <Button icon="✅" onClick={() => { haptic(); try { localStorage.removeItem("wp_state_v3"); } catch {} onFinish(); }}>
+              <Button icon="✅" onClick={() => {
+                haptic();
+                try { localStorage.removeItem("wp_state_v3"); } catch {}
+                if (startedAt) void endSession({ startedAt, endedAt: Date.now(), title: dayTitle ?? workoutLabel });
+                onFinish();
+              }}>
                 Done
               </Button>
             )}

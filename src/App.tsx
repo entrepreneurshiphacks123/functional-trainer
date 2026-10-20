@@ -191,6 +191,8 @@ export default function App() {
               <WorkoutPlayer
                 workout={workout}
                 workoutLabel={dayLabel}
+                planName={plan.name}
+                dayTitle={dayLabel}
                 modeLabel={modeLabel}
                 plannedDay={plannedDay}
                 dayKeys={dayKeys}
