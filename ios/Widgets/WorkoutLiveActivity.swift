@@ -61,54 +61,30 @@ private struct LockScreenView: View {
     ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center, spacing: 8) {
                 Text(attributes.startedAt, style: .timer)
-                    .font(.system(size: 24, weight: .bold).monospacedDigit())
+                    .font(.system(size: 26, weight: .bold).monospacedDigit())
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                    .frame(width: 104, alignment: .leading)
-                Text(state.title)
-                    .font(.system(size: 13, weight: .bold))
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                if let hr = state.heartRate {
-                    Text("♥ \(hr)")
-                        .font(.system(size: 13, weight: .bold).monospacedDigit())
-                        .foregroundStyle(Color(red: 1, green: 0.35, blue: 0.45))
+                    .frame(width: 112, alignment: .leading)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(state.title)
+                        .font(.system(size: 15, weight: .bold))
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    (Text(state.position)
+                        + Text(state.heartRate.map { "  ♥ \($0)" } ?? "")
+                            .foregroundColor(Color(red: 1, green: 0.35, blue: 0.45)))
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.65))
+                        .lineLimit(1)
                 }
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                ForEach(Array(state.rows.enumerated()), id: \.offset) { _, row in
-                    HStack(spacing: 6) {
-                        if let pos = row.pos {
-                            Circle().fill(Self.dotColors[pos] ?? .white).frame(width: 7, height: 7)
-                        }
-                        Text(row.name)
-                            .font(.system(size: 13, weight: .semibold))
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Text(row.dose)
-                            .font(.system(size: 13).monospacedDigit())
-                            .foregroundStyle(.white.opacity(0.65))
-                            .lineLimit(1)
-                            .fixedSize(horizontal: true, vertical: false)
-                    }
-                }
-            }
-            HStack(spacing: 8) {
-                Text("\(attributes.dayTitle) · \(state.position)")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.white.opacity(0.45))
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                Spacer(minLength: 4)
                 if !state.isLast {
                     Button(intent: NextScreenIntent()) {
                         Text("Next ›")
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.system(size: 14, weight: .bold))
                             .padding(.horizontal, 14)
                             .padding(.vertical, 5)
                             .background(Capsule().fill(Color.white.opacity(0.18)))
@@ -117,10 +93,29 @@ private struct LockScreenView: View {
                     .buttonStyle(.plain)
                 }
             }
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(Array(state.rows.enumerated()), id: \.offset) { _, row in
+                    HStack(spacing: 6) {
+                        if let pos = row.pos {
+                            Circle().fill(Self.dotColors[pos] ?? .white).frame(width: 8, height: 8)
+                        }
+                        Text(row.name)
+                            .font(.system(size: 16, weight: .semibold))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(row.dose)
+                            .font(.system(size: 15).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.65))
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
+                    }
+                }
+            }
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 14)
         .padding(.top, 10)
-        .padding(.bottom, 9)
+        .padding(.bottom, 10)
     }
 }
