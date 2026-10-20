@@ -365,8 +365,11 @@ export default function WorkoutPlayer({
     return onHeartRate((bpm, status) => setHr({ bpm, status }));
   }, []);
 
+  // On cold relaunch the restored screenIdx is stale; native may hold a newer one.
+  // Don't push anything to native until the first getIndex() answer has been adopted.
+  const nativeIndexSyncedRef = React.useRef(false);
   React.useEffect(() => {
-    if (startedAt) void setIndex(screenIdx);
+    if (startedAt && nativeIndexSyncedRef.current) void setIndex(screenIdx);
   }, [screenIdx, startedAt]);
 
   const screensLenRef = React.useRef(screens.length);
@@ -378,7 +381,12 @@ export default function WorkoutPlayer({
       if (i < 0 || i > screensLenRef.current - 1) return;
       if (i !== screenIdxRef.current) setScreenIdx(i);
     };
-    const sync = () => { void getIndex().then(apply); };
+    const sync = () => {
+      void getIndex().then((i) => {
+        nativeIndexSyncedRef.current = true;
+        apply(i);
+      });
+    };
     sync();
     const onVis = () => { if (document.visibilityState === "visible") sync(); };
     document.addEventListener("visibilitychange", onVis);
