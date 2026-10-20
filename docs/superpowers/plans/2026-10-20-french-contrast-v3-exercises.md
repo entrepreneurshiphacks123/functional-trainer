@@ -18,7 +18,7 @@ Kept from V2 where they fit. New or changed items are marked ★. Dropped from V
 | | Kneeling jump to feet | 4 | None | Plyo |
 | | Single-arm KB swing (heavy) | 5/side | KB | Loaded jump |
 | | ★ Drop jump, rebound to vertical | 4 | 12-18" box | Reactive (drop jump 1 of 2 max) |
-| **FC 2: Linear speed** | ★ Barbell hip thrust (3s iso hold at top) | 5 @ 80% | Barbell + bench | Heavy, with the day's one iso-pause block |
+| **FC 2: Linear speed** | ★ Machine hip thrust (3s iso hold at top) | 5 @ 80% | Hip thrust machine | Heavy, with the day's one iso-pause block |
 | | ★ Broad jump → stick | 3 | None | Plyo |
 | | ★ DB jump squat (light, 20-30%) | 4 | Light DBs | Loaded jump |
 | | Split step → explosive first step 3m → stick | 4/direction | None or long band | Reactive footwork |

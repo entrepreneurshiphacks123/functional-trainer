@@ -156,16 +156,15 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3a_fc2_1",
           slot: "fc_block",
-          name: "Barbell hip thrust (3s iso hold at top)",
+          name: "Machine hip thrust (3s iso hold at top)",
           dose: "5 @ 80%",
-          equipment: "Barbell + bench",
+          equipment: "Hip thrust machine",
           description: "Heavy — potentiation",
           fcBlock: 2,
           fcPosition: 1,
           restAfter: 20,
-          suggestedLoad: "225 lb",
           howTo:
-            "Upper back on the bench, bar over the hip crease with a pad. Drive through the heels to full hip extension, ribs down, chin tucked. Pause: at the top of every rep, squeeze the glutes and hold the bar still for a slow 3-count, then lower under control. Feel it in the glutes, not the low back. Common mistake: cranking the lower back to fake the lockout.",
+            "Upper back on the pad, belt or pad snug over the hip crease, feet flat and about hip-width. Drive through the heels to full hip extension, ribs down, chin tucked. Pause: at the top of every rep, squeeze the glutes and hold the lockout for a slow 3-count, then lower under control. Feel it in the glutes, not the low back. Common mistake: cranking the lower back to fake the lockout.",
         },
         {
           id: "v3a_fc2_2",
