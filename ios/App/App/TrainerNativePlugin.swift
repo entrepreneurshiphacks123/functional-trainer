@@ -13,6 +13,7 @@ public class TrainerNativePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "setIndex", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "endSession", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getIndex", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setWristNotifications", returnType: CAPPluginReturnPromise),
     ]
 
     public override func load() {
@@ -43,6 +44,7 @@ public class TrainerNativePlugin: CAPPlugin, CAPBridgedPlugin {
             let session = WorkoutSession.shared
             if session.startedAt != payload.startedAt { await session.endActivity() }
             session.start(payload: payload)
+            if WristNotification.isOn() { await WristNotification.requestAuthorization() }
             await session.apply()
             box.value.resolve()
         }
@@ -73,5 +75,12 @@ public class TrainerNativePlugin: CAPPlugin, CAPBridgedPlugin {
             let session = WorkoutSession.shared
             box.value.resolve(["index": session.isActive ? session.index : NSNull()])
         }
+    }
+
+    @objc func setWristNotifications(_ call: CAPPluginCall) {
+        guard let on = call.getBool("on") else { return call.reject("setWristNotifications: missing on") }
+        WristNotification.setOn(on)
+        if !on { WristNotification.clear() }
+        call.resolve()
     }
 }

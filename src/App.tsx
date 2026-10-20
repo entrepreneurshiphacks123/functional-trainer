@@ -10,6 +10,7 @@ import { findPlan, getWorkoutForPlan, getDayTitleForPlan, sorenessDays } from ".
 import { MovementPattern } from "../types/MovementPattern";
 import { applyTheme, loadTheme, saveTheme, Theme } from "./ui/theme";
 import { BottomNav } from "./ui/Primitives";
+import { isNative, setWristNotifications } from "./native/bridge";
 
 type Step = "mode" | "workout" | "soreness";
 type Tab = "workout" | "calendar" | "settings";
@@ -40,12 +41,21 @@ export default function App() {
     persisted.trainingDaysPerWeek ?? 4
   );
 
+  const [wristNotifications, setWristNotificationsState] = useState<boolean>(
+    persisted.wristNotifications ?? true
+  );
+
   const [theme, setTheme] = useState<Theme>(() => loadTheme());
 
   useEffect(() => {
     applyTheme(theme);
     saveTheme(theme);
   }, [theme]);
+
+  // Native reads this flag while JS sleeps (lock-screen Next), so push it down on start.
+  useEffect(() => {
+    if (isNative()) void setWristNotifications(wristNotifications);
+  }, [wristNotifications]);
 
   const plan = useMemo(() => findPlan(activePlanId), [activePlanId]);
   const allDayKeys = Array.isArray(plan.dayKeys) && plan.dayKeys.length ? plan.dayKeys : ["A", "B", "C", "D"];
@@ -167,6 +177,11 @@ export default function App() {
             onTrainingDaysChange={(d) => {
               setTrainingDaysPerWeek(d);
               persist({ trainingDaysPerWeek: d });
+            }}
+            wristNotifications={wristNotifications}
+            onWristNotificationsChange={(on) => {
+              setWristNotificationsState(on);
+              persist({ wristNotifications: on });
             }}
           />
         )}

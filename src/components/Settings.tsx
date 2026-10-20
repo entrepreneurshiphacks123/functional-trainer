@@ -24,12 +24,16 @@ export default function Settings({
   onBack,
   trainingDaysPerWeek,
   onTrainingDaysChange,
+  wristNotifications,
+  onWristNotificationsChange,
 }: {
   theme: Theme;
   onThemeToggle: () => void;
   onBack: () => void;
   trainingDaysPerWeek: 3 | 4;
   onTrainingDaysChange: (days: 3 | 4) => void;
+  wristNotifications: boolean;
+  onWristNotificationsChange: (on: boolean) => void;
 }) {
   const [refresh, setRefresh] = useState(0);
   const plans = useMemo(() => getAllPlans(), [refresh]);
@@ -120,6 +124,34 @@ export default function Settings({
             </div>
           </div>
         </Card>
+
+        {isNative() && (
+          <Card title="Wrist notifications">
+            <div style={{ display: "grid", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {([true, false] as const).map((on) => (
+                  <button
+                    key={String(on)}
+                    onClick={() => onWristNotificationsChange(on)}
+                    style={{
+                      padding: "14px",
+                      background: wristNotifications === on ? "var(--accent)" : "var(--bg)",
+                      color: wristNotifications === on ? "var(--accent-text)" : "var(--text)",
+                      border: "var(--bw) solid var(--border)",
+                      fontWeight: 950,
+                      fontSize: 16,
+                    }}
+                  >
+                    {on ? "On" : "Off"}
+                  </button>
+                ))}
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.6 }}>
+                In Mi Fitness, allow notifications from Functional Trainer.
+              </div>
+            </div>
+          </Card>
+        )}
 
         <Card title="Workout Plans">
           <div style={{ display: "grid", gap: 12 }}>

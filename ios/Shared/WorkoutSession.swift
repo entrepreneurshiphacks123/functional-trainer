@@ -84,13 +84,16 @@ final class WorkoutSession {
 
     // MARK: Live Activity
 
-    /// The one place that pushes the current state out. Task 5 adds the wrist notification
-    /// here, Task 7 feeds heart rate in.
+    /// The one place that pushes the current state out: Live Activity and wrist notification.
+    /// Task 7 feeds heart rate in.
     func apply(heartRate: Int? = nil) async {
         guard isActive, let startedAt else { return }
         let content = ActivityContent(state: currentState(heartRate: heartRate), staleDate: nil)
         let attrs = WorkoutActivityAttributes(planName: planName, dayTitle: dayTitle, startedAt: startedAt)
         await Self.pushActivity(attrs, content)
+        if WristNotification.isOn(), snapshots.indices.contains(index) {
+            await WristNotification.post(snapshots[index])
+        }
     }
 
     /// Ends any Live Activity, including one orphaned by a previous process, without touching the stored session.
@@ -124,6 +127,7 @@ final class WorkoutSession {
 
     func endAndClear() async {
         await endActivity()
+        WristNotification.clear()
         end()
     }
 
