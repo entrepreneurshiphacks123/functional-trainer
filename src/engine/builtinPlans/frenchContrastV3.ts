@@ -479,25 +479,25 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3a_ath4",
           slot: "athletic",
-          name: "Standing cable hip adduction",
+          name: "Standing band hip adduction",
           dose: "2x12/side",
-          equipment: "Cable + ankle cuff",
+          equipment: "Medium or heavy loop band + rack",
           description: "Adductors",
-          suggestedLoad: "20 lb",
+          suggestedLoad: "medium-heavy band",
           howTo:
-            "**Setup:** Set the cable low with an ankle cuff on the ankle nearest the stack. Stand side-on and hold the frame for balance.\n\n**Move:**\n1. Stand tall on the outside leg.\n2. Sweep the cuffed leg across in front of the standing leg, as far as is comfortable.\n3. Return slowly out to the side.\n\n**Feel:** The inner thigh squeezes. Keep the hips square and the trunk still.",
+            "**Setup:** Loop a band around a rack post at ankle height and put the other end around the ankle nearest the rack. Step out sideways until the band is tight. Hold the rack or a bench for balance.\n\n**Move:**\n1. Stand tall on the outside leg.\n2. Sweep the banded leg across in front of the standing leg, as far as is comfortable.\n3. Return slowly out to the side.\n4. Finish all reps, then switch legs.\n\n**Feel:** The inner thigh squeezes. Keep the hips square and the trunk still.",
         },
 
         {
           id: "v3a_ath_calf",
           slot: "athletic",
-          name: "Single-leg calf raise, straight knee (heavy DB)",
-          dose: "3x10/side",
+          name: "Calf raise, both feet, straight knee (heavy DB)",
+          dose: "3x12",
           equipment: "DB + step + rack",
           description: "Calf and Achilles strength",
-          suggestedLoad: "35 lb DB",
+          suggestedLoad: "35-50 lb DB",
           howTo:
-            "**Setup:** Stand on the edge of a step on one foot, heel hanging off. Hold a heavy DB in the same-side hand and hold a rack with the other hand for balance.\n\n**Move:**\n1. Rise up for 2 seconds, straight knee.\n2. Pause 1 second at the top.\n3. Lower for 3 seconds into a full stretch below the step.\n4. Finish all reps, then switch legs.\n\n**Feel:** The calf and Achilles load up heavy and slow. No bouncing out of the bottom.",
+            "**Setup:** Stand on the edge of a step on both feet, heels hanging off. Hold a heavy DB in one hand and hold a rack with the other for balance.\n\n**Move:**\n1. Rise up for 2 seconds, straight knees.\n2. Pause 1 second at the top.\n3. Lower for 3 seconds into a full stretch below the step.\n4. Switch the DB hand each set.\n\n**Feel:** The calves and Achilles load up heavy and slow. No bouncing out of the bottom.\n\n**Note:** Both feet keeps the bunion side out of a balance fight. Push evenly through both big toes.",
         },
 
         // ── Cooldown ──
@@ -580,12 +580,12 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3b_w5",
           slot: "prep",
-          name: "Single-leg balance + calf raise",
-          dose: "1 min/side",
-          equipment: "None (Bosu optional)",
+          name: "Calf raises + single-leg balance",
+          dose: "1 min",
+          equipment: "None (rack for support)",
           description: "Ankle stability",
           howTo:
-            "**Setup:** Stand on one leg near a wall or rack for safety.\n\n**Move:**\n1. Do 10 slow single-leg calf raises.\n2. Then hold a single-leg balance for 20 seconds.\n3. Switch legs.\n\n**Feel:** The ankle works to stay steady. Progress to eyes closed or standing on the Bosu.",
+            "**Setup:** Stand near a rack or wall.\n\n**Move:**\n1. Do 10 slow calf raises on both feet.\n2. Then hold a single-leg balance for 20 seconds on each leg.\n3. Keep a fingertip on the rack as needed, especially on the left foot.\n\n**Feel:** The ankle works to stay steady. Progress by taking the fingertip away.",
         },
 
         {
@@ -853,17 +853,17 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3b_fc4_1",
           slot: "fc_block",
-          name: "Weighted pull-up (or heavy lat pulldown)",
+          name: "Lat pulldown (heavy) or pull-up",
           dose: "5 @ 80%",
-          equipment: "Pull-up bar or lat pulldown",
+          equipment: "Lat pulldown or pull-up bar",
           description: "Heavy vertical pull",
           fcBlock: 4,
           fcPosition: 1,
           restAfter: 20,
           optional: true,
-          suggestedLoad: "bodyweight + 10-25 lb, or pulldown at a 5-rep load",
+          suggestedLoad: "pulldown at a heavy 5-rep load, or bodyweight pull-ups",
           howTo:
-            "**Setup:** Grab the bar slightly wider than shoulder width. Clip a plate or DB to a belt for the weighted version, or sit at the pulldown.\n\n**Move:**\n1. Start from a full hang with the shoulders packed down.\n2. Pull the chest to the bar.\n3. Lower for 2 seconds back to a full hang.\n\n**Feel:** The lats and upper back drive the pull. Don't swing or kip.",
+            "**Setup:** Sit at the pulldown with the thighs locked under the pad, hands slightly wider than shoulders. Or hang from a pull-up bar with the same grip.\n\n**Move:**\n1. Start with the arms straight and the shoulders packed down.\n2. Pull the bar to the upper chest (or the chest to the bar).\n3. Lower for 2 seconds back to straight arms.\n\n**Feel:** The lats and upper back drive the pull. Don't lean way back, swing or kip.",
         },
 
         {
@@ -991,12 +991,12 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3b_ath1",
           slot: "athletic",
-          name: "Hanging shoulder airplane",
+          name: "Hanging shoulder airplane (Smith machine)",
           dose: "3x3/side",
-          equipment: "Pull-up bar",
+          equipment: "Smith machine (bar locked)",
           description: "Shoulder mobility + strength",
           howTo:
-            "**Setup:** Hang from a bar with one hand. Pack the shoulder by pulling it down away from the ear. Free hand off the bar.\n\n**Move:**\n1. Keep the supporting arm fixed and straight.\n2. Slowly rotate the body underneath it, opening the chest away from the bar.\n3. Pause, then rotate back the other way.\n4. Finish all reps, then switch arms.\n\n**Feel:** Shoulder stability and lat strength. Advanced move.\n\n**Regress:** keep the other hand lightly on the bar, or touch your feet to a box.",
+            "**Setup:** Lock the Smith bar high enough to hang from with your feet just touching the floor. Grab it with one hand and pack the shoulder by pulling it down away from the ear. Free hand off the bar.\n\n**Move:**\n1. Keep the supporting arm fixed and straight.\n2. Slowly rotate the body underneath it, opening the chest away from the bar.\n3. Pause, then rotate back the other way.\n4. Finish all reps, then switch arms.\n\n**Feel:** Shoulder stability and lat strength.\n\n**Regress:** keep more weight in your feet, or the other hand lightly on the bar. Progress by raising the bar until you fully hang.",
         },
 
         {
@@ -1006,8 +1006,9 @@ export const frenchContrastV3: StaticPlan = {
           dose: "3x10",
           equipment: "45° back extension bench",
           description: "Posterior chain",
+          suggestedLoad: "10 lb ball or plate",
           howTo:
-            "**Setup:** Set the pads at your hip crease and lock your ankles in. Cross your arms on your chest.\n\n**Move:**\n1. Hinge forward to a gentle hamstring stretch with a flat back.\n2. Squeeze the glutes and rise until the body is in a straight line.\n3. Don't lean back past straight.\n\n**Feel:** Glutes and hamstrings work, not the low back.",
+            "**Setup:** Set the pads at your hip crease and lock your ankles in. Hug a 10 lb ball or plate to your chest.\n\n**Move:**\n1. Hinge forward to a gentle hamstring stretch with a flat back.\n2. Squeeze the glutes and rise until the body is in a straight line.\n3. Don't lean back past straight.\n\n**Feel:** Glutes and hamstrings work, not the low back.",
         },
 
         {
@@ -1015,7 +1016,7 @@ export const frenchContrastV3: StaticPlan = {
           slot: "athletic",
           name: "Standing cable hip abduction + adduction",
           dose: "2x12/side each",
-          equipment: "Cable + ankle cuff",
+          equipment: "Cable + your own ankle cuff",
           description: "Hip abductors + adductors",
           suggestedLoad: "20 lb",
           howTo:
@@ -1216,15 +1217,15 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3c_fc1_4",
           slot: "fc_block",
-          name: "Hurdle hops (continuous, low hurdles)",
-          dose: "5",
-          equipment: "5 low hurdles",
+          name: "Pogo hops (quick, stiff ankles)",
+          dose: "10",
+          equipment: "None",
           description: "Reactive",
           fcBlock: 1,
           fcPosition: 4,
           restAfter: 150,
           howTo:
-            "**Setup:** Line up 5 low hurdles (6-12 inches), about 2 feet apart. Stand facing the first one.\n\n**Move:**\n1. Jump over the first hurdle with both feet.\n2. Land and spring straight into the next hurdle. Don't pause.\n3. Keep the knees fairly straight and the ground contact short.\n4. After the last hurdle, walk back and rest.\n\n**Feel:** Quick, springy contacts, like a hot stove. Common mistake: sinking into each landing.",
+            "**Setup:** Stand tall, feet hip-width, arms relaxed.\n\n**Move:**\n1. Bounce up and down off the balls of your feet, small and fast.\n2. Keep the knees nearly straight and let the ankles do the work.\n3. Spend as little time on the ground as you can.\n\n**Feel:** Quick, springy contacts, like a hot stove. Common mistake: bending the knees and sinking into each landing.",
         },
 
         // ── FC Block 2 - Lateral (done once) ──
@@ -1510,25 +1511,25 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3c_ath3",
           slot: "athletic",
-          name: "Standing cable hip adduction",
+          name: "Standing band hip adduction",
           dose: "2x12/side",
-          equipment: "Cable + ankle cuff",
+          equipment: "Medium or heavy loop band + rack",
           description: "Adductors",
-          suggestedLoad: "20 lb",
+          suggestedLoad: "medium-heavy band",
           howTo:
-            "**Setup:** Set the cable low with an ankle cuff on the ankle nearest the stack. Stand side-on and hold the frame for balance.\n\n**Move:**\n1. Stand tall on the outside leg.\n2. Sweep the cuffed leg across in front of the standing leg, as far as is comfortable.\n3. Return slowly out to the side.\n\n**Feel:** The inner thigh squeezes. Keep the hips square and the trunk still.",
+            "**Setup:** Loop a band around a rack post at ankle height and put the other end around the ankle nearest the rack. Step out sideways until the band is tight. Hold the rack or a bench for balance.\n\n**Move:**\n1. Stand tall on the outside leg.\n2. Sweep the banded leg across in front of the standing leg, as far as is comfortable.\n3. Return slowly out to the side.\n4. Finish all reps, then switch legs.\n\n**Feel:** The inner thigh squeezes. Keep the hips square and the trunk still.",
         },
 
         {
           id: "v3c_ath_calf",
           slot: "athletic",
-          name: "Seated calf raise, bent knee (soleus)",
+          name: "Seated calf raise, bent knee (DBs on knees)",
           dose: "3x12",
-          equipment: "Seated calf machine, or bench + heavy DBs",
+          equipment: "Bench + 2 heavy DBs + plate",
           description: "Soleus strength",
-          suggestedLoad: "machine or 2x50 lb DBs on knees",
+          suggestedLoad: "2x50 lb DBs on knees",
           howTo:
-            "**Setup:** Sit at the seated calf machine, or sit on a bench with the balls of your feet on a plate and a heavy DB resting on each knee.\n\n**Move:**\n1. Rise up onto the toes and squeeze at the top.\n2. Lower for 3 seconds into a deep stretch.\n3. Pause in the stretch, then rise again.\n\n**Feel:** The deep calf muscle under the gastrocnemius burns. Bent knee shifts the work to the soleus.",
+            "**Setup:** Sit on a bench with the balls of your feet on a plate, heels off it. Rest a heavy DB on each knee.\n\n**Move:**\n1. Rise up onto the toes and squeeze at the top.\n2. Lower for 3 seconds into a deep stretch.\n3. Pause in the stretch, then rise again.\n\n**Feel:** The deep calf muscle under the gastrocnemius burns. Bent knee shifts the work to the soleus.",
         },
 
         // ── Cooldown ──
