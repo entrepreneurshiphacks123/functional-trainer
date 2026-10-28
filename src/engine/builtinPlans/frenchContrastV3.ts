@@ -1500,12 +1500,13 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3c_ath5",
           slot: "athletic",
-          name: "Split squat iso hold, lengthened",
-          dose: "30s/side",
-          equipment: "None or light DB",
-          description: "Isometric, lengthened position",
+          name: "Split squat iso hold, lengthened (or backward sled drag)",
+          dose: "30s/side, or 4x20m sled",
+          equipment: "None or light DB, or sled",
+          description: "Knee tendon health. Use the sled if it's free.",
+          suggestedLoad: "light DB, or sled at a load you can step smoothly",
           howTo:
-            "**Setup:** Take a split squat stance, front foot flat or elevated on a plate. Light DB optional.\n\n**Move:**\n1. Lower into the bottom position, with a deep stretch on the rear hip flexor and quad.\n2. Hold it for 30 seconds, breathing steadily.\n3. Rise, then switch legs.\n\n**Feel:** The muscle lengthens under tension. This tendon work protects the knee and hip.",
+            "**Option A: Split squat iso hold**\n\n**Setup:** Take a split squat stance, front foot flat or elevated on a plate. Light DB optional.\n\n**Move:**\n1. Lower into the bottom position, with a deep stretch on the rear hip flexor and quad.\n2. Hold it for 30 seconds, breathing steadily.\n3. Rise, then switch legs.\n\n**Feel:** The muscle lengthens under tension. This tendon work protects the knee and hip.\n\n**Option B: Backward sled drag (if the sled is free)**\n\n**Setup:** Hold the sled straps or handles at arm's length, facing the sled. Sit back slightly, chest up.\n\n**Move:**\n1. Take small, quick steps backward, pushing through the front of each foot.\n2. Let your knees travel forward over your toes. That is the point.\n3. Drag 20m, rest about 45s, repeat 4 times.\n\n**Feel:** The front of the thighs burns and the knees feel warm, never painful.\n\n**Avoid:** Leaning way back and pulling with your arms, or taking long strides.",
         },
 
         {
