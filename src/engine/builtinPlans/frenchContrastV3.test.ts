@@ -35,7 +35,7 @@ for (const k of ["A", "B", "C"]) {
   });
 
   test(`day ${k}: first finisher item is the favorite complex`, () => {
-    expect(items.find((i) => i.slot === "athletic")?.name).toMatch(/knee drive|lateral lunge to drive/i);
+    expect(items.find((i) => i.slot === "athletic")?.name).toMatch(/knee drive|sandbag decel/i);
   });
 
   test(`day ${k}: focus-area rules`, () => {

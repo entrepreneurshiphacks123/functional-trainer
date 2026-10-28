@@ -1428,13 +1428,13 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3c_ath1b",
           slot: "athletic",
-          name: "Sandbag shouldered lateral lunge to drive",
+          name: "Sandbag decel (throw and catch the stop)",
           dose: "3x5/side",
           equipment: "Sandbag",
-          description: "Loaded core, anti-lateral flexion",
-          suggestedLoad: "40 lb",
+          description: "Rotational deceleration, like a pitcher stopping the throw",
+          suggestedLoad: "20-30 lb",
           howTo:
-            "**Setup:** Put the sandbag on one shoulder. Stand tall, feet hip-width.\n\n**Move:**\n1. Step wide into a lateral lunge to the side opposite the bag.\n2. Drive hard off that leg back to center and up into a knee drive.\n3. Finish all reps, then switch shoulders.\n\n**Feel:** The obliques fight the side-bend from the offset load.\n\n**Avoid:** leaning toward the bag instead of staying tall.",
+            "**Setup:** Athletic stance, sideways like a pitcher. Hold the sandbag by its handles at the back shoulder.\n\n**Move:**\n1. Load the back hip, then drive and rotate hard toward the target, as if you are throwing the bag.\n2. Don't let go. At the release point, brake: stop the bag dead in front of you.\n3. Stick the finish on the front leg for 1 second, hips and trunk braced.\n4. Reset and repeat. Finish all reps, then switch sides.\n\n**Feel:** The back of the shoulder, the trunk and the front hip absorb the stop. That braking is the exercise.\n\n**Avoid:** letting the bag drag you past the front foot, or slowing the throw down to make the stop easy.",
         },
 
         {
