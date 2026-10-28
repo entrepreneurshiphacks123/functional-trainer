@@ -109,7 +109,7 @@ export const frenchContrastV3: StaticPlan = {
           description: "Lateral core + hip control",
           suggestedLoad: "18-26 lb KB",
           howTo:
-            "**Setup:** Half-kneel with a light KB pressed overhead on the same side as the down knee. Front foot flat. Eyes on the bell.\n\n**Move:**\n1. Lock the arm out overhead.\n2. Push the hip back toward the bell side and hinge sideways over the front leg.\n3. Slide the free hand down toward the front foot.\n4. Reverse the move and stand tall.\n\n**Feel:** Obliques and the hip of the front leg stretch and work. Keep the bell arm vertical.",
+            "**Setup:** Half-kneel with the right knee down and the left foot planted out to the side. Light KB pressed overhead in the LEFT hand. Eyes on the bell.\n\n**Move:**\n1. Lock the arm out overhead.\n2. Shift the hips toward the bell side and hinge sideways toward the down knee.\n3. Slide the free right hand to the floor beside the right knee.\n4. Reverse the move and come back up tall.\n5. Finish all reps, then switch the knee and hand.\n\n**Feel:** Obliques and the side of the hip under the bell work. Keep the bell arm vertical the whole time.",
         },
 
         {
@@ -597,7 +597,7 @@ export const frenchContrastV3: StaticPlan = {
           description: "Lateral core + hip control",
           suggestedLoad: "18-26 lb KB",
           howTo:
-            "**Setup:** Half-kneel with a light KB pressed overhead on the same side as the down knee. Front foot flat. Eyes on the bell.\n\n**Move:**\n1. Lock the arm out overhead.\n2. Push the hip back toward the bell side and hinge sideways over the front leg.\n3. Slide the free hand down toward the front foot.\n4. Reverse the move and stand tall.\n\n**Feel:** Obliques and the hip of the front leg stretch and work. Keep the bell arm vertical.",
+            "**Setup:** Half-kneel with the right knee down and the left foot planted out to the side. Light KB pressed overhead in the LEFT hand. Eyes on the bell.\n\n**Move:**\n1. Lock the arm out overhead.\n2. Shift the hips toward the bell side and hinge sideways toward the down knee.\n3. Slide the free right hand to the floor beside the right knee.\n4. Reverse the move and come back up tall.\n5. Finish all reps, then switch the knee and hand.\n\n**Feel:** Obliques and the side of the hip under the bell work. Keep the bell arm vertical the whole time.",
         },
 
         {
@@ -1084,7 +1084,7 @@ export const frenchContrastV3: StaticPlan = {
           description: "Lateral core + hip control",
           suggestedLoad: "18-26 lb KB",
           howTo:
-            "**Setup:** Half-kneel with a light KB pressed overhead on the same side as the down knee. Front foot flat. Eyes on the bell.\n\n**Move:**\n1. Lock the arm out overhead.\n2. Push the hip back toward the bell side and hinge sideways over the front leg.\n3. Slide the free hand down toward the front foot.\n4. Reverse the move and stand tall.\n\n**Feel:** Obliques and the hip of the front leg stretch and work. Keep the bell arm vertical.",
+            "**Setup:** Half-kneel with the right knee down and the left foot planted out to the side. Light KB pressed overhead in the LEFT hand. Eyes on the bell.\n\n**Move:**\n1. Lock the arm out overhead.\n2. Shift the hips toward the bell side and hinge sideways toward the down knee.\n3. Slide the free right hand to the floor beside the right knee.\n4. Reverse the move and come back up tall.\n5. Finish all reps, then switch the knee and hand.\n\n**Feel:** Obliques and the side of the hip under the bell work. Keep the bell arm vertical the whole time.",
         },
 
         {
