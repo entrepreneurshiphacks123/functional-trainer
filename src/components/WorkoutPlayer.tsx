@@ -234,7 +234,7 @@ export function buildScreens(items: WorkoutItem[]): WorkoutScreen[] {
   return screens;
 }
 
-// From an optional FC block, the first complex screen to skip ahead to (null if none)
+// From an optional FC block, the first finisher screen to skip ahead to (null if none)
 export function skipTargetIndex(screens: WorkoutScreen[], fromIdx: number): number | null {
   const from = screens[fromIdx];
   if (!from || from.type !== "fc_block" || !from.items.some((x) => x.optional)) return null;
@@ -668,7 +668,7 @@ export default function WorkoutPlayer({
           {/* Skip remaining optional FC blocks */}
           {skipTarget !== null && (
             <Button icon="⏭" variant="ghost" style={{ marginTop: 12 }} onClick={() => { haptic(); setScreenIdx(skipTarget); }}>
-              Skip to complexes
+              Skip to finisher
             </Button>
           )}
 
