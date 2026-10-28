@@ -136,6 +136,11 @@ test("Day B prep includes wrist work", () => {
   expect(b.some((i) => i.slot === "prep" && /wrist/i.test(i.name))).toBe(true);
 });
 
+test("Day B prep includes Y-T-W shoulder raises", () => {
+  const b = frenchContrastV3.days.B.items as WorkoutItem[];
+  expect(b.some((i) => i.slot === "prep" && /Y-T-W/.test(i.name))).toBe(true);
+});
+
 test("Day B finisher includes external rotation", () => {
   const b = frenchContrastV3.days.B.items as WorkoutItem[];
   expect(b.some((i) => i.slot === "athletic" && /external rotation/i.test(i.name))).toBe(true);

@@ -599,6 +599,17 @@ export const frenchContrastV3: StaticPlan = {
           howTo:
             "**Setup:** Sit with a light DB. Rest one forearm on your thigh, palm down, wrist past the knee.\n\n**Move:**\n1. Eccentric wrist extension: use the other hand to help the wrist up, then lower it slowly for 3-4 seconds. 2x12/side.\n2. Hammer rotations: hold the DB at one end, rotate slowly from palm-up to palm-down. 2x10/side.\n\n**Feel:** The forearm muscles work. You should feel no elbow pain, stop if it is sharp. This protects against tennis elbow.",
         },
+        {
+          id: "v3b_w7",
+          slot: "prep",
+          name: "Y-T-W shoulder raises (bent-over, standing)",
+          dose: "1x8 each letter",
+          equipment: "Light plates or DBs (2.5-5 lb), or a light band",
+          description: "Lower trap, mid back and rotator cuff",
+          suggestedLoad: "2.5-5 lb",
+          howTo:
+            "**Setup:** Stand and hinge forward until your chest is close to parallel with the floor, soft knees, flat back. Light weight in each hand, arms hanging, thumbs up.\n\n**Move:**\n1. Y: raise both arms forward and up at a 45° angle into a Y. Pause 2 seconds, lower slowly. 8 reps.\n2. T: raise the arms straight out to the sides into a T. Pause 2 seconds, lower slowly. 8 reps.\n3. W: bend the elbows, pull them back and down, squeezing the shoulder blades into a W. Pause 2 seconds. 8 reps.\n\n**Feel:** Between and below the shoulder blades, and the back of the shoulder.\n\n**Avoid:** Shrugging toward your ears, arching your low back, or going heavy. Light is the point.",
+        },
 
         // ── Core (about 10 min, one mat move) ──
         {
