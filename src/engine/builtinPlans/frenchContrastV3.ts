@@ -580,12 +580,12 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3b_w5",
           slot: "prep",
-          name: "Calf raises + single-leg balance",
-          dose: "1 min",
-          equipment: "None (rack for support)",
+          name: "Calf raises + single-leg balance on Bosu",
+          dose: "1-2 min",
+          equipment: "Bosu",
           description: "Ankle stability",
           howTo:
-            "**Setup:** Stand near a rack or wall.\n\n**Move:**\n1. Do 10 slow calf raises on both feet.\n2. Then hold a single-leg balance for 20 seconds on each leg.\n3. Keep a fingertip on the rack as needed, especially on the left foot.\n\n**Feel:** The ankle works to stay steady. Progress by taking the fingertip away.",
+            "**Setup:** Set a Bosu next to a rack or wall.\n\n**Move:**\n1. On the floor, do 10 slow calf raises on both feet.\n2. Step onto the Bosu and hold a single-leg balance for 20-30 seconds.\n3. Switch legs. Keep these two separate, no calf raises on one leg.\n\n**Feel:** The ankle works to stay steady on the Bosu. Progress to eyes closed.",
         },
 
         {
