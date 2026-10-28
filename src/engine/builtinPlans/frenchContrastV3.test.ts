@@ -28,12 +28,14 @@ for (const k of ["A", "B", "C"]) {
     }
   });
 
-  test(`day ${k}: finisher has 3-4 athletic items, no strength/accessory`, () => {
-    const n = count(items, "athletic");
-    expect(n).toBeGreaterThanOrEqual(3);
-    expect(n).toBeLessThanOrEqual(4);
+  test(`day ${k}: finisher has exactly 4 athletic items, no strength/accessory`, () => {
+    expect(count(items, "athletic")).toBe(4);
     expect(count(items, "strength")).toBe(0);
     expect(count(items, "accessory")).toBe(0);
+  });
+
+  test(`day ${k}: first finisher item is the favorite complex`, () => {
+    expect(items.find((i) => i.slot === "athletic")?.name).toMatch(/knee drive|lateral lunge to drive/i);
   });
 
   test(`day ${k}: focus-area rules`, () => {
@@ -100,4 +102,24 @@ test("soreness day mapping follows V3's own layout", () => {
   expect(sorenessDays(frenchContrastV3)).toEqual({ shoulder: "B", knee: "C" });
   expect(frenchContrastV3.days.B.title).toMatch(/upper/i);
   expect(frenchContrastV3.days.C.title).toMatch(/squat/i);
+});
+
+test("Day C finisher includes the split squat iso", () => {
+  const c = frenchContrastV3.days.C.items as WorkoutItem[];
+  expect(c.some((i) => i.slot === "athletic" && /split squat iso/i.test(i.name))).toBe(true);
+});
+
+test("Day B prep includes ankle stability work", () => {
+  const b = frenchContrastV3.days.B.items as WorkoutItem[];
+  expect(b.some((i) => i.slot === "prep" && /single-leg balance/i.test(i.name))).toBe(true);
+});
+
+test("no suggestedLoad mentions a KB over 50 lb", () => {
+  const over: string[] = [];
+  for (const i of all) {
+    for (const m of (i.suggestedLoad ?? "").matchAll(/(\d+)(?:-(\d+))?\s*lb KB/gi)) {
+      if (Math.max(Number(m[1]), Number(m[2] ?? 0)) > 50) over.push(i.id);
+    }
+  }
+  expect(over).toEqual([]);
 });

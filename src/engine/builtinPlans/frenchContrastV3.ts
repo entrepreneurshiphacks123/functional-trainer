@@ -5,7 +5,7 @@ import type { StaticPlan } from "../plans";
 // Each day = warm-up (incl. posterior-chain activation), core (about 10 min,
 // at most ONE mat move), 5 French contrast blocks of 4 (done ONCE each, no
 // repeat rounds, max ONE drop-family move per day), blocks 4-5 optional
-// (Skip to finisher), ONE short standing finisher (3-4 items), cooldown.
+// (Skip to finisher), ONE short standing finisher (exactly 4 items, favorite complex first), cooldown.
 // Nothing on the mat after core. About 55 min.
 // Every block runs: 1 Heavy -> 2 Plyo -> 3 Loaded jump -> 4 Fast/reactive.
 // Rest about 20s between exercises, 2-3 min between blocks.
@@ -131,7 +131,7 @@ export const frenchContrastV3: StaticPlan = {
           dose: "30m/side",
           equipment: "KB or DB",
           description: "Anti-lateral flexion",
-          suggestedLoad: "53 lb KB",
+          suggestedLoad: "50 lb KB",
           howTo:
             "**Setup:** Hold a heavy KB or DB in one hand at your side.\n\n**Move:**\n1. Stand tall, ribs down, shoulders level.\n2. Walk 30 meters at a steady pace.\n3. Switch hands and walk back.\n\n**Feel:** The obliques on the opposite side fire. Don't lean toward the weight.",
         },
@@ -176,7 +176,7 @@ export const frenchContrastV3: StaticPlan = {
           fcBlock: 1,
           fcPosition: 3,
           restAfter: 20,
-          suggestedLoad: "53 lb KB",
+          suggestedLoad: "50 lb KB",
           howTo:
             "Same hip-snap as a two-hand swing, but single-arm forces your core to resist the rotational pull of the offset load. Don't let your trunk twist.",
         },
@@ -441,13 +441,25 @@ export const frenchContrastV3: StaticPlan = {
 
         // ── Finisher (standing, off the floor) ──
         {
+          id: "v3a_ath1b",
+          slot: "athletic",
+          name: "Cable row to knee drive",
+          dose: "3x6/side",
+          equipment: "Cable",
+          description: "Pull + drive",
+          suggestedLoad: "30 lb",
+          howTo:
+            "**Setup:** Anchor the cable at chest height. Hold the handle in the hand opposite your standing leg, with a slight stagger.\n\n**Move:**\n1. Row the handle to your ribs while exploding the opposite knee up.\n2. Finish tall on one leg, knee at hip height, handle at your side.\n3. Hold the balance for 1 second, then return under control.\n\n**Feel:** The pull and the knee drive link into one motion. One of your staples.\n\n**Avoid:** letting the torso lean back as you drive the knee.",
+        },
+
+        {
           id: "v3a_ath1",
           slot: "athletic",
           name: "Offset deadlift (heavy KB/DB in one hand, from the floor)",
           dose: "3x6/side",
           equipment: "Heavy KB or DB",
           description: "Hinge + anti-lean",
-          suggestedLoad: "70 lb",
+          suggestedLoad: "50 lb KB or 70 lb DB",
           howTo:
             "**Setup:** Place a heavy KB or DB on the floor beside one foot. Feet hip-width.\n\n**Move:**\n1. Hinge back and grab it with one hand. Back flat.\n2. Brace and push the floor away to stand tall. Don't lean toward the weight.\n3. Lower it under control and touch it to the floor.\n4. Finish all reps, then switch hands.\n\n**Feel:** Glutes and hamstrings drive. The obliques stop you from leaning.",
         },
@@ -462,17 +474,6 @@ export const frenchContrastV3: StaticPlan = {
           suggestedLoad: "20 lb DB",
           howTo:
             "**Setup:** Stand on your left leg with a soft knee. Light DB in the left hand if you want load.\n\n**Move:**\n1. Lift the right leg out to the right side.\n2. Hinge at the left hip and bend to the left, over the standing leg. The right leg stays out to the side.\n3. Stand back up.\n4. Finish all reps, then do the other side.\n\n**Feel:** The glute and inner thigh of the standing leg load up. It is a single-leg RDL to the side instead of behind you.",
-        },
-
-        {
-          id: "v3a_ath3",
-          slot: "athletic",
-          name: "45° back extension",
-          dose: "3x10",
-          equipment: "45° back extension bench",
-          description: "Posterior chain",
-          howTo:
-            "**Setup:** Set the pads at your hip crease and lock your ankles in. Cross your arms on your chest.\n\n**Move:**\n1. Hinge forward to a gentle hamstring stretch with a flat back.\n2. Squeeze the glutes and rise until the body is in a straight line.\n3. Don't lean back past straight.\n\n**Feel:** Glutes and hamstrings work, not the low back.",
         },
 
         {
@@ -564,6 +565,17 @@ export const frenchContrastV3: StaticPlan = {
             "**Setup:** Set the cable low with a rope. Face away from the stack, rope between your legs, walk forward until the cable is tight.\n\n**Move:**\n1. Hinge back with soft knees and long arms, rope passing between the legs.\n2. Push the hips back until the hamstrings stretch.\n3. Drive the hips forward and squeeze the glutes at the top.\n\n**Feel:** Glutes and hamstrings work, not the low back.",
         },
 
+        {
+          id: "v3b_w5",
+          slot: "prep",
+          name: "Single-leg balance + calf raise",
+          dose: "1 min/side",
+          equipment: "None (Bosu optional)",
+          description: "Ankle stability",
+          howTo:
+            "**Setup:** Stand on one leg near a wall or rack for safety.\n\n**Move:**\n1. Do 10 slow single-leg calf raises.\n2. Then hold a single-leg balance for 20 seconds.\n3. Switch legs.\n\n**Feel:** The ankle works to stay steady. Progress to eyes closed or standing on the Bosu.",
+        },
+
         // ── Core (about 10 min, one mat move) ──
         {
           id: "v3b_ca1",
@@ -619,7 +631,7 @@ export const frenchContrastV3: StaticPlan = {
           dose: "30m/side",
           equipment: "KB or DB",
           description: "Anti-lateral flexion",
-          suggestedLoad: "53 lb KB",
+          suggestedLoad: "50 lb KB",
           howTo:
             "**Setup:** Hold a heavy KB or DB in one hand at your side.\n\n**Move:**\n1. Stand tall, ribs down, shoulders level.\n2. Walk 30 meters at a steady pace.\n3. Switch hands and walk back.\n\n**Feel:** The obliques on the opposite side fire. Don't lean toward the weight.",
         },
@@ -932,6 +944,16 @@ export const frenchContrastV3: StaticPlan = {
 
         // ── Finisher (standing, off the floor) ──
         {
+          id: "v3b_ath1b",
+          slot: "athletic",
+          name: "Half-kneeling to standing rotational row + knee drive",
+          dose: "3x6/side",
+          equipment: "Cable or band",
+          howTo:
+            "**Setup:** Start half-kneeling with the cable or band anchored low to the side.\n\n**Move:**\n1. Pull the handle into a rotational row as you stand up out of the half-kneel.\n2. Finish by driving the back knee up to hip height on one leg.\n\n**Feel:** The pull, the stand, and the knee drive link into one motion.\n\n**Avoid:** standing first and pulling with the arms alone.",
+        },
+
+        {
           id: "v3b_ath1",
           slot: "athletic",
           name: "Hanging shoulder airplane",
@@ -956,25 +978,13 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3b_ath3",
           slot: "athletic",
-          name: "Standing cable hip abduction",
-          dose: "2x12/side",
+          name: "Standing cable hip abduction + adduction",
+          dose: "2x12/side each",
           equipment: "Cable + ankle cuff",
-          description: "Hip abductors",
+          description: "Hip abductors + adductors",
           suggestedLoad: "20 lb",
           howTo:
-            "**Setup:** Set the cable low with an ankle cuff on the ankle farthest from the stack. Stand side-on and hold the frame for balance.\n\n**Move:**\n1. Stand tall on the inside leg.\n2. Sweep the cuffed leg out to the side, toes forward.\n3. Return slowly under control.\n\n**Feel:** The outer hip burns. Keep the trunk upright, no leaning.",
-        },
-
-        {
-          id: "v3b_ath4",
-          slot: "athletic",
-          name: "Standing cable hip adduction",
-          dose: "2x12/side",
-          equipment: "Cable + ankle cuff",
-          description: "Adductors",
-          suggestedLoad: "20 lb",
-          howTo:
-            "**Setup:** Set the cable low with an ankle cuff on the ankle nearest the stack. Stand side-on and hold the frame for balance.\n\n**Move:**\n1. Stand tall on the outside leg.\n2. Sweep the cuffed leg across in front of the standing leg, as far as is comfortable.\n3. Return slowly out to the side.\n\n**Feel:** The inner thigh squeezes. Keep the hips square and the trunk still.",
+            "**Setup:** Set the cable low with an ankle cuff on one ankle. Stand side-on and hold the frame for balance.\n\n**Move:**\n1. Abduction: with the cuffed ankle farthest from the stack, stand tall and sweep the leg out to the side, toes forward. Return slowly. Do all reps.\n2. Turn around so the cuffed ankle is nearest the stack. Same leg.\n3. Adduction: sweep the cuffed leg across in front of the standing leg, then return slowly out to the side. Do all reps.\n4. Switch legs and repeat both.\n\n**Feel:** The outer hip burns on the way out, the inner thigh squeezes on the way across. Keep the trunk upright and still.",
         },
 
         // ── Cooldown ──
@@ -1106,7 +1116,7 @@ export const frenchContrastV3: StaticPlan = {
           dose: "30m/side",
           equipment: "KB or DB",
           description: "Anti-lateral flexion",
-          suggestedLoad: "53 lb KB",
+          suggestedLoad: "50 lb KB",
           howTo:
             "**Setup:** Hold a heavy KB or DB in one hand at your side.\n\n**Move:**\n1. Stand tall, ribs down, shoulders level.\n2. Walk 30 meters at a steady pace.\n3. Switch hands and walk back.\n\n**Feel:** The obliques on the opposite side fire. Don't lean toward the weight.",
         },
@@ -1416,6 +1426,18 @@ export const frenchContrastV3: StaticPlan = {
 
         // ── Finisher (standing, off the floor) ──
         {
+          id: "v3c_ath1b",
+          slot: "athletic",
+          name: "Sandbag shouldered lateral lunge to drive",
+          dose: "3x5/side",
+          equipment: "Sandbag",
+          description: "Loaded core, anti-lateral flexion",
+          suggestedLoad: "40 lb",
+          howTo:
+            "**Setup:** Put the sandbag on one shoulder. Stand tall, feet hip-width.\n\n**Move:**\n1. Step wide into a lateral lunge to the side opposite the bag.\n2. Drive hard off that leg back to center and up into a knee drive.\n3. Finish all reps, then switch shoulders.\n\n**Feel:** The obliques fight the side-bend from the offset load.\n\n**Avoid:** leaning toward the bag instead of staying tall.",
+        },
+
+        {
           id: "v3c_ath1",
           slot: "athletic",
           name: "Side RDL",
@@ -1428,26 +1450,14 @@ export const frenchContrastV3: StaticPlan = {
         },
 
         {
-          id: "v3c_ath2",
+          id: "v3c_ath5",
           slot: "athletic",
-          name: "Offset deadlift (heavy KB/DB in one hand, from the floor)",
-          dose: "3x6/side",
-          equipment: "Heavy KB or DB",
-          description: "Hinge + anti-lean",
-          suggestedLoad: "70 lb",
+          name: "Split squat iso hold, lengthened",
+          dose: "30s/side",
+          equipment: "None or light DB",
+          description: "Isometric, lengthened position",
           howTo:
-            "**Setup:** Place a heavy KB or DB on the floor beside one foot. Feet hip-width.\n\n**Move:**\n1. Hinge back and grab it with one hand. Back flat.\n2. Brace and push the floor away to stand tall. Don't lean toward the weight.\n3. Lower it under control and touch it to the floor.\n4. Finish all reps, then switch hands.\n\n**Feel:** Glutes and hamstrings drive. The obliques stop you from leaning.",
-        },
-
-        {
-          id: "v3c_ath4",
-          slot: "athletic",
-          name: "Lateral band walk",
-          dose: "2x10 steps/side",
-          equipment: "Mini band",
-          description: "Hip abductors",
-          howTo:
-            "**Setup:** Put a mini band just above the knees (or at the ankles for harder). Drop into a quarter squat with feet hip-width.\n\n**Move:**\n1. Step sideways with the lead foot, keeping tension on the band.\n2. Bring the trailing foot in, but not all the way together.\n3. Take 10 steps one way, then 10 back.\n\n**Feel:** The outer hips and glutes burn. Don't let the knees cave or the hips rise.",
+            "**Setup:** Take a split squat stance, front foot flat or elevated on a plate. Light DB optional.\n\n**Move:**\n1. Lower into the bottom position, with a deep stretch on the rear hip flexor and quad.\n2. Hold it for 30 seconds, breathing steadily.\n3. Rise, then switch legs.\n\n**Feel:** The muscle lengthens under tension. This tendon work protects the knee and hip.",
         },
 
         {
