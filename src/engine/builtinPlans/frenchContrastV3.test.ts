@@ -16,7 +16,7 @@ for (const k of ["A", "B", "C"]) {
 
   test(`day ${k}: section order`, () => {
     expect(dedupe(items.map((i) => i.slot))).toEqual([
-      "prep", "core_activation", "fc_block", "athletic", "strength", "accessory", "cooldown",
+      "prep", "core_activation", "fc_block", "athletic", "cooldown",
     ]);
   });
 
@@ -28,22 +28,40 @@ for (const k of ["A", "B", "C"]) {
     }
   });
 
-  test(`day ${k}: 2 complexes, 3 lifts in own groups, 2 small movements`, () => {
-    expect(count(items, "athletic")).toBe(2);
-    expect(count(items, "accessory")).toBe(2);
-    const lifts = items.filter((i) => i.slot === "strength");
-    expect(lifts).toHaveLength(3);
-    expect(new Set(lifts.map((i) => i.group)).size).toBe(3);
+  test(`day ${k}: finisher has exactly 5 athletic items, no strength/accessory`, () => {
+    expect(count(items, "athletic")).toBe(5);
+    expect(count(items, "strength")).toBe(0);
+    expect(count(items, "accessory")).toBe(0);
+  });
+
+  test(`day ${k}: first finisher item is the favorite complex`, () => {
+    expect(items.find((i) => i.slot === "athletic")?.name).toMatch(/knee drive|sandbag decel/i);
   });
 
   test(`day ${k}: focus-area rules`, () => {
     expect(items.some((i) => i.slot === "prep" && /slider lateral lunge/i.test(i.name))).toBe(true);
     expect(items.some((i) => i.slot === "fc_block" && (i.fcBlock ?? 9) <= 3 && /lateral|cossack|skater/i.test(i.name))).toBe(true);
-    expect(items.some((i) => i.slot === "accessory" && /hold|iso|wall sit|copenhagen/i.test(i.name))).toBe(true);
-    expect(items.some((i) => i.slot === "accessory" && /copenhagen|abduct/i.test(i.name))).toBe(true);
+    const core = items.filter((i) => i.slot === "core_activation");
+    expect(core.length).toBeGreaterThanOrEqual(5);
+    if (k !== "B") expect(core.some((i) => /copenhagen/i.test(i.name))).toBe(true);
+    expect(items.some((i) => i.slot === "athletic" && /abduct|adduct|band walk/i.test(i.name))).toBe(true);
     const p4 = items.filter((i) => i.fcPosition === 4);
     expect(p4.filter((i) => /drop jump/i.test(i.name)).length).toBeLessThanOrEqual(2);
     expect(p4.some((i) => /split step|first step/i.test(i.name))).toBe(true);
+  });
+
+  test(`day ${k}: at most one drop-family move in the FC blocks`, () => {
+    expect(items.filter((i) => i.slot === "fc_block" && /drop/i.test(i.name)).length).toBeLessThanOrEqual(1);
+  });
+
+  test(`day ${k}: nothing on the mat after core`, () => {
+    const after = items.filter((i) => ["fc_block", "athletic", "cooldown"].includes(i.slot));
+    expect(after.filter((i) => /plank|dead bug|side-lying|slider (ham|curl)|glute bridge|lying/i.test(i.name)).map((i) => i.id)).toEqual([]);
+  });
+
+  test(`day ${k}: core has at most one floor move`, () => {
+    const core = items.filter((i) => i.slot === "core_activation");
+    expect(core.filter((i) => /plank|dead bug|side-lying|bridge|lying/i.test(i.name)).length).toBeLessThanOrEqual(1);
   });
 
   test(`day ${k}: base and high-performance modes return the same session`, () => {
@@ -67,6 +85,10 @@ test("banned items and wording are absent", () => {
   expect(all.some((i) => i.hpOnly || i.slot === "individual")).toBe(false);
 });
 
+test("no em-dash in any name, description or how-to", () => {
+  expect(all.filter((i) => /—/.test(`${i.name} ${i.description ?? ""} ${i.howTo ?? ""}`)).map((i) => i.id)).toEqual([]);
+});
+
 test("Day C opens with the back squat", () => {
   const first = frenchContrastV3.days.C.items.find((i: WorkoutItem) => i.slot === "fc_block");
   expect(first?.name).toMatch(/back squat/i);
@@ -80,4 +102,51 @@ test("soreness day mapping follows V3's own layout", () => {
   expect(sorenessDays(frenchContrastV3)).toEqual({ shoulder: "B", knee: "C" });
   expect(frenchContrastV3.days.B.title).toMatch(/upper/i);
   expect(frenchContrastV3.days.C.title).toMatch(/squat/i);
+});
+
+test("Day C finisher includes the split squat iso", () => {
+  const c = frenchContrastV3.days.C.items as WorkoutItem[];
+  expect(c.some((i) => i.slot === "athletic" && /split squat iso/i.test(i.name))).toBe(true);
+});
+
+test("Day B prep includes ankle stability work", () => {
+  const b = frenchContrastV3.days.B.items as WorkoutItem[];
+  expect(b.some((i) => i.slot === "prep" && /single-leg balance/i.test(i.name))).toBe(true);
+});
+
+test("no suggestedLoad mentions a KB over 50 lb", () => {
+  const over: string[] = [];
+  for (const i of all) {
+    for (const m of (i.suggestedLoad ?? "").matchAll(/(\d+)(?:-(\d+))?\s*lb KB/gi)) {
+      if (Math.max(Number(m[1]), Number(m[2] ?? 0)) > 50) over.push(i.id);
+    }
+  }
+  expect(over).toEqual([]);
+});
+
+test("Day A and C finishers include a calf raise", () => {
+  for (const k of ["A", "C"]) {
+    const items = frenchContrastV3.days[k].items as WorkoutItem[];
+    expect(items.some((i) => i.slot === "athletic" && /calf raise/i.test(i.name))).toBe(true);
+  }
+});
+
+test("Day B prep includes wrist work", () => {
+  const b = frenchContrastV3.days.B.items as WorkoutItem[];
+  expect(b.some((i) => i.slot === "prep" && /wrist/i.test(i.name))).toBe(true);
+});
+
+test("Day B prep includes Y-T-W shoulder raises", () => {
+  const b = frenchContrastV3.days.B.items as WorkoutItem[];
+  expect(b.some((i) => i.slot === "prep" && /Y-T-W/.test(i.name))).toBe(true);
+});
+
+test("Day B finisher includes external rotation", () => {
+  const b = frenchContrastV3.days.B.items as WorkoutItem[];
+  expect(b.some((i) => i.slot === "athletic" && /external rotation/i.test(i.name))).toBe(true);
+});
+
+test("Day B pull block opens with a vertical pull", () => {
+  const b = frenchContrastV3.days.B.items as WorkoutItem[];
+  expect(b.some((i) => i.slot === "fc_block" && i.fcBlock === 4 && /pull-up|pulldown/i.test(i.name))).toBe(true);
 });
