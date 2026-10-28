@@ -5,7 +5,7 @@ import type { StaticPlan } from "../plans";
 // Each day = warm-up (incl. posterior-chain activation), core (about 10 min,
 // at most ONE mat move), 5 French contrast blocks of 4 (done ONCE each, no
 // repeat rounds, max ONE drop-family move per day), blocks 4-5 optional
-// (Skip to finisher), ONE short standing finisher (exactly 4 items, favorite complex first), cooldown.
+// (Skip to finisher), ONE short standing finisher (5 items, favorite complex first), cooldown.
 // Nothing on the mat after core. About 55 min.
 // Every block runs: 1 Heavy -> 2 Plyo -> 3 Loaded jump -> 4 Fast/reactive.
 // Rest about 20s between exercises, 2-3 min between blocks.
@@ -488,6 +488,18 @@ export const frenchContrastV3: StaticPlan = {
             "**Setup:** Set the cable low with an ankle cuff on the ankle nearest the stack. Stand side-on and hold the frame for balance.\n\n**Move:**\n1. Stand tall on the outside leg.\n2. Sweep the cuffed leg across in front of the standing leg, as far as is comfortable.\n3. Return slowly out to the side.\n\n**Feel:** The inner thigh squeezes. Keep the hips square and the trunk still.",
         },
 
+        {
+          id: "v3a_ath_calf",
+          slot: "athletic",
+          name: "Single-leg calf raise, straight knee (heavy DB)",
+          dose: "3x10/side",
+          equipment: "DB + step + rack",
+          description: "Calf and Achilles strength",
+          suggestedLoad: "35 lb DB",
+          howTo:
+            "**Setup:** Stand on the edge of a step on one foot, heel hanging off. Hold a heavy DB in the same-side hand and hold a rack with the other hand for balance.\n\n**Move:**\n1. Rise up for 2 seconds, straight knee.\n2. Pause 1 second at the top.\n3. Lower for 3 seconds into a full stretch below the step.\n4. Finish all reps, then switch legs.\n\n**Feel:** The calf and Achilles load up heavy and slow. No bouncing out of the bottom.",
+        },
+
         // ── Cooldown ──
         {
           id: "v3a_cd1",
@@ -574,6 +586,18 @@ export const frenchContrastV3: StaticPlan = {
           description: "Ankle stability",
           howTo:
             "**Setup:** Stand on one leg near a wall or rack for safety.\n\n**Move:**\n1. Do 10 slow single-leg calf raises.\n2. Then hold a single-leg balance for 20 seconds.\n3. Switch legs.\n\n**Feel:** The ankle works to stay steady. Progress to eyes closed or standing on the Bosu.",
+        },
+
+        {
+          id: "v3b_w6",
+          slot: "prep",
+          name: "Forearm care: eccentric wrist extension + hammer rotations",
+          dose: "2 min",
+          equipment: "Light DB (10-15 lb)",
+          description: "Tennis elbow prevention",
+          suggestedLoad: "10-15 lb",
+          howTo:
+            "**Setup:** Sit with a light DB. Rest one forearm on your thigh, palm down, wrist past the knee.\n\n**Move:**\n1. Eccentric wrist extension: use the other hand to help the wrist up, then lower it slowly for 3-4 seconds. 2x12/side.\n2. Hammer rotations: hold the DB at one end, rotate slowly from palm-up to palm-down. 2x10/side.\n\n**Feel:** The forearm muscles work. You should feel no elbow pain, stop if it is sharp. This protects against tennis elbow.",
         },
 
         // ── Core (about 10 min, one mat move) ──
@@ -818,17 +842,17 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3b_fc4_1",
           slot: "fc_block",
-          name: "Landmine T-bar row (bent-over, standing)",
+          name: "Weighted pull-up (or heavy lat pulldown)",
           dose: "5 @ 80%",
-          equipment: "Landmine + V-handle",
-          description: "Heavy row, no chest pad",
+          equipment: "Pull-up bar or lat pulldown",
+          description: "Heavy vertical pull",
           fcBlock: 4,
           fcPosition: 1,
           restAfter: 20,
           optional: true,
-          suggestedLoad: "115 lb",
+          suggestedLoad: "bodyweight + 10-25 lb, or pulldown at a 5-rep load",
           howTo:
-            "Straddle the bar with a V-handle, hinge to about 45° with a flat back. Row the handle to your ribs and squeeze the shoulder blades. Feel the lats and mid-back. Common mistake: standing up to heave the weight, keep the hinge angle fixed.",
+            "**Setup:** Grab the bar slightly wider than shoulder width. Clip a plate or DB to a belt for the weighted version, or sit at the pulldown.\n\n**Move:**\n1. Start from a full hang with the shoulders packed down.\n2. Pull the chest to the bar.\n3. Lower for 2 seconds back to a full hang.\n\n**Feel:** The lats and upper back drive the pull. Don't swing or kip.",
         },
 
         {
@@ -985,6 +1009,18 @@ export const frenchContrastV3: StaticPlan = {
           suggestedLoad: "20 lb",
           howTo:
             "**Setup:** Set the cable low with an ankle cuff on one ankle. Stand side-on and hold the frame for balance.\n\n**Move:**\n1. Abduction: with the cuffed ankle farthest from the stack, stand tall and sweep the leg out to the side, toes forward. Return slowly. Do all reps.\n2. Turn around so the cuffed ankle is nearest the stack. Same leg.\n3. Adduction: sweep the cuffed leg across in front of the standing leg, then return slowly out to the side. Do all reps.\n4. Switch legs and repeat both.\n\n**Feel:** The outer hip burns on the way out, the inner thigh squeezes on the way across. Keep the trunk upright and still.",
+        },
+
+        {
+          id: "v3b_ath_rot",
+          slot: "athletic",
+          name: "90/90 cable external rotation (slow) + iso hold",
+          dose: "2x8/side + 20s hold",
+          equipment: "Cable",
+          description: "Shoulder at the serve position",
+          suggestedLoad: "5-10 lb",
+          howTo:
+            "**Setup:** Stand side-on to the cable, set at elbow height in front of you. Raise the elbow to shoulder height with the elbow bent 90°, hand pointing forward.\n\n**Move:**\n1. Rotate the forearm back and up, 2 seconds.\n2. Hold 1 second.\n3. Lower slowly for 3-4 seconds.\n4. On the last rep of the last set, hold 20 seconds at mid-range, where it is hardest.\n5. Switch sides.\n\n**Feel:** The back of the shoulder. Don't let the elbow drop or the shoulder shrug.",
         },
 
         // ── Cooldown ──
@@ -1470,6 +1506,18 @@ export const frenchContrastV3: StaticPlan = {
           suggestedLoad: "20 lb",
           howTo:
             "**Setup:** Set the cable low with an ankle cuff on the ankle nearest the stack. Stand side-on and hold the frame for balance.\n\n**Move:**\n1. Stand tall on the outside leg.\n2. Sweep the cuffed leg across in front of the standing leg, as far as is comfortable.\n3. Return slowly out to the side.\n\n**Feel:** The inner thigh squeezes. Keep the hips square and the trunk still.",
+        },
+
+        {
+          id: "v3c_ath_calf",
+          slot: "athletic",
+          name: "Seated calf raise, bent knee (soleus)",
+          dose: "3x12",
+          equipment: "Seated calf machine, or bench + heavy DBs",
+          description: "Soleus strength",
+          suggestedLoad: "machine or 2x50 lb DBs on knees",
+          howTo:
+            "**Setup:** Sit at the seated calf machine, or sit on a bench with the balls of your feet on a plate and a heavy DB resting on each knee.\n\n**Move:**\n1. Rise up onto the toes and squeeze at the top.\n2. Lower for 3 seconds into a deep stretch.\n3. Pause in the stretch, then rise again.\n\n**Feel:** The deep calf muscle under the gastrocnemius burns. Bent knee shifts the work to the soleus.",
         },
 
         // ── Cooldown ──

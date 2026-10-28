@@ -28,8 +28,8 @@ for (const k of ["A", "B", "C"]) {
     }
   });
 
-  test(`day ${k}: finisher has exactly 4 athletic items, no strength/accessory`, () => {
-    expect(count(items, "athletic")).toBe(4);
+  test(`day ${k}: finisher has exactly 5 athletic items, no strength/accessory`, () => {
+    expect(count(items, "athletic")).toBe(5);
     expect(count(items, "strength")).toBe(0);
     expect(count(items, "accessory")).toBe(0);
   });
@@ -122,4 +122,26 @@ test("no suggestedLoad mentions a KB over 50 lb", () => {
     }
   }
   expect(over).toEqual([]);
+});
+
+test("Day A and C finishers include a calf raise", () => {
+  for (const k of ["A", "C"]) {
+    const items = frenchContrastV3.days[k].items as WorkoutItem[];
+    expect(items.some((i) => i.slot === "athletic" && /calf raise/i.test(i.name))).toBe(true);
+  }
+});
+
+test("Day B prep includes wrist work", () => {
+  const b = frenchContrastV3.days.B.items as WorkoutItem[];
+  expect(b.some((i) => i.slot === "prep" && /wrist/i.test(i.name))).toBe(true);
+});
+
+test("Day B finisher includes external rotation", () => {
+  const b = frenchContrastV3.days.B.items as WorkoutItem[];
+  expect(b.some((i) => i.slot === "athletic" && /external rotation/i.test(i.name))).toBe(true);
+});
+
+test("Day B pull block opens with a vertical pull", () => {
+  const b = frenchContrastV3.days.B.items as WorkoutItem[];
+  expect(b.some((i) => i.slot === "fc_block" && i.fcBlock === 4 && /pull-up|pulldown/i.test(i.name))).toBe(true);
 });
