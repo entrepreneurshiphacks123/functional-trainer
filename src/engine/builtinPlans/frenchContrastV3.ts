@@ -602,13 +602,13 @@ export const frenchContrastV3: StaticPlan = {
         {
           id: "v3b_w7",
           slot: "prep",
-          name: "Y-T-W shoulder raises (bent-over, standing)",
+          name: "Y-T-W shoulder raises (incline bench, chest down)",
           dose: "1x8 each letter",
-          equipment: "Light plates or DBs (2.5-5 lb), or a light band",
+          equipment: "Incline bench + light plates or DBs (2.5-5 lb)",
           description: "Lower trap, mid back and rotator cuff",
           suggestedLoad: "2.5-5 lb",
           howTo:
-            "**Setup:** Stand and hinge forward until your chest is close to parallel with the floor, soft knees, flat back. Light weight in each hand, arms hanging, thumbs up.\n\n**Move:**\n1. Y: raise both arms forward and up at a 45° angle into a Y. Pause 2 seconds, lower slowly. 8 reps.\n2. T: raise the arms straight out to the sides into a T. Pause 2 seconds, lower slowly. 8 reps.\n3. W: bend the elbows, pull them back and down, squeezing the shoulder blades into a W. Pause 2 seconds. 8 reps.\n\n**Feel:** Between and below the shoulder blades, and the back of the shoulder.\n\n**Avoid:** Shrugging toward your ears, arching your low back, or going heavy. Light is the point.",
+            "**Setup:** Set a bench to about 30-45°. Lie face down with your chest on the pad, feet on the floor. Light weight in each hand, arms hanging straight down, thumbs up.\n\n**Move:**\n1. Y: raise both arms forward and up at a 45° angle into a Y. Pause 2 seconds, lower slowly. 8 reps.\n2. T: raise the arms straight out to the sides into a T. Pause 2 seconds, lower slowly. 8 reps.\n3. W: bend the elbows, pull them back and down, squeezing the shoulder blades into a W. Pause 2 seconds. 8 reps.\n\n**Feel:** Between and below the shoulder blades, and the back of the shoulder.\n\n**Avoid:** Shrugging toward your ears, lifting your chest off the pad, or going heavy. Light is the point.",
         },
 
         // ── Core (about 10 min, one mat move) ──
